@@ -28,6 +28,6 @@ public class Genre {
     private String name;
 
     @ManyToMany(mappedBy = "genres")
-    private Set<Game> games = new LinkedHashSet<>();
+    private Set<Game> games;
 
 }

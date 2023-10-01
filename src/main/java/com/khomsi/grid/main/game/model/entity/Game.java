@@ -64,10 +64,9 @@ public class Game {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "developer_id", nullable = false)
     private Developer developer;
-    //Todo check the relationship
     @ManyToMany
     @JoinTable(name = "games_has_genres",
             joinColumns = @JoinColumn(name = "game_id")
             , inverseJoinColumns = @JoinColumn(name = "genre_id"))
-    private Set<Genre> genres = new LinkedHashSet<>();
+    private Set<Genre> genres;
 }
