@@ -2,8 +2,11 @@ package com.khomsi.grid.main.game.model.dto;
 
 import com.khomsi.grid.main.game.model.entity.Game;
 import lombok.Builder;
-import org.springframework.data.domain.Page;
+
+import java.util.List;
+
 
 @Builder
-public record GeneralGame(Page<Game> games) {
+public record GeneralGame(List<Game> games, long totalItems, int totalPages, int currentPage) {
 }
+

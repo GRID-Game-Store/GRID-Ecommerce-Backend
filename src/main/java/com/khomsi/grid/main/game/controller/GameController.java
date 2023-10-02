@@ -9,13 +9,13 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @Tag(name = "Game", description = "CRUD operation for Game Controller")
-@RequestMapping("api/v1/games")
+@RequestMapping("/api/v1/games")
 public record GameController(GameService gameService) {
     @GetMapping
     @Operation(summary = "Get all games")
     @ResponseStatus(HttpStatus.OK)
-    public GeneralGame showAllGamesByPage(@RequestParam(defaultValue = "1") int page,
-                                          @RequestParam(defaultValue = "1") int pageSize) {
+    public GeneralGame showAllGamesByPage(@RequestParam(value = "page", defaultValue = "1") int page,
+                                          @RequestParam(value = "size", defaultValue = "5") int pageSize) {
         return gameService.showGamesByPage(page, pageSize);
     }
 }

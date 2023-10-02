@@ -1,5 +1,6 @@
 package com.khomsi.grid.additional.developer.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.khomsi.grid.main.game.model.entity.Game;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -28,6 +29,7 @@ public class Developer {
     private String name;
 
     @OneToMany(mappedBy = "developer")
+    @JsonManagedReference
     private Set<Game> games = new LinkedHashSet<>();
 
 }

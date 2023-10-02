@@ -27,7 +27,8 @@ public class Genre {
     @Column(name = "name", nullable = false)
     private String name;
 
-    @ManyToMany(mappedBy = "genres")
-    private Set<Game> games;
+/*    @ManyToMany(mappedBy = "genres")
+    @JsonManagedReference
+    private Set<Game> games;*/
 
 }
