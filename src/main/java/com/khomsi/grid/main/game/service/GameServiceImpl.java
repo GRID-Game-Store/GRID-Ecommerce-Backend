@@ -23,7 +23,7 @@ public record GameServiceImpl(GameRepository gameRepository)
                 .games(gamePage.getContent())
                 .totalItems(gamePage.getTotalElements())
                 .totalPages(gamePage.getTotalPages())
-                .currentPage(gamePage.getNumber())
+                .currentPage(page)
                 .build();
     }
 }
