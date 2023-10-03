@@ -30,7 +30,7 @@ public class Publisher {
     private String name;
 
     @OneToMany(mappedBy = "publisher")
-    @JsonManagedReference
+    @JsonIgnore
     private Set<Game> games = new LinkedHashSet<>();
 
 }

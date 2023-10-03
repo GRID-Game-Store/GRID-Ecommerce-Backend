@@ -1,5 +1,7 @@
 package com.khomsi.grid.additional.genre.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.khomsi.grid.main.game.model.entity.Game;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -27,8 +29,8 @@ public class Genre {
     @Column(name = "name", nullable = false)
     private String name;
 
-/*    @ManyToMany(mappedBy = "genres")
-    @JsonManagedReference
-    private Set<Game> games;*/
+    @ManyToMany(mappedBy = "genres")
+    @JsonIgnore
+    private Set<Game> games;
 
 }
