@@ -1,5 +1,5 @@
 server:
-  port: 8081
+  port: 8082
 spring:
   datasource:
     username: ${DB_USERNAME}
@@ -12,3 +12,5 @@ spring:
   mvc:
     pathmatch:
       matching-strategy: ANT_PATH_MATCHER
+  flyway:
+    enabled: 'false'

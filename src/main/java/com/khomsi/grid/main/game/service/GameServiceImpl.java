@@ -21,7 +21,12 @@ public record GameServiceImpl(GameRepository gameRepository)
 
     @Override
     public GeneralGame showGamesByPage(int page, int pageSize, String[] sort, String title) {
-        Sort sorting = Sort.by(sort[1].equalsIgnoreCase("asc") ? ASC : DESC, sort[0]);
+        Sort sorting;
+        if (sort != null && sort.length == 2) {
+            sorting = Sort.by(sort[1].equalsIgnoreCase("asc") ? ASC : DESC, sort[0]);
+        } else {
+            sorting = Sort.by(DESC, "id");
+        }
         Pageable pagingSort = PageRequest.of(page, pageSize, sorting);
         Page<Game> gamePage = title == null
                 ? gameRepository.findAll(pagingSort)

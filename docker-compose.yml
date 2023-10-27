@@ -1,0 +1,21 @@
+version: '3'
+services:
+  mysql:
+    image: mysql
+    container_name: my-mysql-container
+    ports:
+      - "3307:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: spring
+      MYSQL_DATABASE: GridDB
+      MYSQL_USER: spring
+      MYSQL_PASSWORD: spring
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: my-phpmyadmin-container
+    ports:
+      - "8081:80"
+    environment:
+      PMA_HOST: mysql
+      PMA_PORT: 3306
+      MYSQL_ROOT_PASSWORD: spring
