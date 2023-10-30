@@ -42,4 +42,13 @@ public class GameController {
             @Min(1) @Max(Integer.MAX_VALUE) int gameQuantity) {
         return gameService.getRandomQtyOfGames(gameQuantity);
     }
+
+    @GetMapping("/{game-id}")
+    @Operation(summary = "Get game by id")
+    @ResponseStatus(HttpStatus.OK)
+    public Game showGameById(
+            @PathVariable("game-id")
+            @Min(1) @Max(Long.MAX_VALUE) Long gameId) {
+        return gameService.getGameById(gameId);
+    }
 }

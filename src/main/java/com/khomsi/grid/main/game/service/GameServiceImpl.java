@@ -54,4 +54,9 @@ public record GameServiceImpl(GameRepository gameRepository)
                         .limit(gameQuantity)
                         .mapToObj(games::get).toList();
     }
+
+    @Override
+    public Game getGameById(Long gameId) {
+        return gameRepository.findById(gameId).orElseThrow(GameNotFoundException::new);
+    }
 }

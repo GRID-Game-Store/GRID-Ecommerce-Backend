@@ -10,4 +10,7 @@ public interface GameService {
                                String[] sort, String title);
 
     List<Game> getRandomQtyOfGames(int gameQuantity);
+
+    //Todo extend the method
+    Game getGameById(Long gameId);
 }
