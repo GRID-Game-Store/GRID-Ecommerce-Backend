@@ -11,6 +11,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.Random;
+
 import static org.springframework.data.domain.Sort.Direction.ASC;
 import static org.springframework.data.domain.Sort.Direction.DESC;
 
@@ -20,7 +23,7 @@ public record GameServiceImpl(GameRepository gameRepository)
         implements GameService {
 
     @Override
-    public GeneralGame showGamesByPage(int page, int pageSize, String[] sort, String title) {
+    public GeneralGame getGamesByPage(int page, int pageSize, String[] sort, String title) {
         Sort sorting;
         if (sort != null && sort.length == 2) {
             sorting = Sort.by(sort[1].equalsIgnoreCase("asc") ? ASC : DESC, sort[0]);
@@ -40,5 +43,15 @@ public record GameServiceImpl(GameRepository gameRepository)
                 .totalPages(gamePage.getTotalPages())
                 .currentPage(page)
                 .build();
+    }
+
+    @Override
+    public List<Game> getRandomQtyOfGames(int gameQuantity) {
+        List<Game> games = gameRepository.findAll();
+        return (games.size() <= gameQuantity) ? games :
+                new Random().ints(0, games.size())
+                        .distinct()
+                        .limit(gameQuantity)
+                        .mapToObj(games::get).toList();
     }
 }

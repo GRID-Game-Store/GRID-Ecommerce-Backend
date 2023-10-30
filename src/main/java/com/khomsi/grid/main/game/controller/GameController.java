@@ -1,6 +1,7 @@
 package com.khomsi.grid.main.game.controller;
 
 import com.khomsi.grid.main.game.model.dto.GeneralGame;
+import com.khomsi.grid.main.game.model.entity.Game;
 import com.khomsi.grid.main.game.service.GameService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -12,6 +13,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @Tag(name = "Game", description = "CRUD operation for Game Controller")
 @RequestMapping("/api/v1/games")
@@ -19,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class GameController {
     private final GameService gameService;
+
     @GetMapping
     @Operation(summary = "Get all games")
     @ResponseStatus(HttpStatus.OK)
@@ -27,6 +31,15 @@ public class GameController {
             @RequestParam(value = "size", defaultValue = "5") @Min(1) @Max(Integer.MAX_VALUE) int pageSize,
             @RequestParam(required = false, value = "title") String title,
             @RequestParam(defaultValue = "id,desc") String[] sort) {
-        return gameService.showGamesByPage(page, pageSize, sort, title);
+        return gameService.getGamesByPage(page, pageSize, sort, title);
+    }
+
+    @GetMapping("/random")
+    @Operation(summary = "Get random games")
+    @ResponseStatus(HttpStatus.OK)
+    public List<Game> showRandomQtyOfGames(
+            @RequestParam(value = "qty", defaultValue = "5")
+            @Min(1) @Max(Integer.MAX_VALUE) int gameQuantity) {
+        return gameService.getRandomQtyOfGames(gameQuantity);
     }
 }
