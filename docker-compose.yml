@@ -19,3 +19,17 @@ services:
       PMA_HOST: mysql
       PMA_PORT: 3306
       MYSQL_ROOT_PASSWORD: spring
+  backend:
+    container_name: grid-backend-container
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8082:8082"
+    depends_on:
+      - mysql
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - DB_USERNAME=spring
+      - DB_PASSWORD=spring
+      - DB_URL=jdbc:mysql://my-mysql-container:3306/GridDB?allowPublicKeyRetrieval=true&useSSL=false

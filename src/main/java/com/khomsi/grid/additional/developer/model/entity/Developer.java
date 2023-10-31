@@ -31,6 +31,5 @@ public class Developer {
 
     @OneToMany(mappedBy = "developer")
     @JsonIgnore
-    private Set<Game> games = new LinkedHashSet<>();
-
+    private Set<Game> games;
 }
