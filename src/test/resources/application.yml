@@ -9,6 +9,9 @@ spring:
     generate-ddl: 'false'
   jackson:
     property-naming-strategy: SNAKE_CASE
+  mvc:
+    pathmatch:
+      matching-strategy: ANT_PATH_MATCHER
   flyway:
     enabled: 'false'
 springdoc:

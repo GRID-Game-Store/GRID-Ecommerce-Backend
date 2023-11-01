@@ -1,7 +1,10 @@
 package com.khomsi.grid.main.game.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.khomsi.grid.additional.developer.model.entity.Developer;
 import com.khomsi.grid.additional.genre.model.entity.Genre;
+import com.khomsi.grid.additional.platform.model.entity.Platform;
 import com.khomsi.grid.additional.publisher.model.entity.Publisher;
 import com.khomsi.grid.additional.tag.model.entity.Tag;
 import jakarta.persistence.*;
@@ -11,7 +14,6 @@ import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.LinkedHashSet;
 import java.util.Set;
 
 @Builder
@@ -35,7 +37,7 @@ public class Game {
     @Lob
     @Column(name = "description")
     private String description;
-
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
     @Column(name = "release_date")
     private LocalDate releaseDate;
 
@@ -51,23 +53,30 @@ public class Game {
     private String coverImageUrl;
 
     @NotNull
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "tag_id", nullable = false)
-    private Tag tag;
-
-    @NotNull
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "publisher_id", nullable = false)
     private Publisher publisher;
 
     @NotNull
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "developer_id", nullable = false)
     private Developer developer;
-    //Todo check the relationship
+
+    @ManyToMany
+    @JoinTable(name = "games_has_tags",
+            joinColumns = @JoinColumn(name = "games_id")
+            , inverseJoinColumns = @JoinColumn(name = "tags_id"))
+    private Set<Tag> tags;
+
     @ManyToMany
     @JoinTable(name = "games_has_genres",
-            joinColumns = @JoinColumn(name = "game_id")
-            , inverseJoinColumns = @JoinColumn(name = "genre_id"))
-    private Set<Genre> genres = new LinkedHashSet<>();
+            joinColumns = @JoinColumn(name = "games_id")
+            , inverseJoinColumns = @JoinColumn(name = "genres_id"))
+    private Set<Genre> genres;
+
+    @ManyToMany
+    @JoinTable(name = "games_has_platforms",
+            joinColumns = @JoinColumn(name = "games_id")
+            , inverseJoinColumns = @JoinColumn(name = "platforms_id"))
+    private Set<Platform> platforms;
 }
