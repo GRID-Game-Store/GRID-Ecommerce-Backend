@@ -6,6 +6,6 @@ import java.util.List;
 
 
 @Builder
-public record GeneralGame(List<MainGameModel> games, long totalItems, int totalPages, int currentPage) {
+public record GeneralGame(List<ShortGameModel> games, long totalItems, int totalPages, int currentPage) {
 }
 

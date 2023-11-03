@@ -4,7 +4,7 @@ import com.khomsi.grid.main.game.GameRepository;
 import com.khomsi.grid.main.game.handler.exception.GameNotFoundException;
 import com.khomsi.grid.main.game.mapper.GameMapper;
 import com.khomsi.grid.main.game.model.dto.GeneralGame;
-import com.khomsi.grid.main.game.model.dto.MainGameModel;
+import com.khomsi.grid.main.game.model.dto.ShortGameModel;
 import com.khomsi.grid.main.game.model.entity.Game;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -15,9 +15,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Random;
-import java.util.stream.Collectors;
 
-import static org.springframework.data.domain.Sort.Direction.*;
+import static org.springframework.data.domain.Sort.Direction.ASC;
+import static org.springframework.data.domain.Sort.Direction.DESC;
 
 @Service
 @Slf4j
@@ -34,12 +34,12 @@ public record GameServiceImpl(GameRepository gameRepository, GameMapper gameMapp
         if (gamePage.isEmpty()) {
             throw new GameNotFoundException();
         }
-        List<MainGameModel> mainGameModels = gamePage
+        List<ShortGameModel> shortGameModels = gamePage
                 .map(gameMapper::toMainGames)
                 .getContent();
 
         return GeneralGame.builder()
-                .games(mainGameModels)
+                .games(shortGameModels)
                 .totalItems(gamePage.getTotalElements())
                 .totalPages(gamePage.getTotalPages())
                 .currentPage(page)
@@ -48,15 +48,15 @@ public record GameServiceImpl(GameRepository gameRepository, GameMapper gameMapp
 
 
     @Override
-    public List<MainGameModel> getPopularQtyOfGames(int gameQuantity) {
-        List<MainGameModel> mainGameModels = gameRepository.findAll().stream()
+    public List<ShortGameModel> getPopularQtyOfGames(int gameQuantity) {
+        List<ShortGameModel> shortGameModels = gameRepository.findAll().stream()
                 .map(gameMapper::toMainGames)
                 .toList();
-        return (mainGameModels.size() <= gameQuantity) ? mainGameModels :
-                new Random().ints(0, mainGameModels.size())
+        return (shortGameModels.size() <= gameQuantity) ? shortGameModels :
+                new Random().ints(0, shortGameModels.size())
                         .distinct()
                         .limit(gameQuantity)
-                        .mapToObj(mainGameModels::get).toList();
+                        .mapToObj(shortGameModels::get).toList();
     }
 
     @Override

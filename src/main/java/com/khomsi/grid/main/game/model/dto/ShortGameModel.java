@@ -5,7 +5,7 @@ import lombok.Builder;
 import java.math.BigDecimal;
 
 @Builder
-public record MainGameModel(
+public record ShortGameModel(
         Long id,
         String title,
         String description,

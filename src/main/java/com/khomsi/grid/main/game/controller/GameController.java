@@ -1,7 +1,7 @@
 package com.khomsi.grid.main.game.controller;
 
 import com.khomsi.grid.main.game.model.dto.GeneralGame;
-import com.khomsi.grid.main.game.model.dto.MainGameModel;
+import com.khomsi.grid.main.game.model.dto.ShortGameModel;
 import com.khomsi.grid.main.game.model.entity.Game;
 import com.khomsi.grid.main.game.service.GameService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -38,7 +38,7 @@ public class GameController {
     @GetMapping("/popular")
     @Operation(summary = "Get most 'popular' games")
     @ResponseStatus(HttpStatus.OK)
-    public List<MainGameModel> showPopularQtyOfGames(
+    public List<ShortGameModel> showPopularQtyOfGames(
             @RequestParam(value = "qty", defaultValue = "5")
             @Min(1) @Max(Integer.MAX_VALUE) int gameQuantity) {
         return gameService.getPopularQtyOfGames(gameQuantity);
