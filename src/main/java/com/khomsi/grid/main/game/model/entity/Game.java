@@ -1,9 +1,9 @@
 package com.khomsi.grid.main.game.model.entity;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.khomsi.grid.additional.developer.model.entity.Developer;
 import com.khomsi.grid.additional.genre.model.entity.Genre;
+import com.khomsi.grid.additional.media.model.entity.GameMedia;
 import com.khomsi.grid.additional.platform.model.entity.Platform;
 import com.khomsi.grid.additional.publisher.model.entity.Publisher;
 import com.khomsi.grid.additional.tag.model.entity.Tag;
@@ -79,4 +79,7 @@ public class Game {
             joinColumns = @JoinColumn(name = "games_id")
             , inverseJoinColumns = @JoinColumn(name = "platforms_id"))
     private Set<Platform> platforms;
+
+    @OneToOne(mappedBy = "games", cascade = CascadeType.ALL)
+    private GameMedia gameMedia;
 }

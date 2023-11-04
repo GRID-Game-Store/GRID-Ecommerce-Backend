@@ -4,5 +4,5 @@ import com.khomsi.grid.main.game.model.dto.ShortGameModel;
 import com.khomsi.grid.main.game.model.entity.Game;
 
 public interface GameMapper {
-    ShortGameModel toMainGames(Game game);
+    ShortGameModel toShortGame(Game game);
 }

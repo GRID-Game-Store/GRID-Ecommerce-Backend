@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 @AllArgsConstructor
 public class GameMapperImpl implements GameMapper {
     @Override
-    public ShortGameModel toMainGames(Game game) {
+    public ShortGameModel toShortGame(Game game) {
         return ShortGameModel.builder()
                 .id(game.getId())
                 .title(game.getTitle())

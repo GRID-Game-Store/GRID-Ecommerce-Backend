@@ -35,7 +35,7 @@ public record GameServiceImpl(GameRepository gameRepository, GameMapper gameMapp
             throw new GameNotFoundException();
         }
         List<ShortGameModel> shortGameModels = gamePage
-                .map(gameMapper::toMainGames)
+                .map(gameMapper::toShortGame)
                 .getContent();
 
         return GeneralGame.builder()
@@ -50,7 +50,7 @@ public record GameServiceImpl(GameRepository gameRepository, GameMapper gameMapp
     @Override
     public List<ShortGameModel> getPopularQtyOfGames(int gameQuantity) {
         List<ShortGameModel> shortGameModels = gameRepository.findAll().stream()
-                .map(gameMapper::toMainGames)
+                .map(gameMapper::toShortGame)
                 .toList();
         return (shortGameModels.size() <= gameQuantity) ? shortGameModels :
                 new Random().ints(0, shortGameModels.size())

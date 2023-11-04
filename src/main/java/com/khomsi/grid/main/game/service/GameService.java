@@ -12,6 +12,5 @@ public interface GameService {
 
     List<ShortGameModel> getPopularQtyOfGames(int gameQuantity);
 
-    //Todo extend the method
     Game getGameById(Long gameId);
 }
