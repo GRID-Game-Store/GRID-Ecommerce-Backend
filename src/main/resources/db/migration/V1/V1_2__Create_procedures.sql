@@ -1,11 +1,18 @@
 ######### insert_game PROCEDURE ############
+DELIMITER //
+
 CREATE PROCEDURE insert_game(
     IN game_title VARCHAR(255),
     IN game_description TEXT,
     IN game_release_date DATE,
     IN game_system_requirements TEXT,
-    IN game_price DECIMAL(10,2),
+    IN game_price DECIMAL(10, 2),
+    IN game_permitted_age TEXT,
     IN game_cover_image_url TEXT,
+    IN game_banner_image_url TEXT,
+    IN game_trailer_url TEXT,
+    IN game_screenshot_url TEXT,
+    IN game_trailer_screenshot_url TEXT,
     IN p_developer_name VARCHAR(255),
     IN p_publisher_name VARCHAR(255),
     IN p_tags TEXT,
@@ -15,15 +22,16 @@ CREATE PROCEDURE insert_game(
 BEGIN
     DECLARE dev_id INT;
     DECLARE publish_id INT;
-    DECLARE game_id INT;
+    DECLARE gm_id INT;
 
     -- Check if the game with the same title already exists
-    SELECT game_id INTO game_id
+    SELECT game_id
+    INTO gm_id
     FROM games
     WHERE LOWER(games.title) = LOWER(game_title);
 
     -- If a game with the same title does not exist, proceed with insertion
-    IF game_id IS NULL THEN
+    IF gm_id IS NULL THEN
         -- Get developer_id and publisher_id based on their names
         SELECT developer_id INTO dev_id FROM developers WHERE LOWER(name) = LOWER(p_developer_name);
         SELECT publisher_id INTO publish_id FROM publishers WHERE LOWER(name) = LOWER(p_publisher_name);
@@ -33,16 +41,23 @@ BEGIN
             SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'No matching name for developer or publisher';
         ELSE
             -- Insert game into the games table
-            INSERT INTO games (title, description, release_date, system_requirements, price, cover_image_url, developer_id, publisher_id)
-            VALUES (game_title, game_description, game_release_date, game_system_requirements, game_price, game_cover_image_url, dev_id, publish_id);
+            INSERT INTO games (title, description, release_date, system_requirements, price, permit_age,
+                               cover_image_url, developer_id, publisher_id)
+            VALUES (game_title, game_description, game_release_date, game_system_requirements, game_price,
+                    game_permitted_age, game_cover_image_url, dev_id, publish_id);
 
-            -- Get the game_id of the newly inserted game
-            SET game_id = LAST_INSERT_ID();
+            -- Get the gm_id of the newly inserted game
+            SET gm_id = LAST_INSERT_ID();
+
+            -- INSERT MEDIAS INTO TABLE --
+            INSERT INTO game_medias (games_id, banner_url, screenshot_url, trailer, trailer_screenshot)
+            VALUES (gm_id, game_banner_image_url, game_screenshot_url, game_trailer_url, game_trailer_screenshot_url);
 
             -- PROCESS TAGS --
             -- Replace commas with spaces in the tags string
             -- Split the tags string into individual tags
-            WHILE CHAR_LENGTH(p_tags) > 0 DO
+            WHILE CHAR_LENGTH(p_tags) > 0
+                DO
                     SET @tag = TRIM(SUBSTRING_INDEX(p_tags, ', ', 1));
                     SET p_tags = TRIM(SUBSTRING(p_tags, CHAR_LENGTH(@tag) + 2));
 
@@ -57,11 +72,12 @@ BEGIN
                     END IF;
 
                     -- Insert into games_has_tags
-                    INSERT INTO games_has_tags (tags_id, games_id) VALUES (@tag_id, game_id);
+                    INSERT INTO games_has_tags (tags_id, games_id) VALUES (@tag_id, gm_id);
                 END WHILE;
 
             -- PROCESS GENRES --
-            WHILE CHAR_LENGTH(p_genres) > 0 DO
+            WHILE CHAR_LENGTH(p_genres) > 0
+                DO
                     SET @genre = TRIM(SUBSTRING_INDEX(p_genres, ', ', 1));
                     SET p_genres = TRIM(SUBSTRING(p_genres, CHAR_LENGTH(@genre) + 2));
 
@@ -76,13 +92,14 @@ BEGIN
                     END IF;
 
                     -- Insert into games_has_genres
-                    INSERT INTO games_has_genres (genres_id, games_id) VALUES (@genre_id, game_id);
+                    INSERT INTO games_has_genres (genres_id, games_id) VALUES (@genre_id, gm_id);
                 END WHILE;
 
             -- PROCESS PLATFORMS --
 
             -- Split the platforms string into individual platforms
-            WHILE CHAR_LENGTH(p_platforms) > 0 DO
+            WHILE CHAR_LENGTH(p_platforms) > 0
+                DO
                     SET @platform = TRIM(SUBSTRING_INDEX(p_platforms, ', ', 1));
                     SET p_platforms = TRIM(SUBSTRING(p_platforms, CHAR_LENGTH(@platform) + 2));
 
@@ -97,14 +114,14 @@ BEGIN
                     END IF;
 
                     -- Insert into games_has_platforms
-                    INSERT INTO games_has_platforms (platforms_id, games_id) VALUES (@platform_id, game_id);
+                    INSERT INTO games_has_platforms (platforms_id, games_id) VALUES (@platform_id, gm_id);
                 END WHILE;
         END IF;
     ELSE
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Game with the same title already exists';
     END IF;
 END;
-#
+//
 DELIMITER ;
 
 ######### insert_developer TRIGGER ############
@@ -115,7 +132,8 @@ CREATE PROCEDURE insert_developer(
 BEGIN
     DECLARE developer_count INT;
 
-    SELECT COUNT(*) INTO developer_count
+    SELECT COUNT(*)
+    INTO developer_count
     FROM developers
     WHERE LOWER(name) = LOWER(p_developer_name);
 
@@ -133,7 +151,8 @@ CREATE PROCEDURE insert_publisher(
 BEGIN
     DECLARE publisher_count INT;
 
-    SELECT COUNT(*) INTO publisher_count
+    SELECT COUNT(*)
+    INTO publisher_count
     FROM publishers
     WHERE LOWER(name) = LOWER(p_publisher_name);
 
@@ -151,7 +170,8 @@ CREATE PROCEDURE insert_genre(
 BEGIN
     DECLARE genre_count INT;
 
-    SELECT COUNT(*) INTO genre_count
+    SELECT COUNT(*)
+    INTO genre_count
     FROM genres
     WHERE LOWER(name) = LOWER(p_genre_name);
 
