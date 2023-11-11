@@ -15,6 +15,7 @@ public class GameMapperImpl implements GameMapper {
                 .id(game.getId())
                 .title(game.getTitle())
                 .description(game.getDescription())
+                //TODO check it
                 .coverImageUrl(game.getGameMedia().getBannerUrl())
                 .price(game.getPrice())
                 .build();

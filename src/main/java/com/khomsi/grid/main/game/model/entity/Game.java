@@ -23,6 +23,7 @@ import java.util.Set;
 @Setter
 @Entity
 @Table(name = "games")
+@ToString
 public class Game {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -66,18 +67,21 @@ public class Game {
     @JoinTable(name = "games_has_tags",
             joinColumns = @JoinColumn(name = "games_id")
             , inverseJoinColumns = @JoinColumn(name = "tags_id"))
+    @ToString.Exclude
     private Set<Tag> tags;
 
     @ManyToMany
     @JoinTable(name = "games_has_genres",
             joinColumns = @JoinColumn(name = "games_id")
             , inverseJoinColumns = @JoinColumn(name = "genres_id"))
+    @ToString.Exclude
     private Set<Genre> genres;
 
     @ManyToMany
     @JoinTable(name = "games_has_platforms",
             joinColumns = @JoinColumn(name = "games_id")
             , inverseJoinColumns = @JoinColumn(name = "platforms_id"))
+    @ToString.Exclude
     private Set<Platform> platforms;
 
     @OneToOne(mappedBy = "games", cascade = CascadeType.ALL)

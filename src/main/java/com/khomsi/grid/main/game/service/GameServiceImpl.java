@@ -6,6 +6,7 @@ import com.khomsi.grid.main.game.mapper.GameMapper;
 import com.khomsi.grid.main.game.model.dto.GeneralGame;
 import com.khomsi.grid.main.game.model.dto.ShortGameModel;
 import com.khomsi.grid.main.game.model.entity.Game;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -21,8 +22,11 @@ import static org.springframework.data.domain.Sort.Direction.DESC;
 
 @Service
 @Slf4j
-public record GameServiceImpl(GameRepository gameRepository, GameMapper gameMapper)
-        implements GameService {
+@AllArgsConstructor
+public class GameServiceImpl implements GameService {
+    private final GameRepository gameRepository;
+    private final GameMapper gameMapper;
+
     @Override
     public GeneralGame getGamesByPage(int page, int pageSize, String[] sort, String title) {
         Sort sorting = createSorting(sort);
@@ -65,10 +69,8 @@ public record GameServiceImpl(GameRepository gameRepository, GameMapper gameMapp
     }
 
     private Sort createSorting(String[] sort) {
-        if (sort != null && sort.length == 2) {
-            return Sort.by(sort[1].equalsIgnoreCase("asc") ? ASC : DESC, sort[0]);
-        } else {
-            return Sort.by(DESC, "id");
-        }
+        return (sort != null && sort.length == 2) ?
+                Sort.by(sort[1].equalsIgnoreCase("asc") ? ASC : DESC, sort[0]) :
+                Sort.by(DESC, "id");
     }
 }
