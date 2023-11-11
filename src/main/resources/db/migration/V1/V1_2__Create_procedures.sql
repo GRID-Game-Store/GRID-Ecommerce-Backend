@@ -163,21 +163,28 @@ END;
 #
 DELIMITER ;
 ######### insert_genre TRIGGER ############
-DELIMITER #
+DELIMITER //
 CREATE PROCEDURE insert_genre(
-    IN p_genre_name VARCHAR(255)
+    IN p_genres VARCHAR(255)
 )
 BEGIN
     DECLARE genre_count INT;
+    -- PROCESS GENRES --
+    WHILE CHAR_LENGTH(p_genres) > 0
+        DO
+            SET @genre = TRIM(SUBSTRING_INDEX(p_genres, ', ', 1));
+            SET p_genres = TRIM(SUBSTRING(p_genres, CHAR_LENGTH(@genre) + 2));
 
-    SELECT COUNT(*)
-    INTO genre_count
-    FROM genres
-    WHERE LOWER(name) = LOWER(p_genre_name);
+            -- Get the genre_id based on the genre name
+            SET @genre_id = NULL;
+            SELECT genre_id INTO @genre_id FROM genres WHERE LOWER(name) = LOWER(@genre);
 
-    IF genre_count = 0 THEN
-        INSERT INTO genres (name) VALUES (p_genre_name);
-    END IF;
+            -- If genre doesn't exist, insert it
+            IF @genre_id IS NULL THEN
+                INSERT INTO genres (name) VALUES (@genre);
+                SET @genre_id = LAST_INSERT_ID();
+            END IF;
+        END WHILE;
 END;
-#
+//
 DELIMITER ;
