@@ -4,6 +4,7 @@ import com.khomsi.grid.main.game.GameRepository;
 import com.khomsi.grid.main.game.handler.exception.GameNotFoundException;
 import com.khomsi.grid.main.game.mapper.GameMapper;
 import com.khomsi.grid.main.game.model.dto.GeneralGame;
+import com.khomsi.grid.main.game.model.dto.PopularGameModel;
 import com.khomsi.grid.main.game.model.dto.ShortGameModel;
 import com.khomsi.grid.main.game.model.entity.Game;
 import lombok.AllArgsConstructor;
@@ -52,15 +53,27 @@ public class GameServiceImpl implements GameService {
 
 
     @Override
-    public List<ShortGameModel> getPopularQtyOfGames(int gameQuantity) {
+    public List<PopularGameModel> getPopularQtyOfGames(int gameQuantity) {
+        List<PopularGameModel> shortGameModels = gameRepository.findAll().stream()
+                .map(gameMapper::toPopularGame)
+                .toList();
+        return getRandomGames(shortGameModels, gameQuantity);
+    }
+
+    @Override
+    public List<ShortGameModel> getRandomQtyOfGames(int gameQuantity) {
         List<ShortGameModel> shortGameModels = gameRepository.findAll().stream()
                 .map(gameMapper::toShortGame)
                 .toList();
-        return (shortGameModels.size() <= gameQuantity) ? shortGameModels :
-                new Random().ints(0, shortGameModels.size())
+        return getRandomGames(shortGameModels, gameQuantity);
+    }
+
+    private <T> List<T> getRandomGames(List<T> gameModels, int gameQuantity) {
+        return (gameModels.size() <= gameQuantity) ? gameModels :
+                new Random().ints(0, gameModels.size())
                         .distinct()
                         .limit(gameQuantity)
-                        .mapToObj(shortGameModels::get).toList();
+                        .mapToObj(gameModels::get).toList();
     }
 
     @Override

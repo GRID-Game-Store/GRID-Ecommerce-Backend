@@ -1,6 +1,7 @@
 package com.khomsi.grid.main.game.controller;
 
 import com.khomsi.grid.main.game.model.dto.GeneralGame;
+import com.khomsi.grid.main.game.model.dto.PopularGameModel;
 import com.khomsi.grid.main.game.model.dto.ShortGameModel;
 import com.khomsi.grid.main.game.model.entity.Game;
 import com.khomsi.grid.main.game.service.GameService;
@@ -38,10 +39,19 @@ public class GameController {
     @GetMapping("/popular")
     @Operation(summary = "Get most 'popular' games")
     @ResponseStatus(HttpStatus.OK)
-    public List<ShortGameModel> showPopularQtyOfGames(
+    public List<PopularGameModel> showPopularQtyOfGames(
             @RequestParam(value = "qty", defaultValue = "5")
             @Min(1) @Max(Integer.MAX_VALUE) int gameQuantity) {
         return gameService.getPopularQtyOfGames(gameQuantity);
+    }
+
+    @GetMapping("/random")
+    @Operation(summary = "Get n-number of random games")
+    @ResponseStatus(HttpStatus.OK)
+    public List<ShortGameModel> showRandomQtyOfGames(
+            @RequestParam(value = "qty", defaultValue = "20")
+            @Min(1) @Max(Integer.MAX_VALUE) int gameQuantity) {
+        return gameService.getRandomQtyOfGames(gameQuantity);
     }
 
     @GetMapping("/{game-id}")
