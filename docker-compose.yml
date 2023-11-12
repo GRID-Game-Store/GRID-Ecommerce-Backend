@@ -1,8 +1,9 @@
-version: '3'
+version: '3.8'
+name: grid
 services:
   mysql:
     image: mysql
-    container_name: grid-mysql-container
+    container_name: grid-mysql
     ports:
       - "3307:3306"
     environment:
@@ -12,16 +13,16 @@ services:
       MYSQL_PASSWORD: spring
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
-    container_name: grid-phpmyadmin-container
+    container_name: grid-phpmyadmin
     ports:
       - "8081:80"
     environment:
       PMA_HOST: mysql
       PMA_PORT: 3306
       MYSQL_ROOT_PASSWORD: spring
-  backend:
-    image: grid-backend
-    container_name: grid-backend-container
+  grid:
+    image: backend
+    container_name: grid-backend
     build:
       context: .
       dockerfile: Dockerfile
@@ -33,6 +34,10 @@ services:
       - SPRING_PROFILES_ACTIVE=docker
       - DB_USERNAME=spring
       - DB_PASSWORD=spring
-      - DB_URL=jdbc:mysql://grid-mysql-container:3306/GridDB?allowPublicKeyRetrieval=true&useSSL=false
+      - DB_URL=jdbc:mysql://grid-mysql:3306/GridDB?allowPublicKeyRetrieval=true&useSSL=false
     volumes:
       - ./target:/app/target
+networks:
+  grid:
+    external: true
+    name: none
