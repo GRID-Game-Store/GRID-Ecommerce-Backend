@@ -68,17 +68,17 @@ public class GameServiceImpl implements GameService {
         return getRandomGames(shortGameModels, gameQuantity);
     }
 
+    @Override
+    public Game getGameById(Long gameId) {
+        return gameRepository.findById(gameId).orElseThrow(GameNotFoundException::new);
+    }
+
     private <T> List<T> getRandomGames(List<T> gameModels, int gameQuantity) {
         return (gameModels.size() <= gameQuantity) ? gameModels :
                 new Random().ints(0, gameModels.size())
                         .distinct()
                         .limit(gameQuantity)
                         .mapToObj(gameModels::get).toList();
-    }
-
-    @Override
-    public Game getGameById(Long gameId) {
-        return gameRepository.findById(gameId).orElseThrow(GameNotFoundException::new);
     }
 
     private Sort createSorting(String[] sort) {
