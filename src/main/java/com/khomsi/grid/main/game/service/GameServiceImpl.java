@@ -51,6 +51,12 @@ public class GameServiceImpl implements GameService {
                 .build();
     }
 
+    @Override
+    public List<ShortGameModel> getGamesByGenre(int qty, String genre) {
+        return gameRepository.findGamesByGenre(genre).stream()
+                .map(gameMapper::toShortGame)
+                .limit(qty).toList();
+    }
 
     @Override
     public List<PopularGameModel> getPopularQtyOfGames(int gameQuantity) {

@@ -36,6 +36,16 @@ public class GameController {
         return gameService.getGamesByPage(page, pageSize, sort, title);
     }
 
+    @GetMapping("/genre")
+    @Operation(summary = "Get games by genre")
+    @ResponseStatus(HttpStatus.OK)
+    public List<ShortGameModel> showGamesByGenre(
+            @RequestParam(value = "genre") String genre,
+            @RequestParam(value = "qty", defaultValue = "5")
+            @Min(1) @Max(Integer.MAX_VALUE) int gameQuantity) {
+        return gameService.getGamesByGenre(gameQuantity, genre);
+    }
+
     @GetMapping("/popular")
     @Operation(summary = "Get most 'popular' games")
     @ResponseStatus(HttpStatus.OK)

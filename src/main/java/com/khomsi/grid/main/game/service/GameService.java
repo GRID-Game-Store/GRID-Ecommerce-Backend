@@ -11,6 +11,8 @@ public interface GameService {
     GeneralGame getGamesByPage(int page, int pageSize,
                                String[] sort, String title);
 
+    List<ShortGameModel> getGamesByGenre(int qty, String genre);
+
     List<PopularGameModel> getPopularQtyOfGames(int gameQuantity);
 
     List<ShortGameModel> getRandomQtyOfGames(int gameQuantity);
