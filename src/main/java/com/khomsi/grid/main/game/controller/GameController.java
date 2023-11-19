@@ -1,8 +1,8 @@
 package com.khomsi.grid.main.game.controller;
 
+import com.khomsi.grid.main.game.model.dto.GameModelWithLimit;
 import com.khomsi.grid.main.game.model.dto.GeneralGame;
 import com.khomsi.grid.main.game.model.dto.PopularGameModel;
-import com.khomsi.grid.main.game.model.dto.ShortGameModel;
 import com.khomsi.grid.main.game.model.entity.Game;
 import com.khomsi.grid.main.game.service.GameService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -39,7 +39,7 @@ public class GameController {
     @GetMapping("/genre")
     @Operation(summary = "Get games by genre")
     @ResponseStatus(HttpStatus.OK)
-    public List<ShortGameModel> showGamesByGenre(
+    public List<GameModelWithLimit> showGamesByGenre(
             @RequestParam(value = "genre") String genre,
             @RequestParam(value = "qty", defaultValue = "5")
             @Min(1) @Max(Integer.MAX_VALUE) int gameQuantity) {
@@ -58,7 +58,7 @@ public class GameController {
     @GetMapping("/random")
     @Operation(summary = "Get n-number of random games")
     @ResponseStatus(HttpStatus.OK)
-    public List<ShortGameModel> showRandomQtyOfGames(
+    public List<GameModelWithLimit> showRandomQtyOfGames(
             @RequestParam(value = "qty", defaultValue = "20")
             @Min(1) @Max(Integer.MAX_VALUE) int gameQuantity) {
         return gameService.getRandomQtyOfGames(gameQuantity);
