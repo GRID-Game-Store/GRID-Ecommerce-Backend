@@ -53,7 +53,7 @@ public class GameController {
             @RequestParam(value = "query") String query,
             @RequestParam(value = "qty", defaultValue = "5")
             @Min(1) @Max(Integer.MAX_VALUE) int gameQuantity) {
-        return gameService.getSpeacialOffers(query.toLowerCase(), gameQuantity);
+        return gameService.getSpecialOffers(query.toLowerCase(), gameQuantity);
     }
 
     @GetMapping("/popular")
@@ -72,6 +72,16 @@ public class GameController {
             @RequestParam(value = "qty", defaultValue = "20")
             @Min(1) @Max(Integer.MAX_VALUE) int gameQuantity) {
         return gameService.getRandomQtyOfGames(gameQuantity);
+    }
+
+    @GetMapping("/search")
+    @Operation(summary = "Get game by title (symbol by symbol)")
+    @ResponseStatus(HttpStatus.OK)
+    public List<GameModelWithGenreLimit> showSearchedGame(
+            @RequestParam(value = "title") String title,
+            @RequestParam(value = "qty", defaultValue = "20")
+            @Min(1) @Max(Integer.MAX_VALUE) int gameQuantity) {
+        return gameService.searchGamesByTitle(title, gameQuantity);
     }
 
     @GetMapping("/{game-id}")

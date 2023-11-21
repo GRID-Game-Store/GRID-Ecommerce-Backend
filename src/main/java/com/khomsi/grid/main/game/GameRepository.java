@@ -20,4 +20,8 @@ public interface GameRepository extends JpaRepository<Game, Long> {
 
     @Query("SELECT game FROM Game game WHERE game.discount > 0")
     List<Game> findGamesWithDiscount();
+
+    @Query(value = "SELECT g FROM Game g WHERE UPPER(g.title) LIKE CONCAT('%', UPPER(:text), '%')")
+    List<Game> findSimilarTitles(@Param("text") String text);
+
 }

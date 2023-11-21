@@ -19,5 +19,7 @@ public interface GameService {
 
     Game getGameById(Long gameId);
 
-    List<GameModelWithGenreLimit> getSpeacialOffers(String query, int qty);
+    List<GameModelWithGenreLimit> getSpecialOffers(String query, int qty);
+
+    List<GameModelWithGenreLimit> searchGamesByTitle(String text, int qty);
 }

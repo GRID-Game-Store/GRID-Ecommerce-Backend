@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static org.springframework.data.domain.Sort.Direction.ASC;
 import static org.springframework.data.domain.Sort.Direction.DESC;
@@ -90,7 +91,7 @@ public class GameServiceImpl implements GameService {
     }
 
     @Override
-    public List<GameModelWithGenreLimit> getSpeacialOffers(String query, int qty) {
+    public List<GameModelWithGenreLimit> getSpecialOffers(String query, int qty) {
         //TODO refactor the method in future
         List<Game> games;
         switch (query) {
@@ -104,6 +105,20 @@ public class GameServiceImpl implements GameService {
                 .map(gameMapper::toLimitGenreGame)
                 .limit(qty)
                 .toList();
+    }
+
+    @Override
+    public List<GameModelWithGenreLimit> searchGamesByTitle(String text, int qty) {
+        return gameRepository.findSimilarTitles(transformWord(text)).stream()
+                .map(gameMapper::toLimitGenreGame)
+                .limit(qty)
+                .toList();
+    }
+
+    private String transformWord(String word) {
+        return word.chars()
+                .mapToObj(c -> String.valueOf((char) c))
+                .collect(Collectors.joining("%", "", "%"));
     }
 
     private <T> List<T> getRandomGames(List<T> gameModels, int gameQuantity) {
