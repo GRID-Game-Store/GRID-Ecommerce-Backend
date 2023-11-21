@@ -1,6 +1,6 @@
 package com.khomsi.grid.main.game.mapper;
 
-import com.khomsi.grid.main.game.model.dto.GameModelWithLimit;
+import com.khomsi.grid.main.game.model.dto.GameModelWithGenreLimit;
 import com.khomsi.grid.main.game.model.dto.PopularGameModel;
 import com.khomsi.grid.main.game.model.dto.ShortGameModel;
 import com.khomsi.grid.main.game.model.entity.Game;
@@ -10,5 +10,5 @@ public interface GameMapper {
 
     PopularGameModel toPopularGame(Game game);
 
-    GameModelWithLimit toLimitGame(Game game);
+    GameModelWithGenreLimit toLimitGenreGame(Game game);
 }

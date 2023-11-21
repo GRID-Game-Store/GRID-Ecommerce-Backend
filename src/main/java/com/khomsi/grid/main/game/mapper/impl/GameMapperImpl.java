@@ -1,7 +1,7 @@
 package com.khomsi.grid.main.game.mapper.impl;
 
 import com.khomsi.grid.main.game.mapper.GameMapper;
-import com.khomsi.grid.main.game.model.dto.GameModelWithLimit;
+import com.khomsi.grid.main.game.model.dto.GameModelWithGenreLimit;
 import com.khomsi.grid.main.game.model.dto.PopularGameModel;
 import com.khomsi.grid.main.game.model.dto.ShortGameModel;
 import com.khomsi.grid.main.game.model.entity.Game;
@@ -37,8 +37,8 @@ public class GameMapperImpl implements GameMapper {
     }
 
     @Override
-    public GameModelWithLimit toLimitGame(Game game) {
-        return GameModelWithLimit.builder()
+    public GameModelWithGenreLimit toLimitGenreGame(Game game) {
+        return GameModelWithGenreLimit.builder()
                 .id(game.getId())
                 .title(game.getTitle())
                 .description(game.getDescription())

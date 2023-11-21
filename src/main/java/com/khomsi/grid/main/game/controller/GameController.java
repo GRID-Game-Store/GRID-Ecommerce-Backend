@@ -1,6 +1,6 @@
 package com.khomsi.grid.main.game.controller;
 
-import com.khomsi.grid.main.game.model.dto.GameModelWithLimit;
+import com.khomsi.grid.main.game.model.dto.GameModelWithGenreLimit;
 import com.khomsi.grid.main.game.model.dto.GeneralGame;
 import com.khomsi.grid.main.game.model.dto.PopularGameModel;
 import com.khomsi.grid.main.game.model.entity.Game;
@@ -39,11 +39,21 @@ public class GameController {
     @GetMapping("/genre")
     @Operation(summary = "Get games by genre")
     @ResponseStatus(HttpStatus.OK)
-    public List<GameModelWithLimit> showGamesByGenre(
+    public List<GameModelWithGenreLimit> showGamesByGenre(
             @RequestParam(value = "genre") String genre,
             @RequestParam(value = "qty", defaultValue = "5")
             @Min(1) @Max(Integer.MAX_VALUE) int gameQuantity) {
         return gameService.getGamesByGenre(gameQuantity, genre);
+    }
+
+    @GetMapping("/offers")
+    @Operation(summary = "Get games by 'special' offer")
+    @ResponseStatus(HttpStatus.OK)
+    public List<GameModelWithGenreLimit> showGamesBySpecialOffer(
+            @RequestParam(value = "query") String query,
+            @RequestParam(value = "qty", defaultValue = "5")
+            @Min(1) @Max(Integer.MAX_VALUE) int gameQuantity) {
+        return gameService.getSpeacialOffers(query.toLowerCase(), gameQuantity);
     }
 
     @GetMapping("/popular")
@@ -58,7 +68,7 @@ public class GameController {
     @GetMapping("/random")
     @Operation(summary = "Get n-number of random games")
     @ResponseStatus(HttpStatus.OK)
-    public List<GameModelWithLimit> showRandomQtyOfGames(
+    public List<GameModelWithGenreLimit> showRandomQtyOfGames(
             @RequestParam(value = "qty", defaultValue = "20")
             @Min(1) @Max(Integer.MAX_VALUE) int gameQuantity) {
         return gameService.getRandomQtyOfGames(gameQuantity);

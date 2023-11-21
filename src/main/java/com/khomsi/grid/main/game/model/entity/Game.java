@@ -13,6 +13,7 @@ import jakarta.validation.constraints.Size;
 import lombok.*;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.Set;
 
@@ -54,6 +55,15 @@ public class Game {
     private String coverImageUrl;
 
     @NotNull
+    @Column(name = "discount", nullable = false, precision = 10, scale = 2)
+    private BigDecimal discount;
+
+    @NotNull
+    @Lob
+    @Column(name = "permit_age", nullable = false)
+    private String permitAge;
+
+    @NotNull
     @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "publisher_id", nullable = false)
     private Publisher publisher;
@@ -86,4 +96,13 @@ public class Game {
 
     @OneToOne(mappedBy = "games", cascade = CascadeType.ALL)
     private GameMedia gameMedia;
+
+    public BigDecimal getPrice() {
+        if (discount == null || price == null) {
+            return price;
+        }
+        BigDecimal discountMultiplier = BigDecimal.ONE.subtract(discount.divide(BigDecimal.valueOf(100),
+                RoundingMode.HALF_UP));
+        return price.multiply(discountMultiplier).setScale(2, RoundingMode.HALF_UP);
+    }
 }

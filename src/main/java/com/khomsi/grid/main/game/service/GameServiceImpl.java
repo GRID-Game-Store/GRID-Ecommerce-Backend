@@ -1,11 +1,10 @@
 package com.khomsi.grid.main.game.service;
 
-import com.khomsi.grid.additional.genre.GenreRepository;
 import com.khomsi.grid.additional.genre.model.entity.Genre;
 import com.khomsi.grid.main.game.GameRepository;
 import com.khomsi.grid.main.game.handler.exception.GameNotFoundException;
 import com.khomsi.grid.main.game.mapper.GameMapper;
-import com.khomsi.grid.main.game.model.dto.GameModelWithLimit;
+import com.khomsi.grid.main.game.model.dto.GameModelWithGenreLimit;
 import com.khomsi.grid.main.game.model.dto.GeneralGame;
 import com.khomsi.grid.main.game.model.dto.PopularGameModel;
 import com.khomsi.grid.main.game.model.dto.ShortGameModel;
@@ -31,7 +30,6 @@ import static org.springframework.data.domain.Sort.Direction.DESC;
 public class GameServiceImpl implements GameService {
     private final GameRepository gameRepository;
     private final GameMapper gameMapper;
-    private final GenreRepository genreRepository;
 
     @Override
     public GeneralGame getGamesByPage(int page, int pageSize, String[] sort, String title) {
@@ -56,7 +54,7 @@ public class GameServiceImpl implements GameService {
                 .build();
     }
 
-    public List<GameModelWithLimit> getGamesByGenre(int qty, String excludedGenre) {
+    public List<GameModelWithGenreLimit> getGamesByGenre(int qty, String excludedGenre) {
         return gameRepository.findGamesByGenre(excludedGenre).stream()
                 .filter(game -> {
                     Set<Genre> genres = game.getGenres();
@@ -66,7 +64,7 @@ public class GameServiceImpl implements GameService {
                     return genres.size() <= 2;
                 })
                 .limit(qty)
-                .map(gameMapper::toLimitGame)
+                .map(gameMapper::toLimitGenreGame)
                 .toList();
     }
 
@@ -79,9 +77,9 @@ public class GameServiceImpl implements GameService {
     }
 
     @Override
-    public List<GameModelWithLimit> getRandomQtyOfGames(int gameQuantity) {
-        List<GameModelWithLimit> shortGameModels = gameRepository.findAll().stream()
-                .map(gameMapper::toLimitGame)
+    public List<GameModelWithGenreLimit> getRandomQtyOfGames(int gameQuantity) {
+        List<GameModelWithGenreLimit> shortGameModels = gameRepository.findAll().stream()
+                .map(gameMapper::toLimitGenreGame)
                 .toList();
         return getRandomGames(shortGameModels, gameQuantity);
     }
@@ -89,6 +87,23 @@ public class GameServiceImpl implements GameService {
     @Override
     public Game getGameById(Long gameId) {
         return gameRepository.findById(gameId).orElseThrow(GameNotFoundException::new);
+    }
+
+    @Override
+    public List<GameModelWithGenreLimit> getSpeacialOffers(String query, int qty) {
+        //TODO refactor the method in future
+        List<Game> games;
+        switch (query) {
+            case "release date" -> games = gameRepository.findGamesByEarliestReleaseDate();
+            case "sales" -> games = gameRepository.findGamesWithDiscount();
+            //TODO no metrics yet to use it not as a random
+            case "discount" -> games = getRandomGames(gameRepository.findAll(), qty);
+            default -> throw new GameNotFoundException();
+        }
+        return games.stream()
+                .map(gameMapper::toLimitGenreGame)
+                .limit(qty)
+                .toList();
     }
 
     private <T> List<T> getRandomGames(List<T> gameModels, int gameQuantity) {

@@ -7,7 +7,7 @@ import java.math.BigDecimal;
 import java.util.Set;
 
 @Builder
-public record GameModelWithLimit(
+public record GameModelWithGenreLimit(
         Long id,
         String title,
         String description,

@@ -14,4 +14,10 @@ public interface GameRepository extends JpaRepository<Game, Long> {
 
     @Query("SELECT g FROM Game g JOIN g.genres genre WHERE genre.name = :genre")
     List<Game> findGamesByGenre(@Param("genre") String genre);
+
+    @Query("SELECT game FROM Game game ORDER BY game.releaseDate DESC")
+    List<Game> findGamesByEarliestReleaseDate();
+
+    @Query("SELECT game FROM Game game WHERE game.discount > 0")
+    List<Game> findGamesWithDiscount();
 }
