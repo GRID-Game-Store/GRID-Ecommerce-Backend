@@ -49,7 +49,7 @@ public class GameController {
     @GetMapping("/offers")
     @Operation(summary = "Get games by 'special' offer")
     @ResponseStatus(HttpStatus.OK)
-    public List<GameModelWithGenreLimit> showGamesBySpecialOffer(
+    public List<PopularGameModel> showGamesBySpecialOffer(
             @RequestParam(value = "query") String query,
             @RequestParam(value = "qty", defaultValue = "5")
             @Min(1) @Max(Integer.MAX_VALUE) int gameQuantity) {

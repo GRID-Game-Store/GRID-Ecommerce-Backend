@@ -91,7 +91,7 @@ public class GameServiceImpl implements GameService {
     }
 
     @Override
-    public List<GameModelWithGenreLimit> getSpecialOffers(String query, int qty) {
+    public List<PopularGameModel> getSpecialOffers(String query, int qty) {
         //TODO refactor the method in future
         List<Game> games;
         switch (query) {
@@ -102,7 +102,7 @@ public class GameServiceImpl implements GameService {
             default -> throw new GameNotFoundException();
         }
         return games.stream()
-                .map(gameMapper::toLimitGenreGame)
+                .map(gameMapper::toPopularGame)
                 .limit(qty)
                 .toList();
     }
