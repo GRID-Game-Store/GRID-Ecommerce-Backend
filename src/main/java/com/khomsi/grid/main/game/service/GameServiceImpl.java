@@ -2,7 +2,7 @@ package com.khomsi.grid.main.game.service;
 
 import com.khomsi.grid.additional.genre.model.entity.Genre;
 import com.khomsi.grid.main.game.GameRepository;
-import com.khomsi.grid.main.game.handler.exception.GameNotFoundException;
+import com.khomsi.grid.main.game.exception.GameNotFoundException;
 import com.khomsi.grid.main.game.mapper.GameMapper;
 import com.khomsi.grid.main.game.model.dto.GameModelWithGenreLimit;
 import com.khomsi.grid.main.game.model.dto.GeneralGame;

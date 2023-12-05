@@ -20,16 +20,22 @@ USE `GridDB`;
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `GridDB`.`users`
 (
-    `id`            INT          NOT NULL AUTO_INCREMENT,
-    `email`         VARCHAR(255) NOT NULL,
-    `username`      VARCHAR(100) NOT NULL,
-    `password`      VARCHAR(255) NOT NULL,
-    `roles`         VARCHAR(255) NOT NULL,
-    `balance`       DECIMAL      NOT NULL DEFAULT 0,
-    `first_name`    VARCHAR(100) NULL,
-    `last_name`     VARCHAR(100) NULL,
-    `date_of_birth` DATETIME     NULL,
-    `avatar_url`    TEXT         NULL,
+    `id`                  INT          NOT NULL AUTO_INCREMENT,
+    `email`               VARCHAR(255) NOT NULL,
+    `username`            VARCHAR(100) NOT NULL,
+    `password`            VARCHAR(255) NOT NULL,
+    `balance`             DECIMAL      NOT NULL DEFAULT 0,
+    `active`              TINYINT      NOT NULL,
+    `password_reset_code` VARCHAR(255) NULL,
+    `first_name`          VARCHAR(100) NULL,
+    `last_name`           VARCHAR(100) NULL,
+    `date_of_birth`       DATETIME     NULL,
+    `avatar_url`          TEXT         NULL,
+    `city`                VARCHAR(100) NULL,
+    `address`             VARCHAR(100) NULL,
+    `post_index`          VARCHAR(100) NULL,
+    `phone_number`        VARCHAR(255) NULL,
+    `provider`            VARCHAR(100) NULL,
     PRIMARY KEY (`id`),
     UNIQUE INDEX `email_UNIQUE` (`email` ASC) VISIBLE
 )
@@ -346,10 +352,10 @@ CREATE TABLE IF NOT EXISTS `GridDB`.`transactions`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `GridDB`.`user_roles`
 (
-    `users_id` INT                    NOT NULL,
-    `role`     ENUM ("ADMIN", "USER") NOT NULL,
+    `users_id` INT          NOT NULL,
+    `roles`    VARCHAR(255) NOT NULL,
     PRIMARY KEY (`users_id`),
-    CONSTRAINT `fk_table1_users1`
+    CONSTRAINT `fk_user_roles_users1`
         FOREIGN KEY (`users_id`)
             REFERENCES `GridDB`.`users` (`id`)
             ON DELETE NO ACTION

@@ -1,4 +1,4 @@
-package com.khomsi.grid.main.game.handler;
+package com.khomsi.grid.main.handler;
 
 import lombok.Builder;
 import org.springframework.http.HttpStatus;

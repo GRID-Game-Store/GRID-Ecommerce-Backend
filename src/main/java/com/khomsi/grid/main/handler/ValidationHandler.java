@@ -1,4 +1,4 @@
-package com.khomsi.grid.main.game.handler;
+package com.khomsi.grid.main.handler;
 
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
@@ -15,7 +15,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
-import static com.khomsi.grid.main.game.handler.MessageType.VALIDATION_ERROR;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 
 @ControllerAdvice
@@ -49,7 +48,7 @@ public class ValidationHandler {
 
     private ErrorMessageResponse getErrorMessageResponse(Throwable e, HttpStatus status) {
         return ErrorMessageResponse.builder()
-                .type(VALIDATION_ERROR)
+                .type(MessageType.VALIDATION_ERROR)
                 .createdAt(Instant.now())
                 .statusCode(status)
                 .status(status.value())
