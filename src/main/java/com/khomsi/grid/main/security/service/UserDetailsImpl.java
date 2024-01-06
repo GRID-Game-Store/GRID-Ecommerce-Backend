@@ -24,6 +24,7 @@ public class UserDetailsImpl implements UserDetails, OAuth2User {
     public static UserDetailsImpl create(UserInfo user) {
         String userRole = user.getRoles().iterator().next().toString();
         List<GrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority(userRole));
+
         return new UserDetailsImpl(user.getId(), user.getEmail(), user.getPassword(), authorities);
     }
 

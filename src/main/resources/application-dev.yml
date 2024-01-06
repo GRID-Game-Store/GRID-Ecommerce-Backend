@@ -15,6 +15,10 @@ springdoc:
   swagger-ui:
     disable-swagger-default-url: true
     path: /swagger
-logging:
-  level:
-    ROOT: DEBUG
+jwt:
+  jwt-secret: ======================GRID=Spring===========================
+  jwt-cookie-name: grid-jwt
+  jwt-refresh-cookie-name: grid-jwt-refresh
+  jwt-expiration-Ms: 60000
+  jwt-refresh-expiration-ms: 60000
+  jwt-cookie-max-age: 60

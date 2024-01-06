@@ -1,7 +1,6 @@
 package com.khomsi.grid.main.user.model.entity;
 
 import com.khomsi.grid.main.authentication.model.enums.AuthProvider;
-import com.khomsi.grid.main.authentication.model.enums.Role;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -9,6 +8,7 @@ import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
@@ -19,7 +19,8 @@ import java.util.Set;
 @Setter
 @Entity
 @ToString
-@Table(name = "users")
+@Table(name = "users", uniqueConstraints =
+@UniqueConstraint(columnNames = "email"))
 public class UserInfo {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -86,10 +87,11 @@ public class UserInfo {
     @Enumerated(EnumType.STRING)
     private AuthProvider provider;
 
-    @ElementCollection(targetClass = Role.class, fetch = FetchType.EAGER)
-    @CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "users_id"))
-    @Enumerated(EnumType.STRING)
-    private Set<Role> roles;
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "user_roles",
+            joinColumns = @JoinColumn(name = "users_id"),
+            inverseJoinColumns = @JoinColumn(name = "roles_id"))
+    private Set<Role> roles = new HashSet<>();
 
     @Override
     public boolean equals(Object o) {

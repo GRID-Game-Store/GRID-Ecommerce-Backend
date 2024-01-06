@@ -5,13 +5,13 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
 public record RegistrationRequest(
-        @NotBlank
-        String firstName,
+//        @NotBlank
+//        String firstName,
 
+//        @NotBlank
+//        String lastName,
         @NotBlank
-        String lastName,
-        @NotBlank
-        String userName,
+        String username,
         @Size(min = 6, max = 16)
         String password,
         @Email
