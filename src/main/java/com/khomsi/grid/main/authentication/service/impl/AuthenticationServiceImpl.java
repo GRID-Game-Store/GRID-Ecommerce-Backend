@@ -5,16 +5,12 @@ import com.khomsi.grid.main.authentication.model.enums.AuthProvider;
 import com.khomsi.grid.main.authentication.model.reponse.MessageResponse;
 import com.khomsi.grid.main.authentication.model.request.AuthenticationRequest;
 import com.khomsi.grid.main.authentication.model.request.RegistrationRequest;
-import com.khomsi.grid.main.security.exception.TokenRefreshException;
 import com.khomsi.grid.main.security.jwt.JwtProvider;
 import com.khomsi.grid.main.security.service.UserDetailsImpl;
 import com.khomsi.grid.main.user.RoleRepository;
 import com.khomsi.grid.main.user.UserInfoRepository;
 import com.khomsi.grid.main.user.model.entity.ERole;
-import com.khomsi.grid.main.user.model.entity.RefreshToken;
 import com.khomsi.grid.main.user.model.entity.UserInfo;
-import com.khomsi.grid.main.user.service.RefreshTokenService;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
@@ -29,7 +25,6 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.Collections;
-import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -41,7 +36,6 @@ public class AuthenticationServiceImpl {
     private final PasswordEncoder passwordEncoder;
     private final UserInfoRepository userInfoRepository;
     private final RoleRepository roleRepository;
-    private final RefreshTokenService refreshTokenService;
 
     public ResponseEntity<?> login(AuthenticationRequest request) {
         Authentication authentication = authenticationManager.authenticate(
@@ -52,12 +46,8 @@ public class AuthenticationServiceImpl {
 
         ResponseCookie jwtCookie = jwtProvider.generateJwtCookie(userDetails);
 
-        RefreshToken refreshToken = refreshTokenService.createRefreshToken(userDetails.getId());
-        ResponseCookie jwtRefreshCookie = jwtProvider.generateRefreshJwtCookie(refreshToken.getToken());
-
         return ResponseEntity.ok()
-                .header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
-                .header(HttpHeaders.SET_COOKIE, jwtRefreshCookie.toString()).build();
+                .header(HttpHeaders.SET_COOKIE, jwtCookie.toString()).build();
     }
 
     @Transactional
@@ -92,39 +82,9 @@ public class AuthenticationServiceImpl {
     }
 
     public ResponseEntity<?> logoutUser() {
-        Object principle = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (!Objects.equals(principle.toString(), "anonymousUser")) {
-            Long userId = ((UserDetailsImpl) principle).getId();
-            refreshTokenService.deleteByUserId(userId);
-        }
-
         ResponseCookie jwtCookie = jwtProvider.getCleanJwtCookie();
-        ResponseCookie jwtRefreshCookie = jwtProvider.getCleanJwtRefreshCookie();
-
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
-                .header(HttpHeaders.SET_COOKIE, jwtRefreshCookie.toString())
                 .body(new MessageResponse("You've been signed out!"));
-    }
-
-    public ResponseEntity<?> refreshToken(HttpServletRequest request) {
-        String refreshToken = jwtProvider.getJwtRefreshFromCookies(request);
-
-        if ((refreshToken != null) && (refreshToken.length() > 0)) {
-            return refreshTokenService.findByToken(refreshToken)
-                    .map(refreshTokenService::verifyExpiration)
-                    .map(RefreshToken::getUser)
-                    .map(user -> {
-                        ResponseCookie jwtCookie = jwtProvider.generateJwtCookie(user);
-                        //TODO change everything here
-                        return ResponseEntity.ok()
-                                .header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
-                                .body(new MessageResponse("Token is refreshed successfully!"));
-                    })
-                    .orElseThrow(() -> new TokenRefreshException(refreshToken,
-                            "Refresh token is not in database!"));
-        }
-
-        return ResponseEntity.badRequest().body(new MessageResponse("Refresh Token is empty!"));
     }
 }

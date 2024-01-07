@@ -6,7 +6,6 @@ import com.khomsi.grid.main.authentication.model.request.RegistrationRequest;
 import com.khomsi.grid.main.authentication.service.impl.AuthenticationServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -43,12 +42,6 @@ public class AuthenticationController {
     @Operation(summary = "logout")
     public ResponseEntity<?> logout() {
         return service.logoutUser();
-    }
-
-    @PostMapping("/refreshtoken")
-    @Operation(summary = "refresh")
-    public ResponseEntity<?> refreshToken(HttpServletRequest request) {
-        return service.refreshToken(request);
     }
 }
 

@@ -2,6 +2,7 @@ package com.khomsi.grid.main.security.jwt;
 
 import com.khomsi.grid.main.security.exception.JwtAuthenticationException;
 import com.khomsi.grid.main.security.service.UserDetailsImpl;
+import com.khomsi.grid.main.user.UserInfoRepository;
 import com.khomsi.grid.main.user.model.entity.UserInfo;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
@@ -20,6 +21,7 @@ import java.util.Date;
 @AllArgsConstructor
 public class JwtProvider {
     private JwtProperties jwtProperties;
+    private final UserInfoRepository userInfoRepository;
 
     //TODO Api text should be in another place (yml|constant class)!!!!!
     public ResponseCookie generateJwtCookie(UserDetailsImpl userPrincipal) {
@@ -32,25 +34,12 @@ public class JwtProvider {
         return generateCookie(jwtProperties.jwtCookieName(), jwt, "/api");
     }
 
-    public ResponseCookie generateRefreshJwtCookie(String refreshToken) {
-        return generateCookie(jwtProperties.jwtRefreshCookieName(), refreshToken, "/api/v1/auth/refreshtoken");
-    }
-
     public String getJwtFromCookies(HttpServletRequest request) {
         return getCookieValueByName(request, jwtProperties.jwtCookieName());
     }
 
-    public String getJwtRefreshFromCookies(HttpServletRequest request) {
-        return getCookieValueByName(request, jwtProperties.jwtRefreshCookieName());
-    }
-
     public ResponseCookie getCleanJwtCookie() {
         return ResponseCookie.from(jwtProperties.jwtCookieName(), null).path("/api").build();
-    }
-
-    public ResponseCookie getCleanJwtRefreshCookie() {
-        return ResponseCookie.from(jwtProperties.jwtRefreshCookieName(), null)
-                .path("/api/auth/refreshtoken").build();
     }
 
     public String getUserNameFromJwtToken(String token) {
@@ -71,15 +60,13 @@ public class JwtProvider {
 
     public String generateTokenFromUsername(String username) {
         //FIXME
-/*        Claims claims = Jwts.claims().setSubject(username);
-        String userRole = userInfoRepository.findByEmail(username).orElseThrow(UsernameNotFoundException::new)
-                .getRoles().iterator().next().name();
-//                .getAuthorities().stream().iterator().next().getAuthority();
-
-        claims.put("role", userRole);*/
+        Claims claims = Jwts.claims().setSubject(username);
+        String userRole = String.valueOf(userInfoRepository.findByEmail(username).orElseThrow(() ->
+                        new RuntimeException("NOT FOUND USER"))
+                .getRoles().iterator().next().getName());
+        claims.put("role", userRole);
         return Jwts.builder()
-//                .setClaims(claims)
-                .setSubject(username)
+                .setClaims(claims)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date((new Date()).getTime() + jwtProperties.jwtExpirationMs()))
                 .signWith(getSignKey(), SignatureAlgorithm.HS256)

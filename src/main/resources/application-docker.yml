@@ -33,3 +33,6 @@ jwt:
   #    TEST
   jwt-expiration-Ms: 60000
   jwt-refresh-expiration-ms: 180000
+logging:
+  level:
+    root: TRACE

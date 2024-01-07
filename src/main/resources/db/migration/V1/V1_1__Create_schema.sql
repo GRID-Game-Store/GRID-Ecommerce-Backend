@@ -38,66 +38,6 @@ CREATE TABLE IF NOT EXISTS `GridDB`.`users`
 
 
 -- -----------------------------------------------------
--- Table `GridDB`.`roles`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `GridDB`.`roles`
-(
-    `id`   INT         NOT NULL AUTO_INCREMENT,
-    `name` VARCHAR(20) NOT NULL,
-    PRIMARY KEY (`id`)
-)
-    ENGINE = InnoDB;
-
-
--- -----------------------------------------------------
--- Table `GridDB`.`user_roles`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `GridDB`.`user_roles`
-(
-    `users_id` INT NOT NULL,
-    `roles_id` INT NOT NULL,
-    PRIMARY KEY (`users_id`, `roles_id`),
-    INDEX `fk_user_roles_roles1_idx` (`roles_id` ASC) VISIBLE,
-    CONSTRAINT `fk_user_roles_users1`
-        FOREIGN KEY (`users_id`)
-            REFERENCES `GridDB`.`users` (`id`)
-            ON DELETE NO ACTION
-            ON UPDATE NO ACTION,
-    CONSTRAINT `fk_user_roles_roles1`
-        FOREIGN KEY (`roles_id`)
-            REFERENCES `GridDB`.`roles` (`id`)
-            ON DELETE NO ACTION
-            ON UPDATE NO ACTION
-)
-    ENGINE = InnoDB;
-
-
--- -----------------------------------------------------
--- Table `GridDB`.`users_library`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `GridDB`.`users_library`
-(
-    `users_id`      INT      NOT NULL,
-    `games_id`      INT      NULL,
-    `purchase_date` DATETIME NULL,
-    `playtime`      TIME     NULL,
-    INDEX `fk_user_library_users_idx` (`users_id` ASC) VISIBLE,
-    INDEX `fk_user_library_games1_idx` (`games_id` ASC) VISIBLE,
-    PRIMARY KEY (`users_id`),
-    CONSTRAINT `fk_user_library_users`
-        FOREIGN KEY (`users_id`)
-            REFERENCES `GridDB`.`users` (`id`)
-            ON DELETE NO ACTION
-            ON UPDATE NO ACTION,
-    CONSTRAINT `fk_user_library_games1`
-        FOREIGN KEY (`games_id`)
-            REFERENCES `GridDB`.`games` (`game_id`)
-            ON DELETE NO ACTION
-            ON UPDATE NO ACTION
-)
-    ENGINE = InnoDB;
-
--- -----------------------------------------------------
 -- Table `GridDB`.`developers`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `GridDB`.`developers`
@@ -148,6 +88,32 @@ CREATE TABLE IF NOT EXISTS `GridDB`.`games`
     CONSTRAINT `fk_games_publishers1`
         FOREIGN KEY (`publisher_id`)
             REFERENCES `GridDB`.`publishers` (`publisher_id`)
+            ON DELETE NO ACTION
+            ON UPDATE NO ACTION
+)
+    ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `GridDB`.`users_library`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `GridDB`.`users_library`
+(
+    `users_id`      INT      NOT NULL,
+    `games_id`      INT      NULL,
+    `purchase_date` DATETIME NULL,
+    `playtime`      TIME     NULL,
+    INDEX `fk_user_library_users_idx` (`users_id` ASC) VISIBLE,
+    INDEX `fk_user_library_games1_idx` (`games_id` ASC) VISIBLE,
+    PRIMARY KEY (`users_id`),
+    CONSTRAINT `fk_user_library_users`
+        FOREIGN KEY (`users_id`)
+            REFERENCES `GridDB`.`users` (`id`)
+            ON DELETE NO ACTION
+            ON UPDATE NO ACTION,
+    CONSTRAINT `fk_user_library_games1`
+        FOREIGN KEY (`games_id`)
+            REFERENCES `GridDB`.`games` (`game_id`)
             ON DELETE NO ACTION
             ON UPDATE NO ACTION
 )
@@ -375,6 +341,42 @@ CREATE TABLE IF NOT EXISTS `GridDB`.`transactions`
 )
     ENGINE = InnoDB;
 
+
+-- -----------------------------------------------------
+-- Table `GridDB`.`roles`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `GridDB`.`roles`
+(
+    `id`   INT         NOT NULL AUTO_INCREMENT,
+    `name` VARCHAR(20) NOT NULL,
+    PRIMARY KEY (`id`)
+)
+    ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `GridDB`.`user_roles`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `GridDB`.`user_roles`
+(
+    `users_id` INT NOT NULL,
+    `roles_id` INT NOT NULL,
+    PRIMARY KEY (`users_id`, `roles_id`),
+    INDEX `fk_user_roles_roles1_idx` (`roles_id` ASC) VISIBLE,
+    CONSTRAINT `fk_user_roles_users1`
+        FOREIGN KEY (`users_id`)
+            REFERENCES `GridDB`.`users` (`id`)
+            ON DELETE NO ACTION
+            ON UPDATE NO ACTION,
+    CONSTRAINT `fk_user_roles_roles1`
+        FOREIGN KEY (`roles_id`)
+            REFERENCES `GridDB`.`roles` (`id`)
+            ON DELETE NO ACTION
+            ON UPDATE NO ACTION
+)
+    ENGINE = InnoDB;
+
+
 -- -----------------------------------------------------
 -- Table `GridDB`.`games_has_tags`
 -- -----------------------------------------------------
@@ -393,24 +395,6 @@ CREATE TABLE IF NOT EXISTS `GridDB`.`games_has_tags`
     CONSTRAINT `fk_games_has_tags_tags1`
         FOREIGN KEY (`tags_id`)
             REFERENCES `GridDB`.`tags` (`tag_id`)
-            ON DELETE NO ACTION
-            ON UPDATE NO ACTION
-)
-    ENGINE = InnoDB;
-
-
--- -----------------------------------------------------
--- Table `GridDB`.`refresh_token`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `GridDB`.`refresh_token`
-(
-    `users_id`    INT          NOT NULL,
-    `token`       VARCHAR(255) NOT NULL,
-    `expiry_date` DATETIME     NOT NULL,
-    PRIMARY KEY (`users_id`),
-    CONSTRAINT `fk_refresh_token_users1`
-        FOREIGN KEY (`users_id`)
-            REFERENCES `GridDB`.`users` (`id`)
             ON DELETE NO ACTION
             ON UPDATE NO ACTION
 )

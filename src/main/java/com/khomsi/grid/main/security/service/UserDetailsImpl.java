@@ -8,9 +8,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Data
 public class UserDetailsImpl implements UserDetails, OAuth2User {
@@ -22,9 +22,11 @@ public class UserDetailsImpl implements UserDetails, OAuth2User {
     private Map<String, Object> attributes;
 
     public static UserDetailsImpl create(UserInfo user) {
-        String userRole = user.getRoles().iterator().next().toString();
-        List<GrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority(userRole));
-
+//        String userRole = user.getRoles().iterator().next().toString();
+//        List<GrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority(userRole));
+        List<GrantedAuthority> authorities = user.getRoles().stream()
+                .map(role -> new SimpleGrantedAuthority(role.getName().name()))
+                .collect(Collectors.toList());
         return new UserDetailsImpl(user.getId(), user.getEmail(), user.getPassword(), authorities);
     }
 
