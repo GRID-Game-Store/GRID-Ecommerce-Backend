@@ -1,5 +1,6 @@
-package com.khomsi.grid.main.handler;
+package com.khomsi.grid.main.handler.dto;
 
+import com.khomsi.grid.main.handler.MessageType;
 import lombok.Builder;
 import org.springframework.http.HttpStatus;
 

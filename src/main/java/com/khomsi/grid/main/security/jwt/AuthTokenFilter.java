@@ -1,11 +1,13 @@
 package com.khomsi.grid.main.security.jwt;
 
+import com.khomsi.grid.main.handler.exception.GlobalServiceException;
 import com.khomsi.grid.main.security.service.UserDetailsServiceImpl;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -41,10 +43,8 @@ public class AuthTokenFilter extends OncePerRequestFilter {
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
         } catch (Exception e) {
-            //TODO change the exception
-            throw new RuntimeException("Cannot set user authentication: {}", e);
+            throw new GlobalServiceException(HttpStatus.BAD_REQUEST, "Cannot set user authentication: {}", e);
         }
-
         filterChain.doFilter(request, response);
     }
 

@@ -2,19 +2,20 @@ package com.khomsi.grid.main.game.service;
 
 import com.khomsi.grid.additional.genre.model.entity.Genre;
 import com.khomsi.grid.main.game.GameRepository;
-import com.khomsi.grid.main.game.exception.GameNotFoundException;
 import com.khomsi.grid.main.game.mapper.GameMapper;
 import com.khomsi.grid.main.game.model.dto.GameModelWithGenreLimit;
 import com.khomsi.grid.main.game.model.dto.GeneralGame;
 import com.khomsi.grid.main.game.model.dto.PopularGameModel;
 import com.khomsi.grid.main.game.model.dto.ShortGameModel;
 import com.khomsi.grid.main.game.model.entity.Game;
+import com.khomsi.grid.main.handler.exception.GlobalServiceException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -41,7 +42,7 @@ public class GameServiceImpl implements GameService {
                 : gameRepository.findGameByTitleContainingIgnoreCase(title, pagingSort);
 
         if (gamePage.isEmpty()) {
-            throw new GameNotFoundException();
+            throw new GlobalServiceException(HttpStatus.NOT_FOUND, "Games are not found in database.");
         }
         List<ShortGameModel> shortGameModels = gamePage
                 .map(gameMapper::toShortGame)
@@ -87,7 +88,8 @@ public class GameServiceImpl implements GameService {
 
     @Override
     public Game getGameById(Long gameId) {
-        return gameRepository.findById(gameId).orElseThrow(GameNotFoundException::new);
+        return gameRepository.findById(gameId).orElseThrow(() ->
+                new GlobalServiceException(HttpStatus.NOT_FOUND, "Game with id " + gameId + " is not found."));
     }
 
     @Override
@@ -99,7 +101,7 @@ public class GameServiceImpl implements GameService {
             case "sales" -> games = gameRepository.findGamesWithDiscount();
             //TODO no metrics yet to use it not as a random
             case "discount" -> games = getRandomGames(gameRepository.findAll(), qty);
-            default -> throw new GameNotFoundException();
+            default -> throw new GlobalServiceException(HttpStatus.NOT_FOUND, "Games are not found in database.");
         }
         return games.stream()
                 .map(gameMapper::toPopularGame)

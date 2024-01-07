@@ -1,10 +1,10 @@
 package com.khomsi.grid.main.authentication.service.impl;
 
-import com.khomsi.grid.main.authentication.exception.EmailException;
 import com.khomsi.grid.main.authentication.model.enums.AuthProvider;
 import com.khomsi.grid.main.authentication.model.reponse.MessageResponse;
 import com.khomsi.grid.main.authentication.model.request.AuthenticationRequest;
 import com.khomsi.grid.main.authentication.model.request.RegistrationRequest;
+import com.khomsi.grid.main.handler.exception.GlobalServiceException;
 import com.khomsi.grid.main.security.jwt.JwtProvider;
 import com.khomsi.grid.main.security.service.UserDetailsImpl;
 import com.khomsi.grid.main.user.RoleRepository;
@@ -14,6 +14,7 @@ import com.khomsi.grid.main.user.model.entity.UserInfo;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -29,15 +30,15 @@ import java.util.Collections;
 @Service
 @RequiredArgsConstructor
 public class AuthenticationServiceImpl {
-    //FIXME
-    private final AuthenticationManager authenticationManager;
     private final JwtProvider jwtProvider;
+    private final AuthenticationManager authenticationManager;
+    //FIXME
     //    private final MailSender mailSender;
     private final PasswordEncoder passwordEncoder;
     private final UserInfoRepository userInfoRepository;
     private final RoleRepository roleRepository;
 
-    public ResponseEntity<?> login(AuthenticationRequest request) {
+    public ResponseEntity<?> signInUser(AuthenticationRequest request) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.email(), request.password())
         );
@@ -47,18 +48,15 @@ public class AuthenticationServiceImpl {
         ResponseCookie jwtCookie = jwtProvider.generateJwtCookie(userDetails);
 
         return ResponseEntity.ok()
-                .header(HttpHeaders.SET_COOKIE, jwtCookie.toString()).build();
+                .header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
+                .body(new MessageResponse("You've been signed in!"));
     }
 
     @Transactional
     public MessageResponse registerUser(RegistrationRequest request) {
-//        if (user.password() != null) {
-//            //TODO
-//            throw new PasswordException("PASSWORDS_DO_NOT_MATCH");
-//        }
-        //FIXME currently sends 401 instead of 409 in postman
         if (userInfoRepository.findByEmail(request.email()).isPresent()) {
-            throw new EmailException("EMAIL_IN_USE");
+            throw new GlobalServiceException(HttpStatus.CONFLICT,
+                    "This email is already used. Use another one and try again.");
         }
         //TODO
         UserInfo userInfo = UserInfo.builder()
@@ -71,17 +69,16 @@ public class AuthenticationServiceImpl {
                 .build();
 
         userInfo.setActive(true);
-        //TODO
         userInfo.setRoles(Collections.singleton(roleRepository.findByName(ERole.ROLE_USER)
-                .orElseThrow(() -> new RuntimeException("Error: Role is not found."))));
+                .orElseThrow(() -> new GlobalServiceException(HttpStatus.NOT_FOUND, "Role is not found."))));
         userInfo.setProvider(AuthProvider.LOCAL);
 //        userInfo.setActivationCode(UUID.randomUUID().toString());
         userInfoRepository.save(userInfo);
 
-        return MessageResponse.builder().response("User successfully registered.").build();
+        return MessageResponse.builder().response("User was successfully registered!").build();
     }
 
-    public ResponseEntity<?> logoutUser() {
+    public ResponseEntity<?> signOutUser() {
         ResponseCookie jwtCookie = jwtProvider.getCleanJwtCookie();
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, jwtCookie.toString())

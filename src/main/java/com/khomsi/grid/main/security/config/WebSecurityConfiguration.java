@@ -1,6 +1,6 @@
 package com.khomsi.grid.main.security.config;
 
-import com.khomsi.grid.main.security.exception.AuthEntryPointJwt;
+import com.khomsi.grid.main.handler.AuthEntryPointJwt;
 import com.khomsi.grid.main.security.jwt.AuthTokenFilter;
 import com.khomsi.grid.main.security.service.UserDetailsServiceImpl;
 import lombok.AllArgsConstructor;
@@ -53,25 +53,23 @@ public class WebSecurityConfiguration {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
-                //TODO check how it works
                 .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/swagger", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         .requestMatchers("/api/v1/games", "/api/v1/games/**",
                                 "/api/v1/genres/**", "/api/v1/genres",
-                                "/api/v1/auth/**",
-                                //FIXME remove later
-                                "/api/test/**"
+                                "/api/v1/auth/**"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
                 .authenticationProvider(authenticationProvider())
                 .addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class)
                 .csrf(AbstractHttpConfigurer::disable)
-//                FIXME
+//                FIXME add configuration for cors
                 .cors(AbstractHttpConfigurer::disable)
                 .httpBasic(Customizer.withDefaults())
+//                .formLogin(Customizer.withDefaults())
                 .build();
     }
 

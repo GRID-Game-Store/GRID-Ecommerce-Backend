@@ -41,7 +41,6 @@ public class UserInfo {
     @NotNull
     @Column(name = "password", nullable = false)
     private String password;
-    //FIXME doesn't set default value
     @NotNull
     @Column(name = "balance", nullable = false, precision = 10,
             columnDefinition = "Decimal(10,2) default '0.00'")

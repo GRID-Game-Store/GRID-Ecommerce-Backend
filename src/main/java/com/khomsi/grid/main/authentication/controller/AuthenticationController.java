@@ -23,12 +23,11 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthenticationController {
     private AuthenticationServiceImpl service;
 
-    //FIXME
     @PostMapping("/login")
     @Operation(summary = "Log")
     public ResponseEntity<?> singUp(@RequestBody AuthenticationRequest request) {
         //todo change this
-        return service.login(request);
+        return service.signInUser(request);
     }
 
     @PostMapping("/registration")
@@ -41,7 +40,7 @@ public class AuthenticationController {
     @PostMapping("/signout")
     @Operation(summary = "logout")
     public ResponseEntity<?> logout() {
-        return service.logoutUser();
+        return service.signOutUser();
     }
 }
 

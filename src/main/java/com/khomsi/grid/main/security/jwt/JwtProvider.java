@@ -1,15 +1,15 @@
 package com.khomsi.grid.main.security.jwt;
 
-import com.khomsi.grid.main.security.exception.JwtAuthenticationException;
+import com.khomsi.grid.main.handler.exception.GlobalServiceException;
 import com.khomsi.grid.main.security.service.UserDetailsImpl;
 import com.khomsi.grid.main.user.UserInfoRepository;
-import com.khomsi.grid.main.user.model.entity.UserInfo;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.WebUtils;
@@ -23,15 +23,9 @@ public class JwtProvider {
     private JwtProperties jwtProperties;
     private final UserInfoRepository userInfoRepository;
 
-    //TODO Api text should be in another place (yml|constant class)!!!!!
     public ResponseCookie generateJwtCookie(UserDetailsImpl userPrincipal) {
         String jwt = generateTokenFromUsername(userPrincipal.getUsername());
-        return generateCookie(jwtProperties.jwtCookieName(), jwt, "/api");
-    }
-
-    public ResponseCookie generateJwtCookie(UserInfo user) {
-        String jwt = generateTokenFromUsername(user.getUsername());
-        return generateCookie(jwtProperties.jwtCookieName(), jwt, "/api");
+        return generateCookie(jwtProperties.jwtCookieName(), jwt, jwtProperties.jwtCookiePath());
     }
 
     public String getJwtFromCookies(HttpServletRequest request) {
@@ -39,7 +33,8 @@ public class JwtProvider {
     }
 
     public ResponseCookie getCleanJwtCookie() {
-        return ResponseCookie.from(jwtProperties.jwtCookieName(), null).path("/api").build();
+        return ResponseCookie.from(jwtProperties.jwtCookieName(), null)
+                .path(jwtProperties.jwtCookiePath()).build();
     }
 
     public String getUserNameFromJwtToken(String token) {
@@ -53,16 +48,14 @@ public class JwtProvider {
                     .parseClaimsJws(authToken);
             return !claimsJws.getBody().getExpiration().before(new Date());
         } catch (JwtException | IllegalArgumentException exception) {
-            //TODO fix this text
-            throw new JwtAuthenticationException("INVALID_JWT_TOKEN");
+            throw new GlobalServiceException(HttpStatus.BAD_REQUEST, "JWT token didn't pass the validation.");
         }
     }
 
     public String generateTokenFromUsername(String username) {
-        //FIXME
         Claims claims = Jwts.claims().setSubject(username);
         String userRole = String.valueOf(userInfoRepository.findByEmail(username).orElseThrow(() ->
-                        new RuntimeException("NOT FOUND USER"))
+                        new GlobalServiceException(HttpStatus.NOT_FOUND, "User is not found."))
                 .getRoles().iterator().next().getName());
         claims.put("role", userRole);
         return Jwts.builder()
