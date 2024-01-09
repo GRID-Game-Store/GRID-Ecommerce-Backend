@@ -16,8 +16,8 @@ CREATE TABLE IF NOT EXISTS `GridDB`.`users`
 (
     `id`                  INT          NOT NULL AUTO_INCREMENT,
     `email`               VARCHAR(255) NOT NULL,
-    `username`            VARCHAR(100) NOT NULL,
-    `password`            VARCHAR(255) NOT NULL,
+    `username`            VARCHAR(100) NULL,
+    `password`            VARCHAR(255) NULL,
     `balance`             DECIMAL      NOT NULL DEFAULT 0,
     `active`              TINYINT      NOT NULL,
     `password_reset_code` VARCHAR(255) NULL,

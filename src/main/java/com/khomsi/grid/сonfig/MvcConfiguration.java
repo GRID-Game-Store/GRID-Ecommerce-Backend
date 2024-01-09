@@ -1,4 +1,4 @@
-package com.khomsi.grid.main.security.config;
+package com.khomsi.grid.сonfig;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

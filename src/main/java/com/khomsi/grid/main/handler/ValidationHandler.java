@@ -2,7 +2,7 @@ package com.khomsi.grid.main.handler;
 
 import com.khomsi.grid.main.handler.dto.ErrorMessage;
 import com.khomsi.grid.main.handler.dto.ErrorMessageResponse;
-import com.khomsi.grid.сonfig.PropertiesMessageService;
+import com.khomsi.grid.сonfig.service.PropertiesMessageService;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import lombok.RequiredArgsConstructor;

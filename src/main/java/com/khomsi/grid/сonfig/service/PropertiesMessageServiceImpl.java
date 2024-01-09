@@ -1,4 +1,4 @@
-package com.khomsi.grid.сonfig;
+package com.khomsi.grid.сonfig.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

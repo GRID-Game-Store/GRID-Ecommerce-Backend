@@ -6,7 +6,8 @@ import com.khomsi.grid.main.authentication.model.request.AuthenticationRequest;
 import com.khomsi.grid.main.authentication.model.request.RegistrationRequest;
 import com.khomsi.grid.main.handler.exception.GlobalServiceException;
 import com.khomsi.grid.main.security.jwt.JwtProvider;
-import com.khomsi.grid.main.security.service.UserDetailsImpl;
+import com.khomsi.grid.main.security.oauth2.OAuth2UserInfo;
+import com.khomsi.grid.main.security.service.UserPrincipal;
 import com.khomsi.grid.main.user.RoleRepository;
 import com.khomsi.grid.main.user.UserInfoRepository;
 import com.khomsi.grid.main.user.model.entity.ERole;
@@ -43,7 +44,7 @@ public class AuthenticationServiceImpl {
                 new UsernamePasswordAuthenticationToken(request.email(), request.password())
         );
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+        UserPrincipal userDetails = (UserPrincipal) authentication.getPrincipal();
 
         ResponseCookie jwtCookie = jwtProvider.generateJwtCookie(userDetails);
 
@@ -76,6 +77,33 @@ public class AuthenticationServiceImpl {
         userInfoRepository.save(userInfo);
 
         return MessageResponse.builder().response("User was successfully registered!").build();
+    }
+
+    //TODO check the code below
+    @Transactional
+    public UserInfo registerOauth2User(String provider, OAuth2UserInfo oAuth2UserInfo) {
+        UserInfo user = new UserInfo();
+        user.setEmail(oAuth2UserInfo.getEmail());
+        user.setPassword("Test password");
+        user.setUsername("Test username");
+
+        user.setBalance(BigDecimal.valueOf(0));
+        user.setFirstName(oAuth2UserInfo.getFirstName());
+        user.setLastName(oAuth2UserInfo.getLastName());
+        user.setActive(true);
+        user.setRoles(Collections.singleton(roleRepository.findByName(ERole.ROLE_USER)
+                .orElseThrow(() -> new GlobalServiceException(HttpStatus.NOT_FOUND, "Role is not found."))));
+        user.setProvider(AuthProvider.valueOf(provider.toUpperCase()));
+        return userInfoRepository.save(user);
+    }
+
+    @Transactional
+    public UserInfo updateOauth2User(UserInfo user, String provider, OAuth2UserInfo oAuth2UserInfo) {
+        user.setFirstName(oAuth2UserInfo.getFirstName());
+        user.setLastName(oAuth2UserInfo.getLastName());
+        user.setProvider(AuthProvider.valueOf(provider.toUpperCase()));
+        
+        return userInfoRepository.save(user);
     }
 
     public ResponseEntity<?> signOutUser() {

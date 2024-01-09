@@ -1,4 +1,4 @@
-package com.khomsi.grid.main.security.config;
+package com.khomsi.grid.сonfig;
 
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;

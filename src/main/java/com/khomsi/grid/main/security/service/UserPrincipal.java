@@ -13,7 +13,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Data
-public class UserDetailsImpl implements UserDetails, OAuth2User {
+public class UserPrincipal implements UserDetails, OAuth2User {
 
     private final Long id;
     private final String email;
@@ -21,17 +21,17 @@ public class UserDetailsImpl implements UserDetails, OAuth2User {
     private final Collection<? extends GrantedAuthority> authorities;
     private Map<String, Object> attributes;
 
-    public static UserDetailsImpl create(UserInfo user) {
+    public static UserPrincipal create(UserInfo user) {
         List<GrantedAuthority> authorities = user.getRoles().stream()
                 .map(role -> new SimpleGrantedAuthority(role.getName().name()))
                 .collect(Collectors.toList());
-        return new UserDetailsImpl(user.getId(), user.getEmail(), user.getPassword(), authorities);
+        return new UserPrincipal(user.getId(), user.getEmail(), user.getPassword(), authorities);
     }
 
-    public static UserDetailsImpl create(UserInfo user, Map<String, Object> attributes) {
-        UserDetailsImpl userDetailsImpl = UserDetailsImpl.create(user);
-        userDetailsImpl.setAttributes(attributes);
-        return userDetailsImpl;
+    public static UserPrincipal create(UserInfo user, Map<String, Object> attributes) {
+        UserPrincipal userPrincipal = UserPrincipal.create(user);
+        userPrincipal.setAttributes(attributes);
+        return userPrincipal;
     }
 
     @Override

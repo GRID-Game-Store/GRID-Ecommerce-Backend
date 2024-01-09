@@ -1,7 +1,7 @@
 package com.khomsi.grid.main.security.jwt;
 
 import com.khomsi.grid.main.handler.exception.GlobalServiceException;
-import com.khomsi.grid.main.security.service.UserDetailsImpl;
+import com.khomsi.grid.main.security.service.UserPrincipal;
 import com.khomsi.grid.main.user.UserInfoRepository;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
@@ -23,7 +23,7 @@ public class JwtProvider {
     private JwtProperties jwtProperties;
     private final UserInfoRepository userInfoRepository;
 
-    public ResponseCookie generateJwtCookie(UserDetailsImpl userPrincipal) {
+    public ResponseCookie generateJwtCookie(UserPrincipal userPrincipal) {
         String jwt = generateTokenFromUsername(userPrincipal.getUsername());
         return generateCookie(jwtProperties.jwtCookieName(), jwt, jwtProperties.jwtCookiePath());
     }

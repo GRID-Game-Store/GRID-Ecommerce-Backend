@@ -1,4 +1,4 @@
-package com.khomsi.grid.main.security.config;
+package com.khomsi.grid.сonfig;
 
 import com.khomsi.grid.main.handler.AuthEntryPointJwt;
 import com.khomsi.grid.main.security.jwt.AuthTokenFilter;
@@ -53,23 +53,30 @@ public class WebSecurityConfiguration {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
-                .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
+                //TODO this shit handles any error, even if it's not an error
+//                .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/swagger", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
-                        .requestMatchers("/api/v1/games", "/api/v1/games/**",
-                                "/api/v1/genres/**", "/api/v1/genres",
-                                "/api/v1/auth/**"
-                        ).permitAll()
+//                .authorizeHttpRequests(auth -> auth
+//                        .requestMatchers("/swagger", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
+//                        .requestMatchers("/api/v1/games", "/api/v1/games/**",
+//                                "/api/v1/genres/**", "/api/v1/genres",
+//                                "/api/v1/auth/**",
+//                                "/login"
+//                        ).permitAll()
+//                        .anyRequest().authenticated()
+//                )
+//                .oauth2Login(Customizer.withDefaults())
+                .authorizeHttpRequests(authorize -> authorize
                         .anyRequest().authenticated()
-                )
+                ).oauth2Login(Customizer.withDefaults())
+
+
                 .authenticationProvider(authenticationProvider())
                 .addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class)
                 .csrf(AbstractHttpConfigurer::disable)
 //                FIXME add configuration for cors
                 .cors(AbstractHttpConfigurer::disable)
                 .httpBasic(Customizer.withDefaults())
-//                .formLogin(Customizer.withDefaults())
                 .build();
     }
 

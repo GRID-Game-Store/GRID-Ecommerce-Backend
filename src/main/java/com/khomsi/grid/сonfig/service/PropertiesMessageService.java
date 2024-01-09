@@ -1,4 +1,4 @@
-package com.khomsi.grid.сonfig;
+package com.khomsi.grid.сonfig.service;
 
 public interface PropertiesMessageService {
     String getProperty(String source);

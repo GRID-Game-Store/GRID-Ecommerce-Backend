@@ -18,6 +18,16 @@ spring:
     url: ${DB_URL}
     password: ${DB_PASSWORD}
     enabled: 'true'
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            clientId: 468326435487-k6mu6lh29tik37qthnl3eo6rb9u1nlss.apps.googleusercontent.com
+            clientSecret: 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
+            scope:
+              - email
+              - profile
 springdoc:
   swagger-ui:
     disable-swagger-default-url: true

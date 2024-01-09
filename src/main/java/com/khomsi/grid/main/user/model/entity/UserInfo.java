@@ -33,12 +33,10 @@ public class UserInfo {
     private String email;
 
     @Size(max = 100)
-    @NotNull
     @Column(name = "username", nullable = false, length = 100)
     private String username;
 
     @Size(max = 255)
-    @NotNull
     @Column(name = "password", nullable = false)
     private String password;
     @NotNull
