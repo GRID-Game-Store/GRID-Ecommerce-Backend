@@ -1,6 +1,21 @@
 server:
   port: 8082
 spring:
+  security:
+    oauth2:
+      client:
+        provider:
+          keycloak:
+            issuer-uri: http://localhost:8084/realms/grid-dev
+            user-name-attribute: preferred_username
+        registration:
+          keycloak:
+            client-id: login-app
+            authorization-grant-type: authorization_code
+            scope: openid
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8084/realms/GridProduction
   jpa:
     generate-ddl: 'false'
     database-platform: org.hibernate.dialect.MySQLDialect
@@ -18,23 +33,10 @@ spring:
     url: ${DB_URL}
     password: ${DB_PASSWORD}
     enabled: 'true'
-  security:
-    oauth2:
-      client:
-        registration:
-          google:
-            clientId: 468326435487-k6mu6lh29tik37qthnl3eo6rb9u1nlss.apps.googleusercontent.com
-            clientSecret: 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
-            scope:
-              - email
-              - profile
 springdoc:
   swagger-ui:
     disable-swagger-default-url: true
     path: /swagger
-jwt:
-  jwt-secret: ======================GRID=Spring===========================
-  jwt-cookie-name: grid-jwt
-  jwt-cookie-path: /api
-  jwt-expiration-Ms: 86400000
-  jwt-cookie-max-age: 86400
+#logging:
+#  level:
+#    root: trace

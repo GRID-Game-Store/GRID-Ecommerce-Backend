@@ -6,37 +6,49 @@ services:
     container_name: grid-mysql
     ports:
       - "3307:3306"
-    environment:
-      MYSQL_ROOT_PASSWORD: spring
-      MYSQL_DATABASE: GridDB
-      MYSQL_USER: spring
-      MYSQL_PASSWORD: spring
+    env_file:
+      - src/main/resources/db/db.env
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
     container_name: grid-phpmyadmin
     ports:
       - "8081:80"
-    environment:
-      PMA_HOST: mysql
-      PMA_PORT: 3306
-      MYSQL_ROOT_PASSWORD: spring
+    env_file:
+      - src/main/resources/db/db.env
   grid:
     image: backend
     container_name: grid-backend
     build:
-      context: .
+      context: ../../..
       dockerfile: Dockerfile
     ports:
       - "8082:8082"
     depends_on:
       - mysql
-    environment:
-      - SPRING_PROFILES_ACTIVE=docker
-      - DB_USERNAME=spring
-      - DB_PASSWORD=spring
-      - DB_URL=jdbc:mysql://grid-mysql:3306/GridDB?allowPublicKeyRetrieval=true&useSSL=false
+      - keycloak
+      - keycloak-db
+    env_file:
+      - src/main/resources/db/db.env
     volumes:
       - ./target:/app/target
+
+  keycloak:
+    container_name: keycloak
+    image: quay.io/keycloak/keycloak:23.0.4
+    env_file: src/main/resources/keycloak/config/keycloak.env
+
+    ports:
+      - "8084:8080"
+    depends_on:
+      - keycloak-db
+    command:
+      - start-dev
+  keycloak-db:
+    container_name: keycloak-db
+    image: postgres:latest
+    env_file:
+      - src/main/resources/keycloak/config/keycloak.env
+
 networks:
   grid:
     external: true

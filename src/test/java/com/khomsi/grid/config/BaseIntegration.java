@@ -1,4 +1,4 @@
-package com.khomsi.grid.game.config;
+package com.khomsi.grid.config;
 
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.TestInstance;
