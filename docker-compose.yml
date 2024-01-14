@@ -29,6 +29,7 @@ services:
       - keycloak-db
     env_file:
       - src/main/resources/db/db.env
+      - src/main/resources/keycloak/config/keycloak.env
     volumes:
       - ./target:/app/target
 
@@ -43,6 +44,8 @@ services:
       - keycloak-db
     command:
       - start-dev
+    networks:
+      - grid
   keycloak-db:
     container_name: keycloak-db
     image: postgres:latest
