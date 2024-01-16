@@ -32,7 +32,7 @@ Now you can launch the server 8082.
 * run Spring Boot app using Maven:
   ```mvn spring-boot:run```
 * [optional] Run Spring Boot app with``` java -jar command
-  java -jar target/grid-0.0.1-SNAPSHOT.jar```
+  java -jar target/backend-0.0.1-SNAPSHOT.jar```
 
 ### Built With:
 
