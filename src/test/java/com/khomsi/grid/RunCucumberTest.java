@@ -1,4 +1,4 @@
-package com.khomsi.grid.game;
+package com.khomsi.grid;
 
 import io.cucumber.junit.Cucumber;
 import io.cucumber.junit.CucumberOptions;
@@ -6,7 +6,7 @@ import org.junit.runner.RunWith;
 
 @RunWith(Cucumber.class)
 @CucumberOptions(features = "src/test/resources/features",
-        glue = "com.khomsi.grid.game")
+        glue = "com.khomsi.grid")
 public class RunCucumberTest {
 
 }

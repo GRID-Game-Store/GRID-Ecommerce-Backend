@@ -42,10 +42,12 @@ services:
       - "8084:8080"
     depends_on:
       - keycloak-db
-    command:
-      - start-dev
-    networks:
-      - grid
+    command: -v start-dev
+      #    FIXME fix this import for realm
+      #    command: -v start-dev  --import-realm
+    #    volumes:
+    #      - ./keycloak/config/realm-export.json:/opt/jboss/keycloak/imports/realm-export.json
+  #      - ./src/main/resources/keycloak/config/realm-export.json:/opt/jboss/keycloak/imports/realm-export.json
   keycloak-db:
     container_name: keycloak-db
     image: postgres:latest

@@ -2,15 +2,15 @@ server:
   port: 8082
 #keycloak:
 #  auth-server-url: http://localhost:8084
-#  realm: GridProduction
+#  realm: GRID
 spring:
   security:
     oauth2:
       client:
         provider:
           keycloak:
-            issuer-uri: http://localhost:8084/realms/GridProduction
-        #            issuer-uri: http://keycloak:8084/realms/GridProduction
+            issuer-uri: http://localhost:8084/realms/GRID
+        #            issuer-uri: http://keycloak:8084/realms/GRID
         registration:
           keycloak:
             client-name: Login-App

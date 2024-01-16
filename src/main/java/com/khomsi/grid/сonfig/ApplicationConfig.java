@@ -2,6 +2,10 @@ package com.khomsi.grid.сonfig;
 
 import com.khomsi.grid.сonfig.service.PropertiesMessageService;
 import com.khomsi.grid.сonfig.service.PropertiesMessageServiceImpl;
+import io.swagger.v3.oas.models.Components;
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.info.Contact;
+import io.swagger.v3.oas.models.info.Info;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
@@ -23,5 +27,13 @@ public class ApplicationConfig {
                 registry.addMapping("/**").allowedMethods("*").allowedHeaders("*");
             }
         };
+    }
+
+    @Bean
+    public OpenAPI openAPI() {
+        return new OpenAPI().components(new Components())
+                .info(new Info().title("Application GRID REST API")
+                        .description("GRID Application that allows CRUD operations")
+                        .version("1.0").contact(new Contact().name("Samir Khomsi Kak")));
     }
 }

@@ -9,6 +9,9 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
 
+import static com.khomsi.grid.main.user.model.entity.ERole.ROLE_ADMIN;
+import static com.khomsi.grid.main.user.model.entity.ERole.ROLE_USER;
+
 @Configuration
 @RequiredArgsConstructor
 public class WebSecurityConfiguration {
@@ -22,8 +25,8 @@ public class WebSecurityConfiguration {
                         .requestMatchers("/api/v1/games", "/api/v1/games/**",
                                 "/api/v1/genres/**", "/api/v1/genres"
                         ).permitAll()
-                        .requestMatchers("/api/v1/test/admin").hasAuthority("ROLE_ADMIN")
-                        .requestMatchers("/api/v1/test/user").hasAuthority("ROLE_USER")
+                        .requestMatchers("/api/v1/test/admin").hasAuthority(ROLE_ADMIN.name())
+                        .requestMatchers("/api/v1/test/user").hasAuthority(ROLE_USER.name())
                 )
                 .csrf(AbstractHttpConfigurer::disable)
                 .oauth2Login(Customizer.withDefaults())

@@ -1,4 +1,4 @@
-package com.khomsi.grid.game.config;
+package com.khomsi.grid.config;
 
 import io.cucumber.spring.CucumberContextConfiguration;
 
