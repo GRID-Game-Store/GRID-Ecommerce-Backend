@@ -1,0 +1,37 @@
+server:
+  port: 8082
+spring:
+  security:
+    oauth2:
+      client:
+        provider:
+          keycloak:
+            issuer-uri: http://keycloak:8084/realms/GRID
+        registration:
+          keycloak:
+            client-name: Login-App
+            client-id: login-app
+            authorization-grant-type: authorization_code
+            scope: openid,profile,email,offline_access
+            client-secret: ${KEYCLOAK_CLIENT_SECRET}
+  jpa:
+    generate-ddl: 'false'
+    database-platform: org.hibernate.dialect.MySQLDialect
+  jackson:
+    property-naming-strategy: SNAKE_CASE
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  flyway:
+    baseline-on-migrate: true
+    locations: classpath:db/migration
+    user: ${DB_USERNAME}
+    url: ${DB_URL}
+    password: ${DB_PASSWORD}
+    enabled: 'true'
+springdoc:
+  swagger-ui:
+    disable-swagger-default-url: true
+    path: /swagger

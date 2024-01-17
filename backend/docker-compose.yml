@@ -1,0 +1,35 @@
+version: '1.0'
+name: grid
+services:
+  mysql:
+    image: mysql
+    container_name: grid-mysql
+    ports:
+      - "3307:3306"
+    env_file:
+      - src/main/resources/db/db.env
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: grid-phpmyadmin
+    ports:
+      - "8081:80"
+    env_file:
+      - src/main/resources/db/db.env
+  grid:
+    image: backend
+    container_name: grid-backend
+    build:
+      context: ../../..
+      dockerfile: Dockerfile
+    ports:
+      - "8082:8082"
+    depends_on:
+      - mysql
+    env_file:
+      - src/main/resources/db/db.env
+    volumes:
+      - ./target:/app/target
+networks:
+  grid:
+    external: true
+    name: none
