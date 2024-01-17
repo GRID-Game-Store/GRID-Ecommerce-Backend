@@ -1,16 +1,12 @@
 server:
   port: 8082
-#keycloak:
-#  auth-server-url: http://localhost:8084
-#  realm: GRID
 spring:
   security:
     oauth2:
       client:
         provider:
           keycloak:
-            issuer-uri: http://localhost:8084/realms/GRID
-        #            issuer-uri: http://keycloak:8084/realms/GRID
+            issuer-uri: http://keycloak:8084/realms/GRID
         registration:
           keycloak:
             client-name: Login-App
@@ -37,7 +33,5 @@ spring:
     enabled: 'true'
 springdoc:
   swagger-ui:
-    oauth:
-      client-id: login-app
     disable-swagger-default-url: true
     path: /swagger

@@ -1,7 +1,7 @@
 package com.khomsi.backend.game;
 
-import com.khomsi.grid.config.SpringIntegration;
-import com.khomsi.grid.main.game.model.entity.Game;
+import com.khomsi.backend.config.SpringIntegration;
+import com.khomsi.backend.main.game.model.entity.Game;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
@@ -15,10 +15,12 @@ import org.springframework.web.context.WebApplicationContext;
 import org.testcontainers.shaded.com.fasterxml.jackson.databind.DeserializationFeature;
 import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 
 @Slf4j
+//TODO Write scenarios for services since up to now it's not working.
 public class GameServiceTest extends SpringIntegration {
     private MockMvc mockMvc;
     //    private Long requestedGameId;

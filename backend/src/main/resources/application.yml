@@ -26,7 +26,5 @@ spring:
     enabled: 'false'
 springdoc:
   swagger-ui:
-    oauth:
-      client-id: login-app
     disable-swagger-default-url: true
     path: /swagger

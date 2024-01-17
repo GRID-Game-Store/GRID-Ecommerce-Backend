@@ -1,6 +1,5 @@
 package com.khomsi.backend.main.user.model.entity;
 
-import com.khomsi.backend.main.authentication.model.enums.AuthProvider;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -21,6 +20,7 @@ import java.util.Set;
 @Table(name = "users", uniqueConstraints =
 @UniqueConstraint(columnNames = "email"))
 public class UserInfo {
+    //TODO remove all the field and change the schema in external db due to keycloak usage
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
@@ -78,10 +78,6 @@ public class UserInfo {
 
     @Column(name = "active")
     private boolean active;
-
-    @Column(name = "provider")
-    @Enumerated(EnumType.STRING)
-    private AuthProvider provider;
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "user_roles",

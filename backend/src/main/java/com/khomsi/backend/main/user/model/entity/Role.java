@@ -13,6 +13,7 @@ import lombok.Setter;
 @Entity
 @Table(name = "roles")
 public class Role {
+    //TODO remove class and change the schema in external db due to keycloak usage
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
