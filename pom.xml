@@ -18,7 +18,6 @@
     <description>Game Store project</description>
     <modules>
         <module>backend</module>
-        <module>keycloak</module>
     </modules>
 
 </project>
