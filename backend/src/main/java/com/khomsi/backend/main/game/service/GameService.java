@@ -1,5 +1,6 @@
 package com.khomsi.backend.main.game.service;
 
+import com.khomsi.backend.main.game.model.dto.GameCriteria;
 import com.khomsi.backend.main.game.model.dto.GameModelWithGenreLimit;
 import com.khomsi.backend.main.game.model.dto.GeneralGame;
 import com.khomsi.backend.main.game.model.dto.PopularGameModel;
@@ -8,8 +9,8 @@ import com.khomsi.backend.main.game.model.entity.Game;
 import java.util.List;
 
 public interface GameService {
-    GeneralGame getGamesByPage(int page, int pageSize,
-                               String[] sort, String title);
+
+    GeneralGame getExtendedGamesByPage(GameCriteria gameCriteria);
 
     List<GameModelWithGenreLimit> getGamesByGenre(int qty, String genre);
 
