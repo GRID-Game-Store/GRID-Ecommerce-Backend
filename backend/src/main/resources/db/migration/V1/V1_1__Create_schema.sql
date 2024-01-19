@@ -30,7 +30,6 @@ CREATE TABLE IF NOT EXISTS `GridDB`.`users`
     `address`             VARCHAR(100) NULL,
     `post_index`          VARCHAR(100) NULL,
     `phone_number`        VARCHAR(255) NULL,
-    `provider`            VARCHAR(100) NULL,
     PRIMARY KEY (`id`),
     UNIQUE INDEX `email_UNIQUE` (`email` ASC) VISIBLE
 )

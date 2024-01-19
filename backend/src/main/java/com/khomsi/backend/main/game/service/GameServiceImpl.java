@@ -3,10 +3,7 @@ package com.khomsi.backend.main.game.service;
 import com.khomsi.backend.additional.genre.model.entity.Genre;
 import com.khomsi.backend.main.game.GameRepository;
 import com.khomsi.backend.main.game.mapper.GameMapper;
-import com.khomsi.backend.main.game.model.dto.GameModelWithGenreLimit;
-import com.khomsi.backend.main.game.model.dto.GeneralGame;
-import com.khomsi.backend.main.game.model.dto.PopularGameModel;
-import com.khomsi.backend.main.game.model.dto.ShortGameModel;
+import com.khomsi.backend.main.game.model.dto.*;
 import com.khomsi.backend.main.game.model.entity.Game;
 import com.khomsi.backend.main.handler.exception.GlobalServiceException;
 import lombok.AllArgsConstructor;
@@ -15,6 +12,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -34,16 +32,26 @@ public class GameServiceImpl implements GameService {
     private final GameMapper gameMapper;
 
     @Override
-    public GeneralGame getGamesByPage(int page, int pageSize, String[] sort, String title) {
-        Sort sorting = createSorting(sort);
-        Pageable pagingSort = PageRequest.of(page, pageSize, sorting);
-        Page<Game> gamePage = title == null
-                ? gameRepository.findAll(pagingSort)
-                : gameRepository.findGameByTitleContainingIgnoreCase(title, pagingSort);
+    public GeneralGame getExtendedGamesByPage(GameCriteria gameCriteria) {
+        int page = gameCriteria.getPage();
+
+        Sort sorting = createSorting(gameCriteria.getSort());
+        Pageable pagingSort = PageRequest.of(page, gameCriteria.getSize(), sorting);
+
+        Specification<Game> specification = Specification.where(null);
+        specification = specification.and(GameSpecifications.byTitle(gameCriteria.getTitle()));
+        specification = specification.and(GameSpecifications.byMaxPrice(gameCriteria.getMaxPrice()));
+        specification = specification.and(GameSpecifications.byIds(GameSpecifications.parseIds(gameCriteria.getGenres()), "genres"));
+        specification = specification.and(GameSpecifications.byIds(GameSpecifications.parseIds(gameCriteria.getPlatforms()), "platforms"));
+        specification = specification.and(GameSpecifications.byIds(GameSpecifications.parseIds(gameCriteria.getTags()), "tags"));
+        specification = specification.and(GameSpecifications.byIds(GameSpecifications.parseIds(gameCriteria.getDevelopers()), "developers"));
+
+        Page<Game> gamePage = gameRepository.findAll(specification, pagingSort);
 
         if (gamePage.isEmpty()) {
-            throw new GlobalServiceException(HttpStatus.NOT_FOUND, "Games are not found in database.");
+            throw new GlobalServiceException(HttpStatus.NOT_FOUND, "Games are not found in the database.");
         }
+
         List<ShortGameModel> shortGameModels = gamePage
                 .map(gameMapper::toShortGame)
                 .getContent();
@@ -56,6 +64,7 @@ public class GameServiceImpl implements GameService {
                 .build();
     }
 
+    @Override
     public List<GameModelWithGenreLimit> getGamesByGenre(int qty, String excludedGenre) {
         return gameRepository.findGamesByGenre(excludedGenre).stream()
                 .filter(game -> {
