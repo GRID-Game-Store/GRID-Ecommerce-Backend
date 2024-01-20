@@ -8,6 +8,8 @@ services:
       - "3307:3306"
     env_file:
       - src/main/resources/db/db.env
+    volumes:
+      - ./src/main/resources/db/init_user.sql:/docker-entrypoint-initdb.d/init_user.sql
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
     container_name: grid-phpmyadmin
