@@ -6,7 +6,7 @@ spring:
       client:
         provider:
           keycloak:
-            issuer-uri: http://keycloak:8084/realms/GRID
+            issuer-uri: http://keycloak:8080/realms/GRID
         registration:
           keycloak:
             client-name: Login-App

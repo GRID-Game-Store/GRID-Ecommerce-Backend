@@ -7,30 +7,29 @@ services:
     ports:
       - "3307:3306"
     env_file:
-      - src/main/resources/db/db.env
+      - backend/src/main/resources/db/db.env
     volumes:
-      - ./src/main/resources/db/init_user.sql:/docker-entrypoint-initdb.d/init_user.sql
+      - ./backend/src/main/resources/db/init_user.sql:/docker-entrypoint-initdb.d/init_user.sql/
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
     container_name: grid-phpmyadmin
     ports:
       - "8081:80"
     env_file:
-      - src/main/resources/db/db.env
+      - backend/src/main/resources/db/db.env
   grid:
     image: backend
     container_name: grid-backend
     build:
-      context: ../../..
       dockerfile: Dockerfile
     ports:
       - "8082:8082"
     depends_on:
       - mysql
     env_file:
-      - src/main/resources/db/db.env
+      - backend/src/main/resources/db/db.env
     volumes:
-      - ./target:/app/target
+      - ../target:/app/target
 networks:
   grid:
     external: true
