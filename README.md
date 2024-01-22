@@ -39,8 +39,7 @@ To run Spring Boot app using Docker:
 * Run the Docker Compose file inside backend folder:
   ```docker-compose -f docker-compose.yml up```
 
-**Note:** backend requires authorization in mysql database, so before running backend container, 
-make sure you added authorities in database using this documentation: [Link to documentation](https://github.com/GRID-Game-Store/documentation/blob/main/backend/docker.md)
+[Link to documentation](https://github.com/GRID-Game-Store/documentation/blob/main/backend/docker.md)
 
 ### Built With:
 
