@@ -16,6 +16,7 @@ CREATE TABLE IF NOT EXISTS `GridDB`.`users`
 (
     `id`                  VARCHAR(255)          NOT NULL,
     `email`               VARCHAR(255) NOT NULL,
+    `balance` DECIMAL NOT NULL,
     PRIMARY KEY (`id`),
     UNIQUE INDEX `email_UNIQUE` (`email` ASC) VISIBLE
 )

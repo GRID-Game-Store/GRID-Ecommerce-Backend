@@ -5,6 +5,8 @@ import org.springframework.security.oauth2.client.oidc.web.logout.OidcClientInit
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.stereotype.Component;
 
+import java.net.URI;
+
 @RequiredArgsConstructor
 @Component
 public class KeycloakLogoutHandler {
@@ -14,8 +16,7 @@ public class KeycloakLogoutHandler {
     public OidcClientInitiatedLogoutSuccessHandler oidcLogoutSuccessHandler() {
         final OidcClientInitiatedLogoutSuccessHandler oidcLogoutSuccessHandler =
                 new OidcClientInitiatedLogoutSuccessHandler(clientRegistrationRepository);
-        oidcLogoutSuccessHandler.setPostLogoutRedirectUri("{baseUrl}?logoutsuccess=true");
+        oidcLogoutSuccessHandler.setPostLogoutRedirectUri("{baseUrl}logoutsuccess=true");
         return oidcLogoutSuccessHandler;
     }
-
 }
