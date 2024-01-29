@@ -1,21 +1,12 @@
-# Stage 1: Build with Maven
-FROM maven:3.8.4-openjdk-17 AS builder
-
-WORKDIR /home/app
-COPY . /home/app
-RUN mvn clean install -U -N -f pom.xml
-
-# Stage 2: Build the application
 FROM openjdk:17-alpine
 
-WORKDIR /home/app
-COPY --from=builder /root/.m2 /root/.m2
-COPY . /home/app
+# Install Maven
+RUN apk update
+RUN apk add maven
 
-# Install Maven in the container
-RUN apk add --no-cache maven
-
-RUN mvn clean package -f pom.xml
+COPY src /home/app/src
+COPY pom.xml /home/app
+RUN mvn -f /home/app/pom.xml clean package
 
 EXPOSE 8082
-ENTRYPOINT ["java","-jar","/home/app/backend/target/backend-0.0.1-SNAPSHOT.jar"]
+ENTRYPOINT ["java","-jar","/home/app/target/backend-0.0.1-SNAPSHOT.jar"]

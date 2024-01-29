@@ -7,16 +7,16 @@ services:
     ports:
       - "3307:3306"
     env_file:
-      - backend/src/main/resources/db/db.env
+      - src/main/resources/db/db.env
     volumes:
-      - ./backend/src/main/resources/db/init_user.sql:/docker-entrypoint-initdb.d/init_user.sql/
+      - ./src/main/resources/db/init_user.sql:/docker-entrypoint-initdb.d/init_user.sql/
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
     container_name: grid-phpmyadmin
     ports:
       - "8081:80"
     env_file:
-      - backend/src/main/resources/db/db.env
+      - src/main/resources/db/db.env
   grid:
     image: backend
     container_name: grid-backend
@@ -27,10 +27,9 @@ services:
     depends_on:
       - mysql
     env_file:
-      - backend/src/main/resources/db/db.env
+      - src/main/resources/db/db.env
     volumes:
-      - ../target:/app/target
+      - ./target:/app/target
 networks:
   grid:
-    external: true
-    name: none
+    driver: bridge
