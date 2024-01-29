@@ -8,12 +8,10 @@
         <version>3.2.0-SNAPSHOT</version>
         <relativePath/>
     </parent>
-
     <groupId>com.khomsi</groupId>
-    <artifactId>backend</artifactId>
+    <artifactId>grid</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <packaging>pom</packaging>
-    <name>backend</name>
+    <name>grid</name>
 
     <description>Game Store project for Spring Boot</description>
     <properties>
@@ -152,7 +150,6 @@
             </plugin>
         </plugins>
     </build>
-
     <repositories>
         <repository>
             <id>spring-milestones</id>

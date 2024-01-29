@@ -26,10 +26,33 @@ services:
       - "8082:8082"
     depends_on:
       - mysql
+      - keycloak
     env_file:
       - src/main/resources/db/db.env
     volumes:
       - ./target:/app/target
+  keycloak:
+    container_name: keycloak
+    image: quay.io/keycloak/keycloak:23.0.4
+    env_file:
+      - src/main/resources/imports/keycloak.env
+    build:
+      context: ../../..
+      dockerfile: Dockerfile
+    ports:
+      - "8084:8080"
+    depends_on:
+      - keycloakdb
+    command: -v start-dev --import-realm --features=account3,declarative-user-profile
+    volumes:
+      - ./src/main/resources/imports:/opt/keycloak/data/import/
+      - ./src/main/resources/imports:/opt/keycloak/providers/
+  keycloakdb:
+    container_name: keycloakdb
+    image: postgres:latest
+    env_file:
+      - src/main/resources/imports/keycloak.env
 networks:
   grid:
-    driver: bridge
+    external: true
+    name: grid
