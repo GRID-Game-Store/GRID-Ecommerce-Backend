@@ -10,11 +10,13 @@
 ### IntelliJ IDEA ###
 .idea
 *.iws
-*.iml
 *.ipr
 /target/
 /backend.iml
 /src/main/resources/imports/theme-grid-keycloak-theme.jar
+/src/main/resources/imports/local-keycloak.env
+/src/main/resources/db/local-db.env
+docker-compose-local.yaml
 
 ### NetBeans ###
 /nbproject/private/
