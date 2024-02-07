@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public interface GameSpecifications {
     static Specification<Game> byTitle(String title) {
@@ -24,9 +25,11 @@ public interface GameSpecifications {
                         criteriaBuilder.conjunction();
     }
     static Set<Long> parseIds(String ids) {
-        return ids != null
-                ? Arrays.stream(ids.split(",")).map(Long::valueOf).collect(Collectors.toSet())
-                : Collections.emptySet();
+        try (Stream<String> stream = Arrays.stream(ids != null ? ids.split(",") : new String[0])) {
+            return stream.map(Long::valueOf).collect(Collectors.toSet());
+        } catch (NumberFormatException e) {
+            return Collections.emptySet();
+        }
     }
 
     static Specification<Game> byIds(Set<Long> ids, String fieldJoin) {

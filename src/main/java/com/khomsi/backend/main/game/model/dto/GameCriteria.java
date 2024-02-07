@@ -25,5 +25,6 @@ public class GameCriteria {
     String platforms;
     String tags;
     String developers;
+    String publishers;
     String[] sort = {"id,desc"};
 }
