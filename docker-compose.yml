@@ -48,7 +48,7 @@ services:
     ports:
       - "8084:8080"
 #    healthcheck:
-#      test: [ "CMD", "curl", "-f", "http://localhost:8080/realms/GRID" ]
+#      test: [ "CMD", "curl", "-f", "http://localhost:8084/realms/GRID" ]
 #      interval: 30s
 #      timeout: 10s
 #      retries: 5

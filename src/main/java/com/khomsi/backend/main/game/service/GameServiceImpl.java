@@ -44,14 +44,14 @@ public class GameServiceImpl implements GameService {
         specification = specification.and(GameSpecifications.byIds(GameSpecifications.parseIds(gameCriteria.getGenres()), "genres"));
         specification = specification.and(GameSpecifications.byIds(GameSpecifications.parseIds(gameCriteria.getPlatforms()), "platforms"));
         specification = specification.and(GameSpecifications.byIds(GameSpecifications.parseIds(gameCriteria.getTags()), "tags"));
-        specification = specification.and(GameSpecifications.byIds(GameSpecifications.parseIds(gameCriteria.getDevelopers()), "developers"));
+        specification = specification.and(GameSpecifications.byIds(GameSpecifications.parseIds(gameCriteria.getDevelopers()), "developer"));
+        specification = specification.and(GameSpecifications.byIds(GameSpecifications.parseIds(gameCriteria.getPublishers()), "publisher"));
 
         Page<Game> gamePage = gameRepository.findAll(specification, pagingSort);
 
         if (gamePage.isEmpty()) {
             throw new GlobalServiceException(HttpStatus.NOT_FOUND, "Games are not found in the database.");
         }
-
         List<ShortGameModel> shortGameModels = gamePage
                 .map(gameMapper::toShortGame)
                 .getContent();
