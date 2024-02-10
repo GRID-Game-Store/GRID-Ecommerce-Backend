@@ -688,10 +688,11 @@
       "clientAuthenticatorType": "client-secret",
       "secret": "AFUjH2a0aunmggelvnIXOrlpRujHDWgN",
       "redirectUris": [
-        "http://localhost:8082/*"
+        "http://localhost:8082/*",
+        "http://localhost:3000/*"
       ],
       "webOrigins": [
-        ""
+        "*"
       ],
       "notBefore": 0,
       "bearerOnly": false,
@@ -708,6 +709,7 @@
         "client.secret.creation.time": "1705246588",
         "backchannel.logout.session.required": "true",
         "frontchannel.logout.url": "http://localhost:8082/logout",
+        "post.logout.redirect.uris": "+",
         "display.on.consent.screen": "false",
         "oauth2.device.authorization.grant.enabled": "false",
         "backchannel.logout.revoke.offline.tokens": "false"
@@ -1469,7 +1471,7 @@
   ],
   "identityProviderMappers": [
     {
-      "id": "a6abac6a-5ff7-4c55-85f4-895f6dd2eab7",
+      "id": "efb060b6-f8bd-4bc4-abf6-51d4d5ec9b54",
       "name": "picture ",
       "identityProviderAlias": "google",
       "identityProviderMapper": "google-user-attribute-mapper",
@@ -1498,14 +1500,14 @@
         "subComponents": {},
         "config": {
           "allowed-protocol-mapper-types": [
-            "oidc-usermodel-property-mapper",
-            "oidc-usermodel-attribute-mapper",
-            "saml-user-attribute-mapper",
-            "saml-user-property-mapper",
-            "oidc-address-mapper",
             "oidc-full-name-mapper",
             "oidc-sha256-pairwise-sub-mapper",
-            "saml-role-list-mapper"
+            "saml-role-list-mapper",
+            "oidc-usermodel-property-mapper",
+            "oidc-address-mapper",
+            "saml-user-property-mapper",
+            "saml-user-attribute-mapper",
+            "oidc-usermodel-attribute-mapper"
           ]
         }
       },
@@ -1564,14 +1566,14 @@
         "subComponents": {},
         "config": {
           "allowed-protocol-mapper-types": [
-            "oidc-usermodel-attribute-mapper",
-            "saml-user-attribute-mapper",
-            "oidc-full-name-mapper",
-            "saml-role-list-mapper",
             "saml-user-property-mapper",
-            "oidc-sha256-pairwise-sub-mapper",
             "oidc-address-mapper",
-            "oidc-usermodel-property-mapper"
+            "oidc-usermodel-attribute-mapper",
+            "oidc-full-name-mapper",
+            "oidc-sha256-pairwise-sub-mapper",
+            "saml-role-list-mapper",
+            "oidc-usermodel-property-mapper",
+            "saml-user-attribute-mapper"
           ]
         }
       },

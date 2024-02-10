@@ -19,7 +19,7 @@ spring:
     generate-ddl: 'false'
     database-platform: org.hibernate.dialect.MySQLDialect
   jackson:
-    property-naming-strategy: SNAKE_CASE
+    property-naming-strategy: LOWER_CAMEL_CASE
   datasource:
     url: ${DB_URL}
     username: ${DB_USERNAME}

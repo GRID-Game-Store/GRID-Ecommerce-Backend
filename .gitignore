@@ -11,6 +11,7 @@
 .idea
 *.iws
 *.ipr
+*.iml
 /target/
 /backend.iml
 /src/main/resources/imports/theme-grid-keycloak-theme.jar

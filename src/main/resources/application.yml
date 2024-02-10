@@ -21,7 +21,7 @@ spring:
   jpa:
     generate-ddl: 'false'
   jackson:
-    property-naming-strategy: SNAKE_CASE
+    property-naming-strategy: LOWER_CAMEL_CASE
   flyway:
     enabled: 'false'
 springdoc:
