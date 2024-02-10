@@ -1,6 +1,19 @@
 server:
   port: 8082
 spring:
+  security:
+    oauth2:
+      client:
+        provider:
+          keycloak:
+            issuer-uri: http://localhost:8084/realms/GRID
+        registration:
+          keycloak:
+            client-name: Login-App
+            client-id: login-app
+            authorization-grant-type: authorization_code
+            scope: openid,profile,email,offline_access
+            client-secret: ${KEYCLOAK_CLIENT_SECRET}
   datasource:
     username: ${DB_USERNAME}
     url: ${DB_URL}
@@ -8,7 +21,7 @@ spring:
   jpa:
     generate-ddl: 'false'
   jackson:
-    property-naming-strategy: SNAKE_CASE
+    property-naming-strategy: LOWER_CAMEL_CASE
   flyway:
     enabled: 'false'
 springdoc:
