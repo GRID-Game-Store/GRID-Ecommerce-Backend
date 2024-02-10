@@ -26,7 +26,9 @@ public class WebSecurityConfiguration {
                                 "/v3/api-docs/**","/error").permitAll()
 
                         .requestMatchers("/api/v1/games", "/api/v1/games/**",
-                                "/api/v1/genres/**", "/api/v1/genres"
+                                "/api/v1/genres/**", "/api/v1/genres",
+                                "/api/v1/platforms", "/api/v1/developers",
+                                "/api/v1/publishers", "/api/v1/tags"
                         ).permitAll()
 
                         .requestMatchers("/api/v1/users/**", "/api/v1/users")

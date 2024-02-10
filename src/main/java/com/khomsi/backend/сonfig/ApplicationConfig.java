@@ -29,7 +29,8 @@ public class ApplicationConfig {
         return new WebMvcConfigurer() {
             @Override
             public void addCorsMappings(final CorsRegistry registry) {
-                registry.addMapping("/**").allowedMethods("*").allowedHeaders("*");
+                registry.addMapping("/**").allowedMethods("*").allowedHeaders("*")
+                        .allowCredentials(true).allowedOrigins("http://localhost:3000");;
             }
         };
     }
