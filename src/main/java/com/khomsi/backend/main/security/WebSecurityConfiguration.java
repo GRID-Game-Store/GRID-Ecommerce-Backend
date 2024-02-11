@@ -15,15 +15,13 @@ import static com.khomsi.backend.main.user.model.entity.ERole.ROLE_USER;
 @Configuration
 @RequiredArgsConstructor
 public class WebSecurityConfiguration {
-
     private final KeycloakLogoutHandler keycloakLogoutHandler;
-
     @Bean
     public SecurityFilterChain securityFilterChainConfig(HttpSecurity http) throws Exception {
         return http
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/swagger", "/swagger-ui/**",
-                                "/v3/api-docs/**","/error").permitAll()
+                                "/v3/api-docs/**", "/error").permitAll()
 
                         .requestMatchers("/api/v1/games", "/api/v1/games/**",
                                 "/api/v1/genres/**", "/api/v1/genres",
@@ -31,7 +29,8 @@ public class WebSecurityConfiguration {
                                 "/api/v1/publishers", "/api/v1/tags"
                         ).permitAll()
 
-                        .requestMatchers("/api/v1/users/**", "/api/v1/users")
+                        .requestMatchers("/api/v1/users/**", "/api/v1/users",
+                                "/api/v1/cart/**", "/api/v1/cart")
                         .hasAuthority(ROLE_USER.name())
                 )
                 .csrf(AbstractHttpConfigurer::disable)
@@ -44,5 +43,4 @@ public class WebSecurityConfiguration {
                         .deleteCookies("JSESSIONID"))
                 .build();
     }
-
 }
