@@ -12,10 +12,12 @@ import org.springframework.security.oauth2.core.oidc.OidcUserInfo;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.stereotype.Service;
 
+import java.util.Objects;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class UserInfoServiceImpl implements UserInfoService{
+public class UserInfoServiceImpl implements UserInfoService {
     private final UserInfoRepository userRepository;
 
     @Override
@@ -33,7 +35,8 @@ public class UserInfoServiceImpl implements UserInfoService{
     }
 
     //Get credential of auth user through keycloak
-    private OidcUserInfo getOidcUser() {
+    @Override
+    public OidcUserInfo getOidcUser() {
         OidcUser principal = (OidcUser) SecurityContextHolder.getContext()
                 .getAuthentication()
                 .getPrincipal();
@@ -52,7 +55,27 @@ public class UserInfoServiceImpl implements UserInfoService{
                 .build();
     }
 
-    protected UserInfo getExistingUser(OidcUserInfo userInfo) {
+    @Override
+    public void checkPermissionToAction(String userId) {
+        FullUserInfoDTO currentUser = getCurrentUser();
+        if (!Objects.equals(userId, currentUser.externalId())) {
+            throw new GlobalServiceException(HttpStatus.FORBIDDEN, "User with " + currentUser.externalId()
+                    + "doesn't have authorities to perform this action.");
+        }
+    }
+
+    @Override
+    public UserInfo getExistingUser(OidcUserInfo userInfo) {
         return userRepository.findUserInfoByExternalId(userInfo.getSubject());
     }
+
+    @Override
+    public UserInfo getUserInfo() {
+        final OidcUserInfo userInfo = getOidcUser();
+        if (userInfo == null) {
+            throw new GlobalServiceException(HttpStatus.UNAUTHORIZED, "User is not authenticated.");
+        }
+        return getExistingUser(userInfo);
+    }
+
 }
