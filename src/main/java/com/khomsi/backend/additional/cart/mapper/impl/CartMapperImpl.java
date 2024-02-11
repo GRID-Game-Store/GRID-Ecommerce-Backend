@@ -18,7 +18,6 @@ public class CartMapperImpl implements CartMapper {
                 .cartId(cart.getId())
                 .game(gameMapper.toShortGame(cart.getGames()))
                 .userId(cart.getUser().getExternalId())
-                .quantity(cart.getQuantity())
                 .build();
     }
 }

@@ -7,5 +7,5 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 
 @Builder
-public record CartItemDto(Long cartId, @NotNull String userId, @NotNull @Min(1) Integer quantity, @NotNull ShortGameModel game) {
+public record CartItemDto(Long cartId, @NotNull String userId, @NotNull ShortGameModel game) {
 }

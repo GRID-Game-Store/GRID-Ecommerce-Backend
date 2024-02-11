@@ -321,10 +321,9 @@ CREATE TABLE IF NOT EXISTS `GridDB`.`games_has_tags` (
 -- Table `GridDB`.`cart`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `GridDB`.`cart` (
-                                               `id` INT NOT NULL AUTO_INCREMENT,
-                                               `users_id` VARCHAR(255) NOT NULL,
+    `id` INT NOT NULL AUTO_INCREMENT,
+    `users_id` VARCHAR(255) NOT NULL,
     `games_id` INT NOT NULL,
-    `quantity` INT NOT NULL,
     `created_date` DATE NULL,
     PRIMARY KEY (`id`),
     INDEX `fk_cart_games1_idx` (`games_id` ASC) VISIBLE,
@@ -340,7 +339,6 @@ CREATE TABLE IF NOT EXISTS `GridDB`.`cart` (
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
     ENGINE = InnoDB;
-
 
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
