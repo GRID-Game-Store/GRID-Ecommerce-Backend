@@ -5,7 +5,10 @@ import com.khomsi.backend.main.game.model.entity.Game;
 import com.khomsi.backend.main.user.model.entity.UserInfo;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDate;
 
@@ -29,18 +32,12 @@ public class Cart {
     @JoinColumn(name = "games_id", nullable = false)
     private Game games;
 
-    @NotNull
-    @Column(name = "quantity", nullable = false)
-    private Integer quantity;
-
     @Column(name = "created_date")
     private LocalDate createdDate;
 
-
-    public Cart(Game games, int quantity, UserInfo user) {
+    public Cart(Game games, UserInfo user) {
         this.user = user;
         this.games = games;
-        this.quantity = quantity;
         this.createdDate = LocalDate.now();
     }
 }

@@ -1,12 +1,10 @@
 package com.khomsi.backend.additional.cart.controller;
 
-import com.khomsi.backend.additional.cart.model.dto.AddToCartDto;
 import com.khomsi.backend.additional.cart.model.dto.CartDTO;
 import com.khomsi.backend.additional.cart.model.response.CartResponse;
 import com.khomsi.backend.additional.cart.service.CartService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
@@ -29,20 +27,11 @@ public class CartController {
         return new ResponseEntity<>(cartService.cartItems(), HttpStatus.OK);
     }
 
-    @PostMapping("/add")
+    @PostMapping("/add/{game-id}")
     @Operation(summary = "Add item to user's cart")
-    public ResponseEntity<CartResponse> addToCart(@RequestBody @Valid AddToCartDto addToCartDto) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(cartService.addToCart(addToCartDto));
+    public ResponseEntity<CartResponse> addToCart(@PathVariable("game-id") @Min(1) @Max(Long.MAX_VALUE) Long gameId) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(cartService.addToCart(gameId));
     }
-
-    @PutMapping("/update/{cart-id}")
-    @Operation(summary = "Update user's cart")
-    public ResponseEntity<CartResponse> updateCartItem(
-            @PathVariable("cart-id") @Min(1) @Max(Long.MAX_VALUE) Long cartItemId,
-            @RequestBody @Valid AddToCartDto addToCartDto) {
-        return ResponseEntity.status(HttpStatus.OK).body(cartService.updateCartItem(cartItemId, addToCartDto));
-    }
-
     @DeleteMapping("/delete/{cart-id}")
     @Operation(summary = "Delete item from user's cart")
     public ResponseEntity<CartResponse> deleteCartItem(@PathVariable("cart-id")

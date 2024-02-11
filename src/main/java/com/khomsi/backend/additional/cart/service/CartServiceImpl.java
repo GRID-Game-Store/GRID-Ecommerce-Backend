@@ -2,7 +2,6 @@ package com.khomsi.backend.additional.cart.service;
 
 import com.khomsi.backend.additional.cart.CartRepository;
 import com.khomsi.backend.additional.cart.mapper.CartMapper;
-import com.khomsi.backend.additional.cart.model.dto.AddToCartDto;
 import com.khomsi.backend.additional.cart.model.dto.CartDTO;
 import com.khomsi.backend.additional.cart.model.dto.CartItemDto;
 import com.khomsi.backend.additional.cart.model.entity.Cart;
@@ -19,7 +18,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -32,12 +30,18 @@ public class CartServiceImpl implements CartService {
     private final CartMapper cartMapper;
 
     @Override
-    public CartResponse addToCart(AddToCartDto addToCartDto) {
+    public CartResponse addToCart(Long gameId) {
         UserInfo existingUser = userInfoService.getUserInfo();
-        Game game = gameService.getGameById(addToCartDto.gameId());
-        cartRepository.save(new Cart(game, addToCartDto.quantity(), existingUser));
+        Game game = gameService.getGameById(gameId);
+
+        Cart existingCartEntry = cartRepository.findByUserAndGames(existingUser, game);
+        if (existingCartEntry != null) {
+            return new CartResponse("Game is already in the cart.");
+        }
+        cartRepository.save(new Cart(game, existingUser));
         return new CartResponse("Successfully added to cart!");
     }
+
 
     @Override
     public CartDTO cartItems() {
@@ -45,20 +49,9 @@ public class CartServiceImpl implements CartService {
         List<Cart> cartList = cartRepository.findAllByUserOrderByCreatedDate(existingUser);
         List<CartItemDto> cartItems = cartList.stream().map(cartMapper::toDtoFromCart).toList();
         BigDecimal totalCost = cartItems.stream()
-                .map(cartItemDto -> cartItemDto.game().price().multiply(
-                        BigDecimal.valueOf(cartItemDto.quantity())))
+                .map(cartItemDto -> cartItemDto.game().price())
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
         return new CartDTO(cartItems, totalCost);
-    }
-
-    @Override
-    public CartResponse updateCartItem(Long cartItemId, AddToCartDto cartDto) {
-        Cart cart = cartRepository.getReferenceById(cartItemId);
-        userInfoService.checkPermissionToAction(cart.getUser().getExternalId());
-        cart.setQuantity(cartDto.quantity());
-        cart.setCreatedDate(LocalDate.now());
-        cartRepository.save(cart);
-        return new CartResponse("Cart has been successfully updated!");
     }
 
     @Override
