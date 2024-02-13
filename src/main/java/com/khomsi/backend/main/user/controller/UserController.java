@@ -3,6 +3,7 @@ package com.khomsi.backend.main.user.controller;
 import com.khomsi.backend.main.user.model.dto.FullUserInfoDTO;
 import com.khomsi.backend.main.user.service.UserInfoService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -14,7 +15,6 @@ import org.springframework.web.bind.annotation.*;
 @Validated
 @RequiredArgsConstructor
 @Tag(name = "User", description = "CRUD operation for User Controller")
-@CrossOrigin
 public class UserController {
     private final UserInfoService userInfoService;
 
@@ -27,7 +27,8 @@ public class UserController {
 
     //TODO endpoint for tests, will be removed in future
     @GetMapping("/test")
-    @Operation(summary = "Controller to test the authorization of user")
+    @Operation(security = {@SecurityRequirement(name = "bearer")})
+//    @Operation(summary = "Controller to test the authorization of user")
     @ResponseStatus(HttpStatus.OK)
     public String showTest() {
         return "Test";

@@ -6,6 +6,8 @@ import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Contact;
 import io.swagger.v3.oas.models.info.Info;
+import io.swagger.v3.oas.models.security.SecurityScheme;
+import org.springdoc.core.models.GroupedOpenApi;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
@@ -24,10 +26,10 @@ public class ApplicationConfig {
         return new PropertiesMessageServiceImpl(env);
     }
 
-    @Bean
-    public WebSecurityCustomizer webSecurityCustomizer() {
-        return web -> web.ignoring().requestMatchers("/favicon.ico");
-    }
+//    @Bean
+//    public WebSecurityCustomizer webSecurityCustomizer() {
+//        return web -> web.ignoring().requestMatchers("/favicon.ico");
+//    }
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource(@Value("${app.cors.allowed-origins}")
@@ -43,9 +45,21 @@ public class ApplicationConfig {
     }
     @Bean
     public OpenAPI openAPI() {
-        return new OpenAPI().components(new Components())
+        return new OpenAPI().components(new Components()
+                .addSecuritySchemes("bearer-key",
+                new SecurityScheme().type(SecurityScheme.Type.HTTP).scheme("bearer").bearerFormat("JWT")))
                 .info(new Info().title("Application GRID REST API")
                         .description("GRID Application that allows CRUD operations")
                         .version("1.0").contact(new Contact().name("Samir Khomsi Kak")));
     }
+    @Bean
+    public GroupedOpenApi customApi() {
+        return GroupedOpenApi.builder().group("api").pathsToMatch("/api/**").build();
+    }
+
+    @Bean
+    public GroupedOpenApi actuatorApi() {
+        return GroupedOpenApi.builder().group("actuator").pathsToMatch("/actuator/**").build();
+    }
+
 }

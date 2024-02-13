@@ -3,20 +3,32 @@ server:
 app:
   cors:
     allowed-origins: http://localhost:3000
+jwt:
+  auth:
+    converter:
+      resource-id: login-app
+      principal-attribute: preferred_username
 spring:
   security:
     oauth2:
-      client:
-        provider:
-          keycloak:
-            issuer-uri: http://localhost:8084/realms/GRID
-        registration:
-          keycloak:
-            client-name: Login-App
-            client-id: login-app
-            authorization-grant-type: authorization_code
-            scope: openid,profile,email,offline_access
-            client-secret: ${KEYCLOAK_CLIENT_SECRET}
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8084/realms/GRID
+#  application:
+#    name: grid
+#  security:
+#    oauth2:
+#      client:
+#        provider:
+#          keycloak:
+#            issuer-uri: http://localhost:8084/realms/GRID
+#        registration:
+#          keycloak:
+#            client-name: Login-App
+#            client-id: login-app
+#            authorization-grant-type: authorization_code
+#            scope: openid,profile,email,offline_access
+#            client-secret: ${KEYCLOAK_CLIENT_SECRET}
   datasource:
     username: ${DB_USERNAME}
     url: ${DB_URL}
@@ -28,11 +40,10 @@ spring:
   flyway:
     enabled: 'false'
 springdoc:
+  show-actuator: true
   swagger-ui:
     disable-swagger-default-url: true
     path: /swagger
 logging:
   level:
-    org:
-      springframework:
-        security: trace
+    org.springframework.security: trace
