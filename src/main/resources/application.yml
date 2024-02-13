@@ -1,5 +1,8 @@
 server:
   port: 8082
+app:
+  cors:
+    allowed-origins: http://localhost:3000
 spring:
   security:
     oauth2:
@@ -28,3 +31,8 @@ springdoc:
   swagger-ui:
     disable-swagger-default-url: true
     path: /swagger
+logging:
+  level:
+    org:
+      springframework:
+        security: trace
