@@ -21,15 +21,11 @@ import java.util.List;
 
 @Configuration
 public class ApplicationConfig {
+    public static final String BEARER_KEY_SECURITY_SCHEME = "bearer-key";
     @Bean
     public PropertiesMessageService messageService(Environment env) {
         return new PropertiesMessageServiceImpl(env);
     }
-
-//    @Bean
-//    public WebSecurityCustomizer webSecurityCustomizer() {
-//        return web -> web.ignoring().requestMatchers("/favicon.ico");
-//    }
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource(@Value("${app.cors.allowed-origins}")
@@ -46,7 +42,7 @@ public class ApplicationConfig {
     @Bean
     public OpenAPI openAPI() {
         return new OpenAPI().components(new Components()
-                .addSecuritySchemes("bearer-key",
+                .addSecuritySchemes(BEARER_KEY_SECURITY_SCHEME,
                 new SecurityScheme().type(SecurityScheme.Type.HTTP).scheme("bearer").bearerFormat("JWT")))
                 .info(new Info().title("Application GRID REST API")
                         .description("GRID Application that allows CRUD operations")

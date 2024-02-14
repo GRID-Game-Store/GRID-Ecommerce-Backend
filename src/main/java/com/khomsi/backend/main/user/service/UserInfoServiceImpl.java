@@ -8,8 +8,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.oauth2.core.oidc.OidcUserInfo;
-import org.springframework.security.oauth2.core.oidc.user.OidcUser;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 
 import java.util.Objects;
@@ -22,39 +21,35 @@ public class UserInfoServiceImpl implements UserInfoService {
 
     @Override
     public FullUserInfoDTO getCurrentUser() {
-        final OidcUserInfo userInfo = getOidcUser();
-        if (userInfo == null) {
+        Jwt jwt = getJwt();
+        if (jwt == null) {
             throw new GlobalServiceException(HttpStatus.UNAUTHORIZED, "User is not authenticated.");
         }
-        UserInfo existingUser = getExistingUser(userInfo);
+        UserInfo existingUser = getExistingUser(jwt.getSubject());
         if (existingUser == null) {
             throw new GlobalServiceException(HttpStatus.BAD_REQUEST,
                     "User is empty in external database to view full profile.");
         }
-        return getUserInfo(existingUser, userInfo);
+        return getUserInfo(existingUser, jwt);
     }
 
     //Get credential of auth user through keycloak
     @Override
-    public OidcUserInfo getOidcUser() {
-        OidcUser principal = (OidcUser) SecurityContextHolder.getContext()
-                .getAuthentication()
-                .getPrincipal();
-        return principal.getUserInfo();
+    public Jwt getJwt() {
+        return (Jwt) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
-
-    private FullUserInfoDTO getUserInfo(UserInfo existingUser, OidcUserInfo userInfo) {
+    private FullUserInfoDTO getUserInfo(UserInfo existingUser, Jwt jwt) {
         return FullUserInfoDTO.builder()
-                .externalId(userInfo.getSubject())
-                .email(userInfo.getEmail())
+                .externalId(jwt.getSubject())
+                .email(jwt.getClaimAsString("email"))
+                .givenName(jwt.getClaimAsString("given_name"))
+                .familyName(jwt.getClaimAsString("family_name"))
+                .gender(jwt.getClaimAsString("gender"))
+                .birthdate(jwt.getClaimAsString("birthdate"))
                 .balance(existingUser.getBalance())
-                .givenName(userInfo.getGivenName())
-                .familyName(userInfo.getFamilyName())
-                .gender(userInfo.getGender())
-                .birthdate(userInfo.getBirthdate())
+                // Add other user information based on JWT claims or user in db
                 .build();
     }
-
     @Override
     public void checkPermissionToAction(String userId) {
         FullUserInfoDTO currentUser = getCurrentUser();
@@ -65,17 +60,16 @@ public class UserInfoServiceImpl implements UserInfoService {
     }
 
     @Override
-    public UserInfo getExistingUser(OidcUserInfo userInfo) {
-        return userRepository.findUserInfoByExternalId(userInfo.getSubject());
+    public UserInfo getExistingUser(String userInfo) {
+        return userRepository.findUserInfoByExternalId(userInfo);
     }
 
     @Override
     public UserInfo getUserInfo() {
-        final OidcUserInfo userInfo = getOidcUser();
-        if (userInfo == null) {
+        Jwt jwt = getJwt();
+        if (jwt == null) {
             throw new GlobalServiceException(HttpStatus.UNAUTHORIZED, "User is not authenticated.");
         }
-        return getExistingUser(userInfo);
+        return getExistingUser(jwt.getSubject());
     }
-
 }

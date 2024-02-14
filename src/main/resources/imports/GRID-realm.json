@@ -48,35 +48,19 @@
   "roles": {
     "realm": [
       {
-        "id": "65ec0f72-b37b-4602-8d28-9c1266d9d737",
-        "name": "ROLE_USER",
-        "description": "",
-        "composite": false,
-        "clientRole": false,
-        "containerId": "21e98aec-db49-4af9-9825-4e59d0599854",
-        "attributes": {}
-      },
-      {
-        "id": "549734ca-88cc-4ed4-af75-32e823b6f790",
-        "name": "ROLE_ADMIN",
-        "description": "",
-        "composite": false,
-        "clientRole": false,
-        "containerId": "21e98aec-db49-4af9-9825-4e59d0599854",
-        "attributes": {}
-      },
-      {
         "id": "c85b996f-f1e7-4400-9068-f92ef54698b4",
         "name": "default-roles-springbootkeycloak",
         "description": "${role_default-roles}",
         "composite": true,
         "composites": {
           "realm": [
-            "ROLE_USER",
             "offline_access",
             "uma_authorization"
           ],
           "client": {
+            "login-app": [
+              "USER"
+            ],
             "account": [
               "manage-account",
               "view-profile"
@@ -321,7 +305,26 @@
       ],
       "security-admin-console": [],
       "admin-cli": [],
-      "login-app": [],
+      "login-app": [
+        {
+          "id": "79083e8b-bb34-479a-8fb5-f17e6f55c06e",
+          "name": "USER",
+          "description": "",
+          "composite": false,
+          "clientRole": true,
+          "containerId": "425868f4-dd0e-4a64-bd38-65f97c118564",
+          "attributes": {}
+        },
+        {
+          "id": "1c402939-a7a8-4a43-a92e-69ebe1bd4c36",
+          "name": "ADMIN",
+          "description": "",
+          "composite": false,
+          "clientRole": true,
+          "containerId": "425868f4-dd0e-4a64-bd38-65f97c118564",
+          "attributes": {}
+        }
+      ],
       "account-console": [],
       "broker": [
         {
@@ -688,10 +691,10 @@
       "clientAuthenticatorType": "client-secret",
       "secret": "AFUjH2a0aunmggelvnIXOrlpRujHDWgN",
       "redirectUris": [
-        "http://localhost:8082/*"
+        "http://localhost:3000/*"
       ],
       "webOrigins": [
-        ""
+        "http://localhost:3000"
       ],
       "notBefore": 0,
       "bearerOnly": false,
@@ -700,14 +703,15 @@
       "implicitFlowEnabled": false,
       "directAccessGrantsEnabled": true,
       "serviceAccountsEnabled": false,
-      "publicClient": false,
-      "frontchannelLogout": true,
+      "publicClient": true,
+      "frontchannelLogout": false,
       "protocol": "openid-connect",
       "attributes": {
         "oidc.ciba.grant.enabled": "false",
         "client.secret.creation.time": "1705246588",
         "backchannel.logout.session.required": "true",
         "frontchannel.logout.url": "http://localhost:8082/logout",
+        "post.logout.redirect.uris": "+",
         "display.on.consent.screen": "false",
         "oauth2.device.authorization.grant.enabled": "false",
         "backchannel.logout.revoke.offline.tokens": "false"
@@ -1469,7 +1473,7 @@
   ],
   "identityProviderMappers": [
     {
-      "id": "a6abac6a-5ff7-4c55-85f4-895f6dd2eab7",
+      "id": "b4514682-9f0b-497c-bd39-5ac4283d01ce",
       "name": "picture ",
       "identityProviderAlias": "google",
       "identityProviderMapper": "google-user-attribute-mapper",
@@ -1498,14 +1502,14 @@
         "subComponents": {},
         "config": {
           "allowed-protocol-mapper-types": [
-            "oidc-usermodel-property-mapper",
-            "oidc-usermodel-attribute-mapper",
-            "saml-user-attribute-mapper",
-            "saml-user-property-mapper",
             "oidc-address-mapper",
+            "oidc-usermodel-attribute-mapper",
+            "oidc-usermodel-property-mapper",
             "oidc-full-name-mapper",
             "oidc-sha256-pairwise-sub-mapper",
-            "saml-role-list-mapper"
+            "saml-user-attribute-mapper",
+            "saml-role-list-mapper",
+            "saml-user-property-mapper"
           ]
         }
       },
@@ -1564,14 +1568,14 @@
         "subComponents": {},
         "config": {
           "allowed-protocol-mapper-types": [
-            "oidc-usermodel-attribute-mapper",
-            "saml-user-attribute-mapper",
             "oidc-full-name-mapper",
             "saml-role-list-mapper",
-            "saml-user-property-mapper",
             "oidc-sha256-pairwise-sub-mapper",
+            "saml-user-attribute-mapper",
+            "oidc-usermodel-attribute-mapper",
             "oidc-address-mapper",
-            "oidc-usermodel-property-mapper"
+            "oidc-usermodel-property-mapper",
+            "saml-user-property-mapper"
           ]
         }
       },

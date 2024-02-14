@@ -9,14 +9,10 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 
-import static com.khomsi.backend.main.user.model.entity.ERole.ROLE_ADMIN;
-import static com.khomsi.backend.main.user.model.entity.ERole.ROLE_USER;
-
 
 @Configuration
 @RequiredArgsConstructor
 public class WebSecurityConfiguration {
-    //    private final KeycloakLogoutHandler keycloakLogoutHandler;
     private final JwtAuthConverter jwtAuthConverter;
 
     @Bean
@@ -34,8 +30,7 @@ public class WebSecurityConfiguration {
 
                         .requestMatchers("/api/v1/users/**", "/api/v1/users",
                                 "/api/v1/cart/**", "/api/v1/cart")
-//                        .hasAnyAuthority(ROLE_USER.name(), ROLE_ADMIN.name())
-                                .hasAnyRole("USER", "ADMIN")
+                        .hasAnyRole("USER", "ADMIN")
                 )
                 .oauth2ResourceServer(oauth2ResourceServer -> oauth2ResourceServer.jwt(
                         jwt -> jwt.jwtAuthenticationConverter(jwtAuthConverter)))
