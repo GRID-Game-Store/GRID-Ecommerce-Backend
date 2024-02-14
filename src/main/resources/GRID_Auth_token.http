@@ -1,0 +1,25 @@
+# GRID Web
+###
+# group: Auth
+# @name User Profile
+GET http://localhost:8082/api/v1/users/profile
+
+###
+# group: Auth
+# @name Get access token
+POST http://localhost:8084/realms/GRID/protocol/openid-connect/token?
+    username=admin&
+    password=admin&
+    grant_type=password&
+    client_id=login-app
+Content-Type: application/x-www-form-urlencoded
+
+username = samerx777222@gmail.com &
+password = samerx777222@gmail.com &
+grant_type = password &
+client_id = login-app
+
+###
+# group: Auth
+# @name Test user
+GET http://localhost:8082/api/v1/users/test
