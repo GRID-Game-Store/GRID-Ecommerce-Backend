@@ -1,20 +1,13 @@
 server:
   port: 8082
+  max-http-request-header-size: 10000
 spring:
   security:
     oauth2:
-      client:
-        provider:
-          keycloak:
-            issuer-uri: http://keycloak:8080/realms/GRID
-#            issuer-uri: http://localhost:8084/realms/GRID
-        registration:
-          keycloak:
-            client-name: Login-App
-            client-id: login-app
-            authorization-grant-type: authorization_code
-            scope: openid,profile,email,offline_access
-            client-secret: ${KEYCLOAK_CLIENT_SECRET}
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8084/realms/GRID
+#          issuer-uri: http://keycloak:8080/realms/GRID
   jpa:
     generate-ddl: 'false'
     database-platform: org.hibernate.dialect.MySQLDialect

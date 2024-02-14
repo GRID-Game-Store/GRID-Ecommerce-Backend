@@ -5,7 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 
 @SpringBootApplication
-@ConfigurationPropertiesScan
+//@ConfigurationPropertiesScan
 public class GridApplication {
     public static void main(String[] args) {
         SpringApplication.run(GridApplication.class, args);

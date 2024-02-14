@@ -1,6 +1,8 @@
 package com.khomsi.backend.main.game.model.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.khomsi.backend.additional.cart.model.entity.Cart;
 import com.khomsi.backend.additional.developer.model.entity.Developer;
 import com.khomsi.backend.additional.genre.model.entity.Genre;
 import com.khomsi.backend.additional.media.model.entity.GameMedia;
@@ -15,6 +17,7 @@ import lombok.*;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Set;
 
 @Builder
@@ -93,10 +96,12 @@ public class Game {
             , inverseJoinColumns = @JoinColumn(name = "platforms_id"))
     @ToString.Exclude
     private Set<Platform> platforms;
-
+    @JsonIgnore
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "games")
+    @ToString.Exclude
+    private List<Cart> carts;
     @OneToOne(mappedBy = "games", cascade = CascadeType.ALL)
     private GameMedia gameMedia;
-
     public BigDecimal getPrice() {
         if (discount == null || price == null) {
             return price;
