@@ -1,6 +1,12 @@
 server:
   port: 8082
   max-http-request-header-size: 10000
+app:
+  payment:
+    unitAmount: "100"
+    currency: "uah"
+    stripe-secret: ${STRIPE_SECRET_KEY}
+  front-url: http://localhost:3000
 spring:
   security:
     oauth2:

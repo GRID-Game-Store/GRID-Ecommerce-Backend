@@ -28,7 +28,7 @@ public class ApplicationConfig {
     }
 
     @Bean
-    public CorsConfigurationSource corsConfigurationSource(@Value("${app.cors.allowed-origins}")
+    public CorsConfigurationSource corsConfigurationSource(@Value("${app.front-url}")
                                                                List<String> allowedOrigins) {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowCredentials(true);

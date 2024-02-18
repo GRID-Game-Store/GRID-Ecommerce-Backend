@@ -1,13 +1,18 @@
 server:
   port: 8082
   max-http-request-header-size: 10000
+app:
+  payment:
+    unitAmount: "100"
+    currency: "uah"
+    stripe-secret: ${STRIPE_SECRET_KEY}
+  front-url: http://localhost:3000
 spring:
   security:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: http://localhost:8084/realms/GRID
-#          issuer-uri: http://keycloak:8080/realms/GRID
+          issuer-uri: http://auth.grid.domain-for-tests.com:8084/realms/GRID
   jpa:
     generate-ddl: 'false'
     database-platform: org.hibernate.dialect.MySQLDialect

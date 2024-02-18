@@ -2,8 +2,11 @@ server:
   port: 8082
   max-http-request-header-size: 10000
 app:
-  cors:
-    allowed-origins: http://localhost:3000
+  payment:
+    unitAmount: "100"
+    currency: "uah"
+    stripe-secret: ${STRIPE_SECRET_KEY}
+  front-url: http://localhost:3000
 jwt:
   auth:
     converter:
@@ -14,7 +17,8 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: http://localhost:8084/realms/GRID
+#          issuer-uri: http://localhost:8084/realms/GRID
+          issuer-uri: http://auth.grid.domain-for-tests.com:8084/realms/GRID
   datasource:
     username: ${DB_USERNAME}
     url: ${DB_URL}
