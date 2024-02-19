@@ -1,8 +1,8 @@
 package com.khomsi.backend.main.checkout.controller;
 
-import com.khomsi.backend.main.checkout.apis.Payment;
-import com.khomsi.backend.main.checkout.model.dto.CheckoutItemDto;
-import com.khomsi.backend.main.checkout.model.dto.stripe.StripeResponse;
+import com.khomsi.backend.main.checkout.apis.PaypalService;
+import com.khomsi.backend.main.checkout.apis.StripeService;
+import com.khomsi.backend.main.checkout.model.dto.stripe.PaymentResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -12,8 +12,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 import static com.khomsi.backend.сonfig.ApplicationConfig.BEARER_KEY_SECURITY_SCHEME;
 
 @RestController
@@ -22,29 +20,51 @@ import static com.khomsi.backend.сonfig.ApplicationConfig.BEARER_KEY_SECURITY_S
 @Validated
 @RequiredArgsConstructor
 public class CheckoutController {
-    private final Payment payment;
+    private final StripeService stripeService;
+    private final PaypalService paypalService;
 
     @PostMapping("/stripe/create-payment")
     @Operation(security = {@SecurityRequirement(name = BEARER_KEY_SECURITY_SCHEME)},
-            summary = "Stripe create payment")
-    public ResponseEntity<StripeResponse> checkoutList(@RequestBody List<CheckoutItemDto> checkoutItemDtoList
-            , HttpServletRequest request) {
+            summary = "Stripe endpoint to create session")
+    public ResponseEntity<PaymentResponse> checkoutStripe(HttpServletRequest request) {
         // create the stripe session
-        StripeResponse stripeResponse = payment.createPayment(checkoutItemDtoList, request);
+        PaymentResponse paymentResponse = stripeService.createPayment( request);
         // send the stripe session id in response
         return ResponseEntity
-                .status(stripeResponse.httpStatus())
-                .body(stripeResponse);
+                .status(paymentResponse.httpStatus())
+                .body(paymentResponse);
     }
 
     // Check and place the order if success
     @PostMapping("/stripe/capture-payment")
     @Operation(security = {@SecurityRequirement(name = BEARER_KEY_SECURITY_SCHEME)},
-            summary = "Payment capture to place the order")
-    public ResponseEntity<StripeResponse> placeOrder(@RequestParam("sessionId") String sessionId) {
-        StripeResponse stripeResponse = payment.capturePayment(sessionId);
+            summary = "StripeService capture to place the order")
+    public ResponseEntity<PaymentResponse> placeStripeOrder(@RequestParam("sessionId") String sessionId) {
+        PaymentResponse paymentResponse = stripeService.capturePayment(sessionId);
         return ResponseEntity
-                .status(stripeResponse.httpStatus())
-                .body(stripeResponse);
+                .status(paymentResponse.httpStatus())
+                .body(paymentResponse);
+    }
+
+    @PostMapping("/paypal/create-payment")
+    @Operation(security = {@SecurityRequirement(name = BEARER_KEY_SECURITY_SCHEME)},
+            summary = "Paypal endpoint to create session")
+    public ResponseEntity<PaymentResponse> checkoutPayPal(HttpServletRequest request) {
+        // create the stripe session
+        PaymentResponse paymentResponse = paypalService.createPayment(request);
+        // send the stripe session id in response
+        return ResponseEntity
+                .status(paymentResponse.httpStatus())
+                .body(paymentResponse);
+    }
+
+    @PostMapping("/paypal/capture-payment")
+    @Operation(security = {@SecurityRequirement(name = BEARER_KEY_SECURITY_SCHEME)},
+            summary = "PaypalService capture to place the order")
+    public ResponseEntity<PaymentResponse> placePayPalOrder(@RequestParam("token") String token) {
+        PaymentResponse paymentResponse = paypalService.capturePayment(token);
+        return ResponseEntity
+                .status(paymentResponse.httpStatus())
+                .body(paymentResponse);
     }
 }

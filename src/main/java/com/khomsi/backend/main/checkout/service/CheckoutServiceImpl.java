@@ -28,7 +28,7 @@ public class CheckoutServiceImpl implements CheckoutService {
     private final TransactionGamesRepository transactionGamesRepository;
 
     @Override
-    public void placeOrder(String sessionId) {
+    public void placeOrder(String sessionId, PaymentMethod paymentMethod) {
         UserInfo existingUser = userInfoService.getUserInfo();
         CartDTO cartDto = cartService.cartItems();
         List<CartItemDto> cartItemDtoList = cartDto.cartItems();
@@ -39,7 +39,7 @@ public class CheckoutServiceImpl implements CheckoutService {
         transaction.setTransactionId(sessionId);
         transaction.setUsers(existingUser);
         transaction.setTotalAmount(cartDto.totalCost());
-        transaction.setPaymentMethods(PaymentMethod.STRIPE.name());
+        transaction.setPaymentMethods(String.valueOf(paymentMethod));
         transaction.setPaid(true);
         transactionRepository.save(transaction);
 

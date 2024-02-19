@@ -1,10 +1,14 @@
-package com.khomsi.backend.main.checkout.apis;
+package com.khomsi.backend.main.checkout.apis.impl;
 
-import com.khomsi.backend.main.checkout.model.dto.CheckoutItemDto;
+import com.khomsi.backend.additional.cart.model.dto.CartDTO;
+import com.khomsi.backend.additional.cart.model.dto.CartItemDto;
+import com.khomsi.backend.additional.cart.service.CartService;
+import com.khomsi.backend.main.checkout.apis.StripeService;
 import com.khomsi.backend.main.checkout.model.dto.stripe.CapturePaymentResponse;
 import com.khomsi.backend.main.checkout.model.dto.stripe.CreatePaymentResponse;
-import com.khomsi.backend.main.checkout.model.dto.stripe.StripeResponse;
+import com.khomsi.backend.main.checkout.model.dto.stripe.PaymentResponse;
 import com.khomsi.backend.main.checkout.model.enums.Constant;
+import com.khomsi.backend.main.checkout.model.enums.PaymentMethod;
 import com.khomsi.backend.main.checkout.service.CheckoutService;
 import com.stripe.Stripe;
 import com.stripe.exception.StripeException;
@@ -25,20 +29,26 @@ import static com.khomsi.backend.main.checkout.model.enums.PaymentEndpoints.*;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class StripeImpl implements Payment {
-    @Value("${app.payment.stripe-secret}")
+public class StripeServiceImpl implements StripeService {
+    @Value("${app.payment.stripe.stripe-secret}")
     private String secretKey;
-    @Value("${app.payment.currency}")
+    @Value("${app.payment.stripe.currency}")
     private String currency;
     @Value("${app.payment.unitAmount}")
     private String unitAmount;
     private final CheckoutService checkoutService;
+    private final CartService cartService;
 
-    public StripeResponse createPayment(List<CheckoutItemDto> checkoutItemDtoList, HttpServletRequest url) {
+    public PaymentResponse createPayment(HttpServletRequest url) {
+        CartDTO cartDto = cartService.cartItems();
+        List<CartItemDto> cartItemDtoList = cartDto.cartItems();
+        if (cartItemDtoList.isEmpty()) {
+            return buildFailureResponse("Cart is empty", HttpStatus.BAD_REQUEST);
+        }
         try {
             Stripe.apiKey = secretKey;
 
-            List<SessionCreateParams.LineItem> sessionItemsList = createSessionItemsList(checkoutItemDtoList);
+            List<SessionCreateParams.LineItem> sessionItemsList = createSessionItemsList(cartItemDtoList);
 
             SessionCreateParams params = buildSessionParams(url, sessionItemsList);
 
@@ -46,15 +56,15 @@ public class StripeImpl implements Payment {
 
             CreatePaymentResponse responseData = buildPaymentResponse(session);
 
-            return buildResponse(responseData, "Payment session created successfully");
+            return buildResponse(responseData, "StripeService session created successfully");
         } catch (StripeException e) {
             log.error("Error creating payment session: {}", e.getMessage());
-            return buildFailureResponse("Payment session creation failed", HttpStatus.BAD_REQUEST);
+            return buildFailureResponse("StripeService session creation failed", HttpStatus.BAD_REQUEST);
         }
     }
 
     @Override
-    public StripeResponse capturePayment(String sessionId) {
+    public PaymentResponse capturePayment(String sessionId) {
         Stripe.apiKey = secretKey;
         try {
             Session session = Session.retrieve(sessionId);
@@ -62,16 +72,16 @@ public class StripeImpl implements Payment {
             CapturePaymentResponse responseData = buildCapturePaymentResponse(sessionId, status);
 
             if (status.equalsIgnoreCase(Constant.STRIPE_SESSION_STATUS_SUCCESS.label)) {
-                checkoutService.placeOrder(sessionId);
+                checkoutService.placeOrder(sessionId, PaymentMethod.STRIPE);
                 return buildResponse(responseData,
-                        "Payment successfully captured for session ID: " + sessionId);
+                        "StripeService successfully captured for session ID: " + sessionId);
             } else {
-                return buildFailureResponse("Payment capture failed for session ID: " + sessionId,
+                return buildFailureResponse("StripeService capture failed for session ID: " + sessionId,
                         HttpStatus.BAD_REQUEST, responseData);
             }
         } catch (StripeException e) {
             log.error("Error capturing payment: {}", e.getMessage());
-            return buildFailureResponse("Payment capture failed due to a server error.",
+            return buildFailureResponse("StripeService capture failed due to a server error.",
                     HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -84,8 +94,8 @@ public class StripeImpl implements Payment {
                 .build();
     }
 
-    private <T> StripeResponse buildResponse(T responseData, String message) {
-        return StripeResponse.builder()
+    private <T> PaymentResponse buildResponse(T responseData, String message) {
+        return PaymentResponse.builder()
                 .status(Constant.SUCCESS.name())
                 .message(message)
                 .httpStatus(HttpStatus.OK.value())
@@ -93,8 +103,8 @@ public class StripeImpl implements Payment {
                 .build();
     }
 
-    private <T> StripeResponse buildFailureResponse(String message, HttpStatus httpStatus, T responseData) {
-        return StripeResponse.builder()
+    private <T> PaymentResponse buildFailureResponse(String message, HttpStatus httpStatus, T responseData) {
+        return PaymentResponse.builder()
                 .status(Constant.FAILURE.name())
                 .message(message)
                 .httpStatus(httpStatus.value())
@@ -102,20 +112,8 @@ public class StripeImpl implements Payment {
                 .build();
     }
 
-    private StripeResponse buildFailureResponse(String message, HttpStatus httpStatus) {
+    private PaymentResponse buildFailureResponse(String message, HttpStatus httpStatus) {
         return buildFailureResponse(message, httpStatus, null);
-    }
-
-    // Create total price
-    SessionCreateParams.LineItem.PriceData createPriceData(CheckoutItemDto checkoutItemDto) {
-        return SessionCreateParams.LineItem.PriceData.builder()
-                .setCurrency(currency)
-                .setUnitAmount(checkoutItemDto.price().multiply(new BigDecimal(unitAmount)).longValueExact())
-                .setProductData(
-                        SessionCreateParams.LineItem.PriceData.ProductData.builder()
-                                .setName(checkoutItemDto.productName())
-                                .build())
-                .build();
     }
 
     // Build each product in the stripe checkout page
@@ -124,13 +122,25 @@ public class StripeImpl implements Payment {
         return SessionCreateParams.builder()
                 .addPaymentMethodType(SessionCreateParams.PaymentMethodType.CARD)
                 .setMode(SessionCreateParams.Mode.PAYMENT)
-                .setCancelUrl(createUrl(url, PAYMENT_FAILED))
+                .setCancelUrl(createUrl(url, STRIPE_FAILED))
                 .addAllLineItem(sessionItemsList)
-                .setSuccessUrl(createUrl(url, PAYMENT_SUCCESS))
+                .setSuccessUrl(createUrl(url, STRIPE_SUCCESS))
                 .build();
     }
 
-    SessionCreateParams.LineItem createSessionLineItem(CheckoutItemDto checkoutItemDto) {
+    // Create total price
+    SessionCreateParams.LineItem.PriceData createPriceData(CartItemDto checkoutItemDto) {
+        return SessionCreateParams.LineItem.PriceData.builder()
+                .setCurrency(currency)
+                .setUnitAmount(checkoutItemDto.game().price().multiply(new BigDecimal(unitAmount)).longValueExact())
+                .setProductData(
+                        SessionCreateParams.LineItem.PriceData.ProductData.builder()
+                                .setName(checkoutItemDto.game().title())
+                                .build())
+                .build();
+    }
+
+    SessionCreateParams.LineItem createSessionLineItem(CartItemDto checkoutItemDto) {
         return SessionCreateParams.LineItem.builder()
                 // set price for each product
                 .setPriceData(createPriceData(checkoutItemDto))
@@ -138,8 +148,8 @@ public class StripeImpl implements Payment {
                 .build();
     }
 
-    private List<SessionCreateParams.LineItem> createSessionItemsList(List<CheckoutItemDto> checkoutItemDtoList) {
-        return checkoutItemDtoList.stream().map(this::createSessionLineItem).toList();
+    private List<SessionCreateParams.LineItem> createSessionItemsList(List<CartItemDto> cartItemDtoList) {
+        return cartItemDtoList.stream().map(this::createSessionLineItem).toList();
     }
 
     private CreatePaymentResponse buildPaymentResponse(Session session) {
