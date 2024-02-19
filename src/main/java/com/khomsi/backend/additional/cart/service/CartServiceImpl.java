@@ -48,10 +48,14 @@ public class CartServiceImpl implements CartService {
         UserInfo existingUser = userInfoService.getUserInfo();
         List<Cart> cartList = cartRepository.findAllByUserOrderByCreatedDate(existingUser);
         List<CartItemDto> cartItems = cartList.stream().map(cartMapper::toDtoFromCart).toList();
-        BigDecimal totalCost = cartItems.stream()
+        BigDecimal totalCost = getTotalCost(cartItems);
+        return new CartDTO(cartItems, totalCost);
+    }
+
+    private BigDecimal getTotalCost(List<CartItemDto> cartItems) {
+        return cartItems.stream()
                 .map(cartItemDto -> cartItemDto.game().price())
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
-        return new CartDTO(cartItems, totalCost);
     }
 
     @Override
