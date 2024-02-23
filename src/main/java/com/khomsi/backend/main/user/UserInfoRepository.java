@@ -8,6 +8,4 @@ import java.util.Optional;
 
 public interface UserInfoRepository extends JpaRepository<UserInfo, Long> {
     UserInfo findUserInfoByExternalId(String externalId);
-//    UserInfo findUserInfoByEmail(String email);
-//    Optional<UserInfo> findUserInfoByEmail(String email);
 }
