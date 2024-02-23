@@ -9,7 +9,6 @@ import com.khomsi.backend.additional.media.model.entity.GameMedia;
 import com.khomsi.backend.additional.platform.model.entity.Platform;
 import com.khomsi.backend.additional.publisher.model.entity.Publisher;
 import com.khomsi.backend.additional.tag.model.entity.Tag;
-import org.springframework.lang.Nullable;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;

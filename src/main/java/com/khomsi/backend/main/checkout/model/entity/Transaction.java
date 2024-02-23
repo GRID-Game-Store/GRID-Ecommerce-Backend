@@ -1,5 +1,6 @@
 package com.khomsi.backend.main.checkout.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.khomsi.backend.main.user.model.entity.UserInfo;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -8,8 +9,9 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.math.BigDecimal;
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 
 @Getter
@@ -25,11 +27,12 @@ public class Transaction {
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "users_id", nullable = false)
+    @JsonIgnore
     private UserInfo users;
 
     @NotNull
     @Column(name = "created_at", nullable = false)
-    private Date createdAt;
+    private LocalDate createdAt;
 
     @NotNull
     @Column(name = "total_amount", nullable = false, precision = 10)
@@ -44,7 +47,6 @@ public class Transaction {
     private Boolean paid;
 
     @OneToMany(mappedBy = "transactions")
-    private Set<TransactionGames> transactionGames = new LinkedHashSet<>();
-
+    private List<TransactionGames> transactionGames;
 
 }

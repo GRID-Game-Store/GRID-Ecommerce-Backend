@@ -31,7 +31,8 @@ public class WebSecurityConfiguration {
 
                         .requestMatchers("/api/v1/users/**", "/api/v1/users",
                                 "/api/v1/cart/**", "/api/v1/cart",
-                                "/api/v1/checkout", "/api/v1/checkout/**"
+                                "/api/v1/checkout", "/api/v1/checkout/**",
+                                "/api/v1/transactions", "/api/v1/transactions/**"
                         )
                         .hasAnyRole(Role.USER.name(), Role.ADMIN.name())
                 )

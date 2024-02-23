@@ -20,7 +20,7 @@ public class TransactionGames {
     private Long id;
 
     @NotNull
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @OneToOne
     @JoinColumn(name = "games_id", nullable = false)
     private Game games;
 
@@ -29,9 +29,8 @@ public class TransactionGames {
     private BigDecimal priceOnPay;
 
     @NotNull
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne
     @JoinColumn(name = "transactions_id", nullable = false)
     @JsonIgnore
     private Transaction transactions;
-
 }

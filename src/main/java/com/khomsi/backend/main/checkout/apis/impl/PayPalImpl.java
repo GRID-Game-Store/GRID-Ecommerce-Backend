@@ -9,7 +9,7 @@ import com.khomsi.backend.main.checkout.model.dto.paypal.*;
 import com.khomsi.backend.main.checkout.model.dto.stripe.PaymentResponse;
 import com.khomsi.backend.main.checkout.model.enums.Constant;
 import com.khomsi.backend.main.checkout.model.enums.PaymentMethod;
-import com.khomsi.backend.main.checkout.service.CheckoutService;
+import com.khomsi.backend.main.checkout.service.TransactionService;
 import com.khomsi.backend.main.handler.exception.GlobalServiceException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -41,7 +41,7 @@ public class PayPalImpl implements PaypalService {
     @Value("${app.payment.paypal.currency_USD}")
     private String currencyUSD;
     private final RestTemplate restTemplate;
-    private final CheckoutService checkoutService;
+    private final TransactionService transactionService;
     private final CurrencyService currencyService;
     private final CartService cartService;
 
@@ -82,7 +82,7 @@ public class PayPalImpl implements PaypalService {
             throw new GlobalServiceException(HttpStatus.BAD_REQUEST, "Can't capture paypal payment!");
 
         if (responseEntity.getBody().status().equals("COMPLETED")) {
-            checkoutService.placeOrder(token, PaymentMethod.PAYPAL);
+            transactionService.placeOrder(token, PaymentMethod.PAYPAL);
             return buildResponse("PaypalService successfully captured for session ID: " + token);
         }
         return buildResponse("PaypalService capture failed for session ID: " + token,

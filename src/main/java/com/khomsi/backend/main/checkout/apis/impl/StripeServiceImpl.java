@@ -9,7 +9,7 @@ import com.khomsi.backend.main.checkout.model.dto.stripe.CreatePaymentResponse;
 import com.khomsi.backend.main.checkout.model.dto.stripe.PaymentResponse;
 import com.khomsi.backend.main.checkout.model.enums.Constant;
 import com.khomsi.backend.main.checkout.model.enums.PaymentMethod;
-import com.khomsi.backend.main.checkout.service.CheckoutService;
+import com.khomsi.backend.main.checkout.service.TransactionService;
 import com.stripe.Stripe;
 import com.stripe.exception.StripeException;
 import com.stripe.model.checkout.Session;
@@ -36,7 +36,7 @@ public class StripeServiceImpl implements StripeService {
     private String currency;
     @Value("${app.payment.unitAmount}")
     private String unitAmount;
-    private final CheckoutService checkoutService;
+    private final TransactionService transactionService;
     private final CartService cartService;
 
     public PaymentResponse createPayment(HttpServletRequest url) {
@@ -72,7 +72,7 @@ public class StripeServiceImpl implements StripeService {
             CapturePaymentResponse responseData = buildCapturePaymentResponse(sessionId, status);
 
             if (status.equalsIgnoreCase(Constant.STRIPE_SESSION_STATUS_SUCCESS.label)) {
-                checkoutService.placeOrder(sessionId, PaymentMethod.STRIPE);
+                transactionService.placeOrder(sessionId, PaymentMethod.STRIPE);
                 return buildResponse(responseData,
                         "StripeService successfully captured for session ID: " + sessionId);
             } else {
