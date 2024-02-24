@@ -53,7 +53,7 @@ public class CheckoutController {
     // Check and place the order if success
     @PostMapping("/stripe/capture-payment")
     @Operation(security = {@SecurityRequirement(name = BEARER_KEY_SECURITY_SCHEME)},
-            summary = "StripeService capture to place the order")
+            summary = "Stripe capture to place the order")
     public ResponseEntity<PaymentResponse> placeStripeOrder(@RequestParam("sessionId") String sessionId) {
         PaymentResponse paymentResponse = stripeService.capturePayment(sessionId);
         return ResponseEntity

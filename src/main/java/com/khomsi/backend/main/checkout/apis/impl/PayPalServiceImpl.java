@@ -31,15 +31,15 @@ import static com.khomsi.backend.main.checkout.model.enums.PaymentEndpoints.*;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class PayPalImpl implements PaypalService {
+public class PayPalServiceImpl implements PaypalService {
     @Value("${app.payment.paypal.paypal-id}")
     private String clientId;
     @Value("${app.payment.paypal.paypal-secret}")
     private String clientSecret;
     @Value("${app.payment.paypal.base-api-url}")
     private String baseApiUrl;
-    @Value("${app.payment.paypal.currency_USD}")
-    private String currencyUSD;
+    @Value("${app.payment.paypal.currency_EURO}")
+    private String currencyEuro;
     private final RestTemplate restTemplate;
     private final TransactionService transactionService;
     private final CurrencyService currencyService;
@@ -54,7 +54,7 @@ public class PayPalImpl implements PaypalService {
         }
         PaymentCreationRequest paymentRequest = new PaymentCreationRequest(
                 "CAPTURE",
-                createPurchaseUnits(cartItemDtoList),
+                createPurchaseUnits(withBalance, cartItemDtoList),
                 createPaymentSource(url)
         );
         ResponseEntity<PaymentCreationResponse> paymentCreationResponse = restTemplate.exchange(
@@ -63,8 +63,10 @@ public class PayPalImpl implements PaypalService {
 
         if (!paymentCreationResponse.getStatusCode().is2xxSuccessful())
             throw new GlobalServiceException(HttpStatus.BAD_REQUEST, "Can't create paypal payment!");
-
-        return buildResponse(paymentCreationResponse.getBody().links().get(1).href());
+        String redirectUrl = paymentCreationResponse.getBody().links().get(1).href();
+        transactionService.placeTemporaryTransaction(paymentCreationResponse.getBody().id(), redirectUrl,
+                withBalance, PaymentMethod.PAYPAL);
+        return buildResponse(redirectUrl);
     }
 
     @Override
@@ -82,10 +84,10 @@ public class PayPalImpl implements PaypalService {
             throw new GlobalServiceException(HttpStatus.BAD_REQUEST, "Can't capture paypal payment!");
 
         if (responseEntity.getBody().status().equals("COMPLETED")) {
-            transactionService.placeOrder(token, PaymentMethod.PAYPAL);
-            return buildResponse("PaypalService successfully captured for session ID: " + token);
+            transactionService.completeTransaction(token);
+            return buildResponse("Paypal successfully captured for session ID: " + token);
         }
-        return buildResponse("PaypalService capture failed for session ID: " + token,
+        return buildResponse("Paypal capture failed for session ID: " + token,
                 HttpStatus.BAD_REQUEST.value(), Constant.FAILURE.name());
     }
 
@@ -132,14 +134,12 @@ public class PayPalImpl implements PaypalService {
         return accessTokenResponse.getBody().access_token();
     }
 
-    private List<PurchaseUnit> createPurchaseUnits(List<CartItemDto> checkoutItems) {
+    private List<PurchaseUnit> createPurchaseUnits(boolean withBalance, List<CartItemDto> checkoutItems) {
         List<PurchaseUnit> purchaseUnits = new ArrayList<>();
-        checkoutItems.forEach(checkoutItemDto -> {
-            BigDecimal convertedPrice = currencyService.convertToUSD(checkoutItemDto.game().price());
-            String paymentId = UUID.randomUUID().toString();
-            purchaseUnits.add(new PurchaseUnit(paymentId, new Amount(currencyUSD,
-                    String.valueOf(convertedPrice))));
-        });
+        BigDecimal totalAmountForBill = transactionService.getTotalAmountForBill(withBalance, checkoutItems);
+        BigDecimal convertedPrice = currencyService.convertToUSD(totalAmountForBill);
+        String paymentId = UUID.randomUUID().toString();
+        purchaseUnits.add(new PurchaseUnit(paymentId, new Amount(currencyEuro, String.valueOf(convertedPrice))));
         return purchaseUnits;
     }
 

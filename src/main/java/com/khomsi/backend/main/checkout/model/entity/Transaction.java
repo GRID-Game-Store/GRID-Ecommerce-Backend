@@ -10,6 +10,7 @@ import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -32,7 +33,7 @@ public class Transaction {
 
     @NotNull
     @Column(name = "created_at", nullable = false)
-    private LocalDate createdAt;
+    private LocalDateTime createdAt;
 
     @NotNull
     @Column(name = "total_amount", nullable = false, precision = 10)
@@ -48,5 +49,19 @@ public class Transaction {
 
     @OneToMany(mappedBy = "transactions")
     private List<TransactionGames> transactionGames;
+
+    @NotNull
+    @Column(name = "with_balance", nullable = false)
+    private Boolean withBalance;
+
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
+
+    @Lob
+    @Column(name = "redirect_url")
+    private String redirectUrl;
+
+    @Column(name = "used_balance", precision = 10, scale = 2)
+    private BigDecimal usedBalance;
 
 }

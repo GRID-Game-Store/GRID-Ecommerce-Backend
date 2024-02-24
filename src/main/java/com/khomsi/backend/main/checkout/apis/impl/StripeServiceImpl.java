@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.khomsi.backend.main.checkout.apis.impl.ApiResponseBuilder.buildFailureResponse;
 import static com.khomsi.backend.main.checkout.apis.impl.ApiResponseBuilder.buildResponse;
@@ -37,7 +38,7 @@ public class StripeServiceImpl implements StripeService {
     @Value("${app.payment.stripe.currency}")
     private String currency;
     @Value("${app.payment.unitAmount}")
-    private String unitAmount;
+    private BigDecimal unitAmount;
     private final TransactionService transactionService;
     private final CartService cartService;
 
@@ -49,19 +50,23 @@ public class StripeServiceImpl implements StripeService {
         }
         try {
             Stripe.apiKey = secretKey;
+            // Calculate total amount
+            BigDecimal totalAmount = transactionService.getTotalAmountForBill(withBalance, cartItemDtoList);
 
-            List<SessionCreateParams.LineItem> sessionItemsList = createSessionItemsList(cartItemDtoList);
+            // Create session line item with total amount
+            SessionCreateParams.LineItem sessionLineItem = createSessionLineItemWithTotal(totalAmount, cartItemDtoList);
 
-            SessionCreateParams params = buildSessionParams(url, sessionItemsList);
+            SessionCreateParams params = buildSessionParams(url, sessionLineItem);
 
             Session session = Session.create(params);
 
             CreatePaymentResponse responseData = buildPaymentResponse(session);
-
-            return buildResponse(responseData, "StripeService session created successfully");
+            transactionService.placeTemporaryTransaction(responseData.sessionId(), responseData.sessionUrl(),
+                    withBalance, PaymentMethod.STRIPE);
+            return buildResponse(responseData, "Stripe session created successfully");
         } catch (StripeException e) {
             log.error("Error creating payment session: {}", e.getMessage());
-            return buildFailureResponse("StripeService session creation failed", HttpStatus.BAD_REQUEST);
+            return buildFailureResponse("Stripe session creation failed", HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -74,16 +79,16 @@ public class StripeServiceImpl implements StripeService {
             CapturePaymentResponse responseData = buildCapturePaymentResponse(sessionId, status);
 
             if (status.equalsIgnoreCase(Constant.STRIPE_SESSION_STATUS_SUCCESS.label)) {
-                transactionService.placeOrder(sessionId, PaymentMethod.STRIPE);
+                transactionService.completeTransaction(sessionId);
                 return buildResponse(responseData,
-                        "StripeService successfully captured for session ID: " + sessionId);
+                        "Stripe successfully captured for session ID: " + sessionId);
             } else {
-                return buildFailureResponse("StripeService capture failed for session ID: " + sessionId,
+                return buildFailureResponse("Stripe capture failed for session ID: " + sessionId,
                         HttpStatus.BAD_REQUEST, responseData);
             }
         } catch (StripeException e) {
             log.error("Error capturing payment: {}", e.getMessage());
-            return buildFailureResponse("StripeService capture failed due to a server error.",
+            return buildFailureResponse("Stripe capture failed due to a server error.",
                     HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -96,40 +101,42 @@ public class StripeServiceImpl implements StripeService {
                 .build();
     }
 
-    // Build each product in the stripe checkout page
+    // Build session parameters
     private SessionCreateParams buildSessionParams(HttpServletRequest url,
-                                                   List<SessionCreateParams.LineItem> sessionItemsList) {
+                                                   SessionCreateParams.LineItem sessionLineItem) {
         return SessionCreateParams.builder()
                 .addPaymentMethodType(SessionCreateParams.PaymentMethodType.CARD)
                 .setMode(SessionCreateParams.Mode.PAYMENT)
                 .setCancelUrl(createUrl(url, STRIPE_FAILED))
-                .addAllLineItem(sessionItemsList)
+                .addLineItem(sessionLineItem)
                 .setSuccessUrl(createUrl(url, STRIPE_SUCCESS))
                 .build();
     }
 
-    // Create total price
-    SessionCreateParams.LineItem.PriceData createPriceData(CartItemDto checkoutItemDto) {
-        return SessionCreateParams.LineItem.PriceData.builder()
-                .setCurrency(currency)
-                .setUnitAmount(checkoutItemDto.game().price().multiply(new BigDecimal(unitAmount)).longValueExact())
-                .setProductData(
-                        SessionCreateParams.LineItem.PriceData.ProductData.builder()
-                                .setName(checkoutItemDto.game().title())
-                                .build())
-                .build();
-    }
-
-    SessionCreateParams.LineItem createSessionLineItem(CartItemDto checkoutItemDto) {
+    // Create session line item with total amount
+    private SessionCreateParams.LineItem createSessionLineItemWithTotal(BigDecimal totalAmount,
+                                                                        List<CartItemDto> cartItemDtoList) {
         return SessionCreateParams.LineItem.builder()
-                // set price for each product
-                .setPriceData(createPriceData(checkoutItemDto))
+                .setPriceData(createPriceData(totalAmount, cartItemDtoList))
                 .setQuantity(1L)
                 .build();
     }
 
-    private List<SessionCreateParams.LineItem> createSessionItemsList(List<CartItemDto> cartItemDtoList) {
-        return cartItemDtoList.stream().map(this::createSessionLineItem).toList();
+    // Create total price
+    private SessionCreateParams.LineItem.PriceData createPriceData(BigDecimal totalAmount,
+                                                                   List<CartItemDto> cartItemDtoList) {
+        String description = cartItemDtoList.stream()
+                .map(cartItem -> cartItem.game().title())
+                .collect(Collectors.joining(", "));
+        return SessionCreateParams.LineItem.PriceData.builder()
+                .setCurrency(currency)
+                .setUnitAmount(totalAmount.multiply(unitAmount).longValueExact())
+                .setProductData(
+                        SessionCreateParams.LineItem.PriceData.ProductData.builder()
+                                .setName("Total amount | GRID")
+                                .setDescription(description)
+                                .build())
+                .build();
     }
 
     private CreatePaymentResponse buildPaymentResponse(Session session) {

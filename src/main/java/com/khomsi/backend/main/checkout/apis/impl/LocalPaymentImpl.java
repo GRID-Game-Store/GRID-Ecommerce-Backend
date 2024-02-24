@@ -24,11 +24,12 @@ import static com.khomsi.backend.main.checkout.apis.impl.ApiResponseBuilder.buil
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class LocalPaymentImpl implements LocalPaymentService{
+public class LocalPaymentImpl implements LocalPaymentService {
     private final CartService cartService;
     private final UserInfoService userInfoService;
     private final UserInfoRepository userInfoRepository;
     private final TransactionService transactionService;
+
     @Override
     public PaymentResponse createPayment() {
         UserInfo existingUser = userInfoService.getUserInfo();
@@ -41,7 +42,10 @@ public class LocalPaymentImpl implements LocalPaymentService{
         BigDecimal newBalance = existingUser.getBalance().subtract(cartDto.totalCost());
         existingUser.setBalance(newBalance);
         userInfoRepository.save(existingUser);
-        transactionService.placeOrder(UUID.randomUUID().toString(), PaymentMethod.LOCAL);
+        String transactionId = UUID.randomUUID().toString();
+        transactionService.placeTemporaryTransaction(transactionId, null,
+                false, PaymentMethod.LOCAL);
+        transactionService.completeTransaction(transactionId);
         return buildResponse(null, "Local payment is successfully finished!");
     }
 }
