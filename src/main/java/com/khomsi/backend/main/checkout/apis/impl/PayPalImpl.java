@@ -46,7 +46,7 @@ public class PayPalImpl implements PaypalService {
     private final CartService cartService;
 
     @Override
-    public PaymentResponse createPayment(HttpServletRequest url) {
+    public PaymentResponse createPayment(boolean withBalance, HttpServletRequest url) {
         CartDTO cartDto = cartService.cartItems();
         List<CartItemDto> cartItemDtoList = cartDto.cartItems();
         if (cartItemDtoList.isEmpty()) {

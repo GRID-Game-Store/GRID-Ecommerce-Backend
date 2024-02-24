@@ -24,6 +24,8 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.util.List;
 
+import static com.khomsi.backend.main.checkout.apis.impl.ApiResponseBuilder.buildFailureResponse;
+import static com.khomsi.backend.main.checkout.apis.impl.ApiResponseBuilder.buildResponse;
 import static com.khomsi.backend.main.checkout.model.enums.PaymentEndpoints.*;
 
 @Service
@@ -39,7 +41,7 @@ public class StripeServiceImpl implements StripeService {
     private final TransactionService transactionService;
     private final CartService cartService;
 
-    public PaymentResponse createPayment(HttpServletRequest url) {
+    public PaymentResponse createPayment(boolean withBalance, HttpServletRequest url) {
         CartDTO cartDto = cartService.cartItems();
         List<CartItemDto> cartItemDtoList = cartDto.cartItems();
         if (cartItemDtoList.isEmpty()) {
@@ -92,28 +94,6 @@ public class StripeServiceImpl implements StripeService {
                 .sessionStatus(status)
                 .paymentStatus(status)
                 .build();
-    }
-
-    private <T> PaymentResponse buildResponse(T responseData, String message) {
-        return PaymentResponse.builder()
-                .status(Constant.SUCCESS.name())
-                .message(message)
-                .httpStatus(HttpStatus.OK.value())
-                .data(responseData)
-                .build();
-    }
-
-    private <T> PaymentResponse buildFailureResponse(String message, HttpStatus httpStatus, T responseData) {
-        return PaymentResponse.builder()
-                .status(Constant.FAILURE.name())
-                .message(message)
-                .httpStatus(httpStatus.value())
-                .data(responseData)
-                .build();
-    }
-
-    private PaymentResponse buildFailureResponse(String message, HttpStatus httpStatus) {
-        return buildFailureResponse(message, httpStatus, null);
     }
 
     // Build each product in the stripe checkout page
