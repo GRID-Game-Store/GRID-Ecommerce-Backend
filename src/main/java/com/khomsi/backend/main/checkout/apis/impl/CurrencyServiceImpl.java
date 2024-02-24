@@ -9,6 +9,8 @@ import org.springframework.web.client.RestTemplate;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 @Service
 public class CurrencyServiceImpl implements CurrencyService {
@@ -22,7 +24,8 @@ public class CurrencyServiceImpl implements CurrencyService {
 
     private BigDecimal getUSDRate() {
         RestTemplate restTemplate = new RestTemplate();
-        CurrencyRate[] rates = restTemplate.getForObject(currencyApiUrl, CurrencyRate[].class);
+        String formattedDate = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+        CurrencyRate[] rates = restTemplate.getForObject(currencyApiUrl + "&date=" + formattedDate + "&json", CurrencyRate[].class);
         if (rates != null && rates.length > 0) {
             return BigDecimal.valueOf(rates[0].rate());
         } else {

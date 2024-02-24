@@ -31,6 +31,9 @@ public class CartServiceImpl implements CartService {
 
     @Override
     public CartResponse addToCart(Long gameId) {
+        //TODO add logic to handle situation when:
+        // the game costs 0 (=free), so add it directly to library, avoiding cart and transaction
+        // the game is already in library, in that case, the game is only for gift
         UserInfo existingUser = userInfoService.getUserInfo();
         Game game = gameService.getGameById(gameId);
 
