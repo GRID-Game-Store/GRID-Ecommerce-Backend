@@ -31,24 +31,72 @@ public class GameServiceImpl implements GameService {
     private final GameRepository gameRepository;
     private final GameMapper gameMapper;
 
+    //    public GeneralGame getExtendedGamesByPage(GameCriteria gameCriteria) {
+//        int page = gameCriteria.getPage();
+//
+//        Sort sorting = createSorting(gameCriteria.getSort());
+//        Pageable pagingSort = PageRequest.of(page, gameCriteria.getSize(), sorting);
+//
+//        // Создаем спецификацию на основе списка тегов
+//        Specification<Game> tagSpecification = GameSpecifications.byIds(GameSpecifications.parseIds(gameCriteria.getTags()));
+//
+//        // Комбинируем спецификации, включая другие критерии, если необходимо
+//        Specification<Game> combinedSpecification = Specification.where(tagSpecification)
+//                .and(GameSpecifications.byTitle(gameCriteria.getTitle()))
+//                .and(GameSpecifications.byMaxPrice(gameCriteria.getMaxPrice()));
+//
+//        // Получаем страницу игр с учетом всех критериев
+//        Page<Game> gamePage = gameRepository.findAll(combinedSpecification, pagingSort);
+//
+//        if (gamePage.isEmpty()) {
+//            throw new GlobalServiceException(HttpStatus.NOT_FOUND, "Games are not found in the database.");
+//        }
+//
+//        List<ShortGameModel> shortGameModels = gamePage
+//                .map(gameMapper::toShortGame)
+//                .getContent();
+//
+//        return GeneralGame.builder()
+//                .games(shortGameModels)
+//                .totalItems(gamePage.getTotalElements())
+//                .totalPages(gamePage.getTotalPages())
+//                .currentPage(page)
+//                .build();
+//    }
     @Override
     public GeneralGame getExtendedGamesByPage(GameCriteria gameCriteria) {
         int page = gameCriteria.getPage();
 
         Sort sorting = createSorting(gameCriteria.getSort());
         Pageable pagingSort = PageRequest.of(page, gameCriteria.getSize(), sorting);
-
+        //Я вставляю теги и нету четкого понятия сколько игр должно выйти, после того, как переход происходит на
+        // новую страницу, количество товаров увеличивается. Так же выводит игры, которые выводит не по тем тегам, которые указаны в самих
+        // тегах. Тоесть они фактически не работают. Так же с ценой и так далее.
         Specification<Game> specification = Specification.where(null);
-        specification = specification.and(GameSpecifications.byTitle(gameCriteria.getTitle()));
-        specification = specification.and(GameSpecifications.byMaxPrice(gameCriteria.getMaxPrice()));
-        specification = specification.and(GameSpecifications.byIds(GameSpecifications.parseIds(gameCriteria.getGenres()), "genres"));
-        specification = specification.and(GameSpecifications.byIds(GameSpecifications.parseIds(gameCriteria.getPlatforms()), "platforms"));
-        specification = specification.and(GameSpecifications.byIds(GameSpecifications.parseIds(gameCriteria.getTags()), "tags"));
-        specification = specification.and(GameSpecifications.byIds(GameSpecifications.parseIds(gameCriteria.getDevelopers()), "developer"));
-        specification = specification.and(GameSpecifications.byIds(GameSpecifications.parseIds(gameCriteria.getPublishers()), "publisher"));
+        specification = specification
+                .and(GameSpecifications.byTitle(gameCriteria.getTitle()));
+        specification = specification
+                .and(GameSpecifications.byMaxPrice(gameCriteria.getMaxPrice()));
+
+//        specification = specification.and(GameSpecifications.byTagsIds(GameSpecifications.parseIds(gameCriteria.getTags())));
+//        specification = specification.and(GameSpecifications.byGenres(GameSpecifications.parseIds(gameCriteria.getGenres())));
+//        specification = specification.and(GameSpecifications.byTagsIds(GameSpecifications.parseIds(gameCriteria.getPlatforms()), "platforms"));
+//        specification = specification.and(GameSpecifications.byTagsIds(GameSpecifications.parseIds(gameCriteria.getDevelopers()), "developer"));
+//        specification = specification.and(GameSpecifications.byTagsIds(GameSpecifications.parseIds(gameCriteria.getPublishers()), "publisher"));
+
+//        specification = specification
+//                .and(GameSpecifications.byIds(GameSpecifications.parseIds(gameCriteria.getGenres()), "genres"));
+//        specification = specification
+//                .and(GameSpecifications.byIds(GameSpecifications.parseIds(gameCriteria.getPlatforms()), "platforms"));
+//        specification = specification
+//                .and(GameSpecifications.byIds(GameSpecifications.parseIds(gameCriteria.getTags())));
+//        specification = specification
+//                .and(GameSpecifications.byIds(GameSpecifications.parseIds(gameCriteria.getDevelopers()), "developer"));
+//        specification = specification
+//                .and(GameSpecifications.byIds(GameSpecifications.parseIds(gameCriteria.getPublishers()), "publisher"));
 
         Page<Game> gamePage = gameRepository.findAll(specification, pagingSort);
-
+        log.info("gamepage={}", gamePage);
         if (gamePage.isEmpty()) {
             throw new GlobalServiceException(HttpStatus.NOT_FOUND, "Games are not found in the database.");
         }
