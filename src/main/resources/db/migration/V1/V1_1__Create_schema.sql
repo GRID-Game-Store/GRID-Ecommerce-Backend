@@ -16,7 +16,7 @@ USE `GridDB` ;
 CREATE TABLE IF NOT EXISTS `GridDB`.`users` (
     `id` VARCHAR(255) NOT NULL,
     `email` VARCHAR(255) NOT NULL,
-    `balance` DECIMAL NOT NULL,
+    `balance` DECIMAL(10,2) NOT NULL,
     PRIMARY KEY (`id`),
     UNIQUE INDEX `email_UNIQUE` (`email` ASC) VISIBLE)
     ENGINE = InnoDB;
@@ -268,10 +268,14 @@ CREATE TABLE IF NOT EXISTS `GridDB`.`wishlist` (
 CREATE TABLE IF NOT EXISTS `GridDB`.`transactions` (
     `transaction_id` VARCHAR(255) NOT NULL,
     `users_id` VARCHAR(255) NOT NULL,
-    `created_at` DATE NOT NULL,
+    `with_balance` TINYINT NOT NULL,
+    `created_at` DATETIME NOT NULL,
+    `updated_at` DATETIME NULL,
     `total_amount` DECIMAL(10,2) NOT NULL,
     `payment_methods` VARCHAR(150) NOT NULL,
     `paid` TINYINT NOT NULL,
+    `redirect_url` TEXT NULL,
+    `used_balance` DECIMAL(10,2) NULL,
     PRIMARY KEY (`transaction_id`),
     INDEX `fk_transactions_users1_idx` (`users_id` ASC) VISIBLE,
     CONSTRAINT `fk_transactions_users1`
