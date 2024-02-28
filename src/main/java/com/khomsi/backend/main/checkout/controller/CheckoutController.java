@@ -4,6 +4,7 @@ import com.khomsi.backend.main.checkout.apis.PaypalService;
 import com.khomsi.backend.main.checkout.apis.StripeService;
 import com.khomsi.backend.main.checkout.apis.impl.LocalPaymentService;
 import com.khomsi.backend.main.checkout.model.dto.stripe.PaymentResponse;
+import com.khomsi.backend.main.checkout.model.enums.BalanceAction;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -15,6 +16,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.math.BigDecimal;
 
 import static com.khomsi.backend.сonfig.ApplicationConfig.BEARER_KEY_SECURITY_SCHEME;
 
@@ -38,12 +41,24 @@ public class CheckoutController {
                 .body(paymentResponse);
     }
 
+    @PostMapping("/recharge/stripe/create-payment")
+    @Operation(security = {@SecurityRequirement(name = BEARER_KEY_SECURITY_SCHEME)},
+            summary = "Stripe endpoint to create session for balance recharging")
+    public ResponseEntity<PaymentResponse> balanceRechargeStripe(BigDecimal amount, HttpServletRequest request) {
+        // create the stripe session
+        PaymentResponse paymentResponse = stripeService.createBalanceRecharge(amount, request);
+        // send the stripe session id in response
+        return ResponseEntity
+                .status(paymentResponse.httpStatus())
+                .body(paymentResponse);
+    }
+
     @PostMapping("/stripe/create-payment")
     @Operation(security = {@SecurityRequirement(name = BEARER_KEY_SECURITY_SCHEME)},
             summary = "Stripe endpoint to create session")
-    public ResponseEntity<PaymentResponse> checkoutStripe(boolean withBalance, HttpServletRequest request) {
+    public ResponseEntity<PaymentResponse> checkoutStripe(BalanceAction balanceAction, HttpServletRequest request) {
         // create the stripe session
-        PaymentResponse paymentResponse = stripeService.createPayment(withBalance, request);
+        PaymentResponse paymentResponse = stripeService.createPayment(balanceAction, request);
         // send the stripe session id in response
         return ResponseEntity
                 .status(paymentResponse.httpStatus())
@@ -61,12 +76,24 @@ public class CheckoutController {
                 .body(paymentResponse);
     }
 
+    @PostMapping("/recharge/paypal/create-payment")
+    @Operation(security = {@SecurityRequirement(name = BEARER_KEY_SECURITY_SCHEME)},
+            summary = "Paypal endpoint to create session for balance recharge")
+    public ResponseEntity<PaymentResponse> balanceRechargePayPal(BigDecimal amount, HttpServletRequest request) {
+        // create the stripe session
+        PaymentResponse paymentResponse = paypalService.createBalanceRecharge(amount, request);
+        // send the stripe session id in response
+        return ResponseEntity
+                .status(paymentResponse.httpStatus())
+                .body(paymentResponse);
+    }
+
     @PostMapping("/paypal/create-payment")
     @Operation(security = {@SecurityRequirement(name = BEARER_KEY_SECURITY_SCHEME)},
             summary = "Paypal endpoint to create session")
-    public ResponseEntity<PaymentResponse> checkoutPayPal(boolean withBalance, HttpServletRequest request) {
+    public ResponseEntity<PaymentResponse> checkoutPayPal(BalanceAction balanceAction, HttpServletRequest request) {
         // create the stripe session
-        PaymentResponse paymentResponse = paypalService.createPayment(withBalance, request);
+        PaymentResponse paymentResponse = paypalService.createPayment(balanceAction, request);
         // send the stripe session id in response
         return ResponseEntity
                 .status(paymentResponse.httpStatus())

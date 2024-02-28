@@ -4,6 +4,7 @@ import com.khomsi.backend.additional.cart.model.dto.CartDTO;
 import com.khomsi.backend.additional.cart.model.dto.CartItemDto;
 import com.khomsi.backend.additional.cart.service.CartService;
 import com.khomsi.backend.main.checkout.model.dto.stripe.PaymentResponse;
+import com.khomsi.backend.main.checkout.model.enums.BalanceAction;
 import com.khomsi.backend.main.checkout.model.enums.PaymentMethod;
 import com.khomsi.backend.main.checkout.service.TransactionService;
 import com.khomsi.backend.main.user.UserInfoRepository;
@@ -43,8 +44,8 @@ public class LocalPaymentImpl implements LocalPaymentService {
         existingUser.setBalance(newBalance);
         userInfoRepository.save(existingUser);
         String transactionId = UUID.randomUUID().toString();
-        transactionService.placeTemporaryTransaction(transactionId, null,
-                false, PaymentMethod.LOCAL);
+        transactionService.placeTemporaryTransaction(null, transactionId, null,
+                BalanceAction.NO_ACTION, PaymentMethod.LOCAL);
         transactionService.completeTransaction(transactionId);
         return buildResponse(null, "Local payment is successfully finished!");
     }

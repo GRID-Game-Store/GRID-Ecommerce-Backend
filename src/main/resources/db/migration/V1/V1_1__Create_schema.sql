@@ -268,7 +268,7 @@ CREATE TABLE IF NOT EXISTS `GridDB`.`wishlist` (
 CREATE TABLE IF NOT EXISTS `GridDB`.`transactions` (
     `transaction_id` VARCHAR(255) NOT NULL,
     `users_id` VARCHAR(255) NOT NULL,
-    `with_balance` TINYINT NOT NULL,
+    `balance_action` VARCHAR(60) NOT NULL,
     `created_at` DATETIME NOT NULL,
     `updated_at` DATETIME NULL,
     `total_amount` DECIMAL(10,2) NOT NULL,

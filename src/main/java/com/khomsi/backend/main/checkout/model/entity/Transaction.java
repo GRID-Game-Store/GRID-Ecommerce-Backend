@@ -1,6 +1,8 @@
 package com.khomsi.backend.main.checkout.model.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.khomsi.backend.main.checkout.model.enums.BalanceAction;
+import com.khomsi.backend.main.checkout.model.enums.PaymentMethod;
 import com.khomsi.backend.main.user.model.entity.UserInfo;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -9,11 +11,8 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
 
 @Getter
 @Setter
@@ -50,9 +49,10 @@ public class Transaction {
     @OneToMany(mappedBy = "transactions")
     private List<TransactionGames> transactionGames;
 
+    @Enumerated(EnumType.STRING)
     @NotNull
-    @Column(name = "with_balance", nullable = false)
-    private Boolean withBalance;
+    @Column(name = "balance_action", nullable = false, length = 60)
+    private BalanceAction balanceAction;
 
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
@@ -63,5 +63,6 @@ public class Transaction {
 
     @Column(name = "used_balance", precision = 10, scale = 2)
     private BigDecimal usedBalance;
+
 
 }
