@@ -28,7 +28,7 @@ public class CheckoutController {
     private final PaypalService paypalService;
     private final LocalPaymentService localPaymentService;
 
-    @PostMapping("/grid/pay")
+    @PostMapping("/balance/create-payment")
     @Operation(security = {@SecurityRequirement(name = BEARER_KEY_SECURITY_SCHEME)},
             summary = "Local endpoint to create payment")
     public ResponseEntity<PaymentResponse> checkoutLocal() {
