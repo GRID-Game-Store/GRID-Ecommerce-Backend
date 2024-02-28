@@ -7,6 +7,7 @@ import com.khomsi.backend.main.checkout.apis.StripeService;
 import com.khomsi.backend.main.checkout.model.dto.stripe.CapturePaymentResponse;
 import com.khomsi.backend.main.checkout.model.dto.stripe.CreatePaymentResponse;
 import com.khomsi.backend.main.checkout.model.dto.stripe.PaymentResponse;
+import com.khomsi.backend.main.checkout.model.enums.BalanceAction;
 import com.khomsi.backend.main.checkout.model.enums.Constant;
 import com.khomsi.backend.main.checkout.model.enums.PaymentMethod;
 import com.khomsi.backend.main.checkout.service.TransactionService;
@@ -42,27 +43,39 @@ public class StripeServiceImpl implements StripeService {
     private final TransactionService transactionService;
     private final CartService cartService;
 
-    public PaymentResponse createPayment(boolean withBalance, HttpServletRequest url) {
+    @Override
+    public PaymentResponse createBalanceRecharge(BigDecimal amount, HttpServletRequest url) {
+        return getPaymentResponse(amount, true, BalanceAction.BALANCE_RECHARGE,
+                url, null);
+    }
+
+    @Override
+    public PaymentResponse createPayment(BalanceAction balanceAction, HttpServletRequest url) {
         CartDTO cartDto = cartService.cartItems();
         List<CartItemDto> cartItemDtoList = cartDto.cartItems();
-        if (cartItemDtoList.isEmpty()) {
-            return buildFailureResponse("Cart is empty", HttpStatus.BAD_REQUEST);
+        if (cartItemDtoList.isEmpty() || balanceAction == BalanceAction.BALANCE_RECHARGE) {
+            return buildFailureResponse("Method is not accessible.", HttpStatus.BAD_REQUEST);
         }
+        return getPaymentResponse(null, false, balanceAction, url, cartItemDtoList);
+    }
+
+    private PaymentResponse getPaymentResponse(BigDecimal amount, boolean isBalanceRecharge,
+                                               BalanceAction balanceAction, HttpServletRequest url,
+                                               List<CartItemDto> cartItemDtoList) {
         try {
             Stripe.apiKey = secretKey;
-            // Calculate total amount
-            BigDecimal totalAmount = transactionService.getTotalAmountForBill(withBalance, cartItemDtoList);
-
+            BigDecimal totalAmount = transactionService.calculateTotalAmount(amount, balanceAction, cartItemDtoList);
             // Create session line item with total amount
-            SessionCreateParams.LineItem sessionLineItem = createSessionLineItemWithTotal(totalAmount, cartItemDtoList);
+            SessionCreateParams.LineItem sessionLineItem =
+                    createSessionLineItemWithTotal(totalAmount, cartItemDtoList, isBalanceRecharge);
 
             SessionCreateParams params = buildSessionParams(url, sessionLineItem);
 
             Session session = Session.create(params);
 
             CreatePaymentResponse responseData = buildPaymentResponse(session);
-            transactionService.placeTemporaryTransaction(responseData.sessionId(), responseData.sessionUrl(),
-                    withBalance, PaymentMethod.STRIPE);
+            transactionService.placeTemporaryTransaction(totalAmount,
+                    responseData.sessionId(), responseData.sessionUrl(), balanceAction, PaymentMethod.STRIPE);
             return buildResponse(responseData, "Stripe session created successfully");
         } catch (StripeException e) {
             log.error("Error creating payment session: {}", e.getMessage());
@@ -115,19 +128,22 @@ public class StripeServiceImpl implements StripeService {
 
     // Create session line item with total amount
     private SessionCreateParams.LineItem createSessionLineItemWithTotal(BigDecimal totalAmount,
-                                                                        List<CartItemDto> cartItemDtoList) {
+                                                                        List<CartItemDto> cartItemDtoList,
+                                                                        boolean isBalanceRecharge) {
+        String productName = isBalanceRecharge ? "Balance Recharge | GRID" :
+                cartItemDtoList.stream()
+                        .map(cartItem -> cartItem.game().title())
+                        .collect(Collectors.joining(", "));
+
+        SessionCreateParams.LineItem.PriceData priceData = createPriceData(totalAmount, productName);
+
         return SessionCreateParams.LineItem.builder()
-                .setPriceData(createPriceData(totalAmount, cartItemDtoList))
+                .setPriceData(priceData)
                 .setQuantity(1L)
                 .build();
     }
 
-    // Create total price
-    private SessionCreateParams.LineItem.PriceData createPriceData(BigDecimal totalAmount,
-                                                                   List<CartItemDto> cartItemDtoList) {
-        String description = cartItemDtoList.stream()
-                .map(cartItem -> cartItem.game().title())
-                .collect(Collectors.joining(", "));
+    private SessionCreateParams.LineItem.PriceData createPriceData(BigDecimal totalAmount, String description) {
         return SessionCreateParams.LineItem.PriceData.builder()
                 .setCurrency(currency)
                 .setUnitAmount(totalAmount.multiply(unitAmount).longValueExact())

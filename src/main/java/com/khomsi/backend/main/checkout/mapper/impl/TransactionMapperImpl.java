@@ -20,7 +20,7 @@ public class TransactionMapperImpl implements TransactionMapper {
                 .createdAt(transaction.getCreatedAt())
                 .totalAmount(transaction.getTotalAmount())
                 .paymentMethods(transaction.getPaymentMethods())
-                .withBalance(transaction.getWithBalance())
+                .balanceAction(transaction.getBalanceAction())
                 .updatedAt(transaction.getUpdatedAt())
                 .redirectUrl(transaction.getRedirectUrl())
                 .paid(transaction.getPaid())

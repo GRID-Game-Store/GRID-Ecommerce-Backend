@@ -38,6 +38,7 @@ public class UserInfo {
     private BigDecimal balance;
 
     @OneToMany(mappedBy = "users")
+    @ToString.Exclude
     private Set<Transaction> transactions = new LinkedHashSet<>();
 
 }

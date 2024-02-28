@@ -7,6 +7,7 @@ import com.khomsi.backend.main.checkout.apis.CurrencyService;
 import com.khomsi.backend.main.checkout.apis.PaypalService;
 import com.khomsi.backend.main.checkout.model.dto.paypal.*;
 import com.khomsi.backend.main.checkout.model.dto.stripe.PaymentResponse;
+import com.khomsi.backend.main.checkout.model.enums.BalanceAction;
 import com.khomsi.backend.main.checkout.model.enums.Constant;
 import com.khomsi.backend.main.checkout.model.enums.PaymentMethod;
 import com.khomsi.backend.main.checkout.service.TransactionService;
@@ -26,6 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import static com.khomsi.backend.main.checkout.apis.impl.ApiResponseBuilder.buildFailureResponse;
 import static com.khomsi.backend.main.checkout.model.enums.PaymentEndpoints.*;
 
 @Service
@@ -46,15 +48,28 @@ public class PayPalServiceImpl implements PaypalService {
     private final CartService cartService;
 
     @Override
-    public PaymentResponse createPayment(boolean withBalance, HttpServletRequest url) {
+    public PaymentResponse createBalanceRecharge(BigDecimal amount, HttpServletRequest url) {
+        return getPaymentResponse(amount, BalanceAction.BALANCE_RECHARGE,
+                url, null);
+    }
+
+    @Override
+    public PaymentResponse createPayment(BalanceAction balanceAction, HttpServletRequest url) {
         CartDTO cartDto = cartService.cartItems();
         List<CartItemDto> cartItemDtoList = cartDto.cartItems();
-        if (cartItemDtoList.isEmpty()) {
-            return buildResponse("Cart is empty", HttpStatus.BAD_REQUEST.value(), Constant.FAILURE.name());
+        if (cartItemDtoList.isEmpty() || balanceAction == BalanceAction.BALANCE_RECHARGE) {
+            return buildFailureResponse("Method is not accessible.", HttpStatus.BAD_REQUEST);
         }
+        return getPaymentResponse(null, balanceAction, url, cartItemDtoList);
+    }
+
+    private PaymentResponse getPaymentResponse(BigDecimal amount, BalanceAction balanceAction,
+                                               HttpServletRequest url, List<CartItemDto> cartItemDtoList) {
+        BigDecimal totalAmountForBill
+                = transactionService.calculateTotalAmount(amount, balanceAction, cartItemDtoList);
         PaymentCreationRequest paymentRequest = new PaymentCreationRequest(
                 "CAPTURE",
-                createPurchaseUnits(withBalance, cartItemDtoList),
+                createPurchaseUnits(totalAmountForBill),
                 createPaymentSource(url)
         );
         ResponseEntity<PaymentCreationResponse> paymentCreationResponse = restTemplate.exchange(
@@ -64,8 +79,8 @@ public class PayPalServiceImpl implements PaypalService {
         if (!paymentCreationResponse.getStatusCode().is2xxSuccessful())
             throw new GlobalServiceException(HttpStatus.BAD_REQUEST, "Can't create paypal payment!");
         String redirectUrl = paymentCreationResponse.getBody().links().get(1).href();
-        transactionService.placeTemporaryTransaction(paymentCreationResponse.getBody().id(), redirectUrl,
-                withBalance, PaymentMethod.PAYPAL);
+        transactionService.placeTemporaryTransaction(totalAmountForBill, paymentCreationResponse.getBody().id(),
+                redirectUrl, balanceAction, PaymentMethod.PAYPAL);
         return buildResponse(redirectUrl);
     }
 
@@ -134,9 +149,8 @@ public class PayPalServiceImpl implements PaypalService {
         return accessTokenResponse.getBody().access_token();
     }
 
-    private List<PurchaseUnit> createPurchaseUnits(boolean withBalance, List<CartItemDto> checkoutItems) {
+    private List<PurchaseUnit> createPurchaseUnits(BigDecimal totalAmountForBill) {
         List<PurchaseUnit> purchaseUnits = new ArrayList<>();
-        BigDecimal totalAmountForBill = transactionService.getTotalAmountForBill(withBalance, checkoutItems);
         BigDecimal convertedPrice = currencyService.convertToUSD(totalAmountForBill);
         String paymentId = UUID.randomUUID().toString();
         purchaseUnits.add(new PurchaseUnit(paymentId, new Amount(currencyEuro, String.valueOf(convertedPrice))));
