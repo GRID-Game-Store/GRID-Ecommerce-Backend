@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -20,9 +21,9 @@ public class GameCriteria {
     int size = 5;
     String title;
     BigDecimal maxPrice;
+    List<Integer> tags;
     String genres;
     String platforms;
-    String tags;
     String developers;
     String publishers;
     String[] sort = {"id,desc"};
