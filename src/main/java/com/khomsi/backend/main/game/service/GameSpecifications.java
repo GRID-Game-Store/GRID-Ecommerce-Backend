@@ -28,7 +28,7 @@ public interface GameSpecifications {
 
     static Specification<Game> byTagIds(List<Integer> tagIds) {
         return (root, query, criteriaBuilder) -> {
-            if (!tagIds.isEmpty()) {
+            if (tagIds != null && !tagIds.isEmpty()) {
                 // Subquery to calculate the number of unique tags for each game
                 Subquery<Integer> subquery = query.subquery(Integer.class);
                 Root<Game> subRoot = subquery.from(Game.class);
