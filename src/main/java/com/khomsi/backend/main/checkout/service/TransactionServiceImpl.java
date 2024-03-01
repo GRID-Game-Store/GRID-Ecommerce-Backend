@@ -14,9 +14,11 @@ import com.khomsi.backend.main.checkout.repository.TransactionRepository;
 import com.khomsi.backend.main.game.model.entity.Game;
 import com.khomsi.backend.main.game.service.GameService;
 import com.khomsi.backend.main.handler.exception.GlobalServiceException;
-import com.khomsi.backend.main.user.UserInfoRepository;
+import com.khomsi.backend.main.user.repository.UserInfoRepository;
 import com.khomsi.backend.main.user.model.entity.UserInfo;
 import com.khomsi.backend.main.user.service.UserInfoService;
+import com.khomsi.backend.main.user.service.UserGamesService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -36,20 +38,27 @@ public class TransactionServiceImpl implements TransactionService {
     private final TransactionGamesRepository transactionGamesRepository;
     private final TransactionMapper transactionMapper;
     private final UserInfoRepository userInfoRepository;
+    private final UserGamesService userGamesService;
 
     @Override
+    @Transactional
     public void completeTransaction(String sessionId) {
         Transaction transaction = transactionRepository.findById(sessionId)
                 .orElseThrow(() -> new GlobalServiceException(HttpStatus.BAD_REQUEST,
                         "Transaction " + sessionId + " is not found."));
         UserInfo user = transaction.getUsers();
         BalanceAction balanceAction = transaction.getBalanceAction();
-        if (balanceAction == BalanceAction.PAYMENT_WITH_BALANCE) {
-            BigDecimal newBalance = user.getBalance().subtract(transaction.getUsedBalance());
-            user.setBalance(newBalance);
-        } else if (balanceAction == BalanceAction.BALANCE_RECHARGE) {
-            BigDecimal newBalance = user.getBalance().add(transaction.getTotalAmount());
-            user.setBalance(newBalance);
+        switch (balanceAction) {
+            case NO_ACTION -> userGamesService.getGamesFromTransactionToLibrary(user, transaction);
+            case PAYMENT_WITH_BALANCE -> {
+                BigDecimal newBalance = user.getBalance().subtract(transaction.getUsedBalance());
+                user.setBalance(newBalance);
+                userGamesService.getGamesFromTransactionToLibrary(user, transaction);
+            }
+            case BALANCE_RECHARGE -> {
+                BigDecimal newBalance = user.getBalance().add(transaction.getTotalAmount());
+                user.setBalance(newBalance);
+            }
         }
         userInfoRepository.save(user);
 
@@ -99,7 +108,7 @@ public class TransactionServiceImpl implements TransactionService {
             Game game = gameService.getGameById(cartItemDto.game().id());
             TransactionGames orderItem = new TransactionGames();
             orderItem.setPriceOnPay(cartItemDto.game().price());
-            orderItem.setGames(game);
+            orderItem.setGame(game);
             orderItem.setTransactions(transaction);
             transactionGamesRepository.save(orderItem);
         });

@@ -41,4 +41,8 @@ public class UserInfo {
     @ToString.Exclude
     private Set<Transaction> transactions = new LinkedHashSet<>();
 
+    @OneToMany(mappedBy = "user")
+    @ToString.Exclude
+    private Set<UserGames> userGames = new LinkedHashSet<>();
+
 }

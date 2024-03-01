@@ -103,8 +103,8 @@ public class CheckoutController {
     @PostMapping("/paypal/capture-payment")
     @Operation(security = {@SecurityRequirement(name = BEARER_KEY_SECURITY_SCHEME)},
             summary = "PaypalService capture to place the order")
-    public ResponseEntity<PaymentResponse> placePayPalOrder(@RequestParam("token") String token) {
-        PaymentResponse paymentResponse = paypalService.capturePayment(token);
+    public ResponseEntity<PaymentResponse> placePayPalOrder(@RequestParam("sessionId") String sessionId) {
+        PaymentResponse paymentResponse = paypalService.capturePayment(sessionId);
         return ResponseEntity
                 .status(paymentResponse.httpStatus())
                 .body(paymentResponse);
