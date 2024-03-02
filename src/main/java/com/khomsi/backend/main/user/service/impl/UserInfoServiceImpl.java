@@ -1,9 +1,10 @@
-package com.khomsi.backend.main.user.service;
+package com.khomsi.backend.main.user.service.impl;
 
 import com.khomsi.backend.main.handler.exception.GlobalServiceException;
-import com.khomsi.backend.main.user.UserInfoRepository;
+import com.khomsi.backend.main.user.repository.UserInfoRepository;
 import com.khomsi.backend.main.user.model.dto.FullUserInfoDTO;
 import com.khomsi.backend.main.user.model.entity.UserInfo;
+import com.khomsi.backend.main.user.service.UserInfoService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;

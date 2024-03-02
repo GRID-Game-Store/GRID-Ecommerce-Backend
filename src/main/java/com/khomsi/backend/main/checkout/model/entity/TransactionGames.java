@@ -22,7 +22,7 @@ public class TransactionGames {
     @NotNull
     @OneToOne
     @JoinColumn(name = "games_id", nullable = false)
-    private Game games;
+    private Game game;
 
     @NotNull
     @Column(name = "price_on_pay", nullable = false, precision = 10, scale = 2)

@@ -7,6 +7,10 @@ SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,N
 -- -----------------------------------------------------
 -- Schema GridDB
 -- -----------------------------------------------------
+
+-- -----------------------------------------------------
+-- Schema GridDB
+-- -----------------------------------------------------
 CREATE SCHEMA IF NOT EXISTS `GridDB` DEFAULT CHARACTER SET utf8 ;
 USE `GridDB` ;
 
@@ -74,22 +78,22 @@ CREATE TABLE IF NOT EXISTS `GridDB`.`games` (
 
 
 -- -----------------------------------------------------
--- Table `GridDB`.`users_library`
+-- Table `GridDB`.`user_has_games`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `GridDB`.`users_library` (
-    `users_id` VARCHAR(255) NOT NULL,
-    `games_id` INT NULL,
-    `purchase_date` DATETIME NULL,
-    `playtime` TIME NULL,
-    INDEX `fk_user_library_users_idx` (`users_id` ASC) VISIBLE,
-    INDEX `fk_user_library_games1_idx` (`games_id` ASC) VISIBLE,
-    PRIMARY KEY (`users_id`),
-    CONSTRAINT `fk_user_library_users`
+CREATE TABLE IF NOT EXISTS `GridDB`.`user_has_games` (
+                                                         `id` INT NOT NULL AUTO_INCREMENT,
+                                                         `users_id` VARCHAR(255) NOT NULL,
+    `games_id` INT NOT NULL,
+    `purchase_date` DATETIME NOT NULL,
+    `playtime` TIME NOT NULL,
+    PRIMARY KEY (`id`),
+    INDEX `fk_user_has_games_games1_idx` (`games_id` ASC) VISIBLE,
+    CONSTRAINT `fk_user_has_games_users1`
     FOREIGN KEY (`users_id`)
     REFERENCES `GridDB`.`users` (`id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
-    CONSTRAINT `fk_user_library_games1`
+    CONSTRAINT `fk_user_has_games_games1`
     FOREIGN KEY (`games_id`)
     REFERENCES `GridDB`.`games` (`game_id`)
     ON DELETE NO ACTION

@@ -7,7 +7,7 @@ import com.khomsi.backend.main.checkout.model.dto.stripe.PaymentResponse;
 import com.khomsi.backend.main.checkout.model.enums.BalanceAction;
 import com.khomsi.backend.main.checkout.model.enums.PaymentMethod;
 import com.khomsi.backend.main.checkout.service.TransactionService;
-import com.khomsi.backend.main.user.UserInfoRepository;
+import com.khomsi.backend.main.user.repository.UserInfoRepository;
 import com.khomsi.backend.main.user.model.entity.UserInfo;
 import com.khomsi.backend.main.user.service.UserInfoService;
 import lombok.RequiredArgsConstructor;
