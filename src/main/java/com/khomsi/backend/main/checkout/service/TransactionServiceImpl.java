@@ -9,15 +9,16 @@ import com.khomsi.backend.main.checkout.model.entity.Transaction;
 import com.khomsi.backend.main.checkout.model.entity.TransactionGames;
 import com.khomsi.backend.main.checkout.model.enums.BalanceAction;
 import com.khomsi.backend.main.checkout.model.enums.PaymentMethod;
+import com.khomsi.backend.main.checkout.model.response.TransactionResponse;
 import com.khomsi.backend.main.checkout.repository.TransactionGamesRepository;
 import com.khomsi.backend.main.checkout.repository.TransactionRepository;
 import com.khomsi.backend.main.game.model.entity.Game;
 import com.khomsi.backend.main.game.service.GameService;
 import com.khomsi.backend.main.handler.exception.GlobalServiceException;
-import com.khomsi.backend.main.user.repository.UserInfoRepository;
 import com.khomsi.backend.main.user.model.entity.UserInfo;
-import com.khomsi.backend.main.user.service.UserInfoService;
+import com.khomsi.backend.main.user.repository.UserInfoRepository;
 import com.khomsi.backend.main.user.service.UserGamesService;
+import com.khomsi.backend.main.user.service.UserInfoService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -27,6 +28,8 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -69,6 +72,7 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
+    @Transactional
     public void placeTemporaryTransaction(BigDecimal amount, String sessionId, String url,
                                           BalanceAction balanceAction,
                                           PaymentMethod paymentMethod) {
@@ -87,6 +91,31 @@ public class TransactionServiceImpl implements TransactionService {
             transactionRepository.save(transaction);
         } else {
             processCartTransaction(transaction);
+        }
+    }
+
+    @Override
+    @Transactional
+    public TransactionResponse returnTransactionToCart(String sessionId) {
+        UserInfo userInfo = userInfoService.getUserInfo();
+        Optional<Transaction> optionalTransaction = userInfo.getTransactions()
+                .stream()
+                .filter(transaction -> transaction.getTransactionId().equals(sessionId) && !transaction.getPaid())
+                .findFirst();
+
+        if (optionalTransaction.isPresent()) {
+            Transaction transaction = optionalTransaction.get();
+
+            Set<TransactionGames> transactionGamesList = transaction.getTransactionGames();
+            transactionGamesList.stream()
+                    .map(TransactionGames::getGame)
+                    .map(Game::getId)
+                    .forEach(cartService::addToCart);
+
+            transactionRepository.delete(transaction);
+            return new TransactionResponse("Transaction successfully returned to cart.");
+        } else {
+            return new TransactionResponse("Transaction with ID " + sessionId + " not found for revert.");
         }
     }
 

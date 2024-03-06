@@ -1,7 +1,7 @@
 package com.khomsi.backend.main.checkout.controller;
 
 import com.khomsi.backend.main.checkout.model.dto.TransactionDTO;
-import com.khomsi.backend.main.checkout.model.entity.Transaction;
+import com.khomsi.backend.main.checkout.model.response.TransactionResponse;
 import com.khomsi.backend.main.checkout.service.TransactionService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -9,10 +9,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -32,5 +29,13 @@ public class TransactionController {
             summary = "Get all transactions for user")
     public List<TransactionDTO> getAllTransactions() {
         return transactionService.transactionList();
+    }
+
+    @PostMapping("/revert")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(security = {@SecurityRequirement(name = BEARER_KEY_SECURITY_SCHEME)},
+            summary = "Revert transaction for user in case of cancel")
+    public TransactionResponse revertTransactionToCart(@RequestParam("sessionId") String sessionId) {
+        return transactionService.returnTransactionToCart(sessionId);
     }
 }
