@@ -41,6 +41,16 @@ public class CheckoutController {
                 .body(paymentResponse);
     }
 
+    @PostMapping("/balance/capture-payment")
+    @Operation(security = {@SecurityRequirement(name = BEARER_KEY_SECURITY_SCHEME)},
+            summary = "Local endpoint to capture payment")
+    public ResponseEntity<PaymentResponse> captureLocal(@RequestParam("sessionId") String sessionId) {
+        PaymentResponse paymentResponse = localPaymentService.capturePayment(sessionId);
+        return ResponseEntity
+                .status(paymentResponse.httpStatus())
+                .body(paymentResponse);
+    }
+
     @PostMapping("/recharge/stripe/create-payment")
     @Operation(security = {@SecurityRequirement(name = BEARER_KEY_SECURITY_SCHEME)},
             summary = "Stripe endpoint to create session for balance recharging")

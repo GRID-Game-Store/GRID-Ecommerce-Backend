@@ -5,4 +5,6 @@ import jakarta.servlet.http.HttpServletRequest;
 
 public interface LocalPaymentService {
     PaymentResponse createPayment();
+
+    PaymentResponse capturePayment(String sessionId);
 }
