@@ -39,7 +39,7 @@ public class UserGamesServiceImpl implements UserGamesService {
 
     @Override
     public void getGamesFromTransactionToLibrary(UserInfo user, Transaction transaction) {
-        List<TransactionGames> transactionGamesList = transaction.getTransactionGames();
+        Set<TransactionGames> transactionGamesList = transaction.getTransactionGames();
         Set<UserGames> userGames = new LinkedHashSet<>();
         transactionGamesList.forEach(transactionGames -> userGames.add(createUserGames(user, transactionGames.getGame())));
         userGamesRepository.saveAll(userGames);

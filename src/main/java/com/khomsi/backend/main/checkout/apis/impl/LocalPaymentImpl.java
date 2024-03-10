@@ -3,13 +3,15 @@ package com.khomsi.backend.main.checkout.apis.impl;
 import com.khomsi.backend.additional.cart.model.dto.CartDTO;
 import com.khomsi.backend.additional.cart.model.dto.CartItemDto;
 import com.khomsi.backend.additional.cart.service.CartService;
+import com.khomsi.backend.main.checkout.model.dto.stripe.CreatePaymentResponse;
 import com.khomsi.backend.main.checkout.model.dto.stripe.PaymentResponse;
 import com.khomsi.backend.main.checkout.model.enums.BalanceAction;
 import com.khomsi.backend.main.checkout.model.enums.PaymentMethod;
 import com.khomsi.backend.main.checkout.service.TransactionService;
-import com.khomsi.backend.main.user.repository.UserInfoRepository;
 import com.khomsi.backend.main.user.model.entity.UserInfo;
+import com.khomsi.backend.main.user.repository.UserInfoRepository;
 import com.khomsi.backend.main.user.service.UserInfoService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -25,6 +27,7 @@ import static com.khomsi.backend.main.checkout.apis.impl.ApiResponseBuilder.buil
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@Transactional
 public class LocalPaymentImpl implements LocalPaymentService {
     private final CartService cartService;
     private final UserInfoService userInfoService;
@@ -46,7 +49,14 @@ public class LocalPaymentImpl implements LocalPaymentService {
         String transactionId = UUID.randomUUID().toString();
         transactionService.placeTemporaryTransaction(null, transactionId, null,
                 BalanceAction.NO_ACTION, PaymentMethod.LOCAL);
-        transactionService.completeTransaction(transactionId);
-        return buildResponse(null, "Local payment is successfully finished!");
+        return buildResponse(CreatePaymentResponse.builder()
+                .sessionId(transactionId).build(), "Local payment is successfully created!");
+    }
+
+    @Override
+    public PaymentResponse capturePayment(String sessionId) {
+        transactionService.completeTransaction(sessionId);
+        return buildResponse(null,
+                "Local payment successfully captured for session ID: " + sessionId);
     }
 }
