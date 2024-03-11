@@ -1,6 +1,19 @@
 server:
   port: 8082
   max-http-request-header-size: 10000
+app:
+  front-url: http://localhost:3000
+  payment:
+    unitAmount: "100"
+    currencyApi: https://bank.gov.ua/NBUStatService/v1/statdirectory/exchange?valcode=EUR
+    paypal:
+      base-api-url: https://api-m.sandbox.paypal.com
+      paypal-id: ${PAYPAL_CLIENT_ID}
+      paypal-secret: ${PAYPAL_SECRET_KEY}
+      currency_EURO: "EUR"
+    stripe:
+      currency: "uah"
+      stripe-secret: ${STRIPE_SECRET_KEY}
 spring:
   security:
     oauth2:

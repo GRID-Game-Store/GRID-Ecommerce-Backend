@@ -1,6 +1,6 @@
-package com.khomsi.backend.main.user.service;
+package com.khomsi.backend.main.user.service.impl;
 
-import com.khomsi.backend.main.user.UserInfoRepository;
+import com.khomsi.backend.main.user.repository.UserInfoRepository;
 import com.khomsi.backend.main.user.model.entity.UserInfo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,6 +26,7 @@ public class UserSynchronizationService {
     private void syncWithDatabase(final Jwt jwt) {
         String userId = jwt.getSubject();
         UserInfo user = userInfoServiceImpl.getExistingUser(userId);
+        //Create user and his library
         if (user == null) {
             user = createUserInfoToDB(jwt);
         }

@@ -11,6 +11,7 @@ import com.khomsi.backend.main.game.service.GameService;
 import com.khomsi.backend.main.handler.exception.GlobalServiceException;
 import com.khomsi.backend.main.user.model.dto.FullUserInfoDTO;
 import com.khomsi.backend.main.user.model.entity.UserInfo;
+import com.khomsi.backend.main.user.service.UserGamesService;
 import com.khomsi.backend.main.user.service.UserInfoService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -28,11 +29,22 @@ public class CartServiceImpl implements CartService {
     private final UserInfoService userInfoService;
     private final GameService gameService;
     private final CartMapper cartMapper;
+    private final UserGamesService userGamesService;
 
     @Override
     public CartResponse addToCart(Long gameId) {
         UserInfo existingUser = userInfoService.getUserInfo();
         Game game = gameService.getGameById(gameId);
+        boolean gameAlreadyInLibrary = userGamesService.checkIfGameExists(existingUser, game);
+        //Check if the game is already is library
+        if (gameAlreadyInLibrary) {
+            return new CartResponse("Game is already in the library.");
+        }
+        // Check if game is free
+        if (game.getPrice().compareTo(BigDecimal.ZERO) == 0) {
+            userGamesService.saveUserGames(existingUser, game);
+            return new CartResponse("Game is free. Added directly to library.");
+        }
 
         Cart existingCartEntry = cartRepository.findByUserAndGames(existingUser, game);
         if (existingCartEntry != null) {
@@ -48,10 +60,14 @@ public class CartServiceImpl implements CartService {
         UserInfo existingUser = userInfoService.getUserInfo();
         List<Cart> cartList = cartRepository.findAllByUserOrderByCreatedDate(existingUser);
         List<CartItemDto> cartItems = cartList.stream().map(cartMapper::toDtoFromCart).toList();
-        BigDecimal totalCost = cartItems.stream()
+        BigDecimal totalCost = getTotalCost(cartItems);
+        return new CartDTO(cartItems, totalCost);
+    }
+
+    private BigDecimal getTotalCost(List<CartItemDto> cartItems) {
+        return cartItems.stream()
                 .map(cartItemDto -> cartItemDto.game().price())
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
-        return new CartDTO(cartItems, totalCost);
     }
 
     @Override

@@ -12,6 +12,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -28,7 +29,7 @@ public class ApplicationConfig {
     }
 
     @Bean
-    public CorsConfigurationSource corsConfigurationSource(@Value("${app.cors.allowed-origins}")
+    public CorsConfigurationSource corsConfigurationSource(@Value("${app.front-url}")
                                                                List<String> allowedOrigins) {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowCredentials(true);
@@ -40,6 +41,10 @@ public class ApplicationConfig {
         return source;
     }
     @Bean
+    public RestTemplate restTemplate() {
+        return new RestTemplate();
+    }
+    @Bean
     public OpenAPI openAPI() {
         return new OpenAPI().components(new Components()
                 .addSecuritySchemes(BEARER_KEY_SECURITY_SCHEME,
@@ -48,14 +53,4 @@ public class ApplicationConfig {
                         .description("GRID Application that allows CRUD operations")
                         .version("1.0").contact(new Contact().name("Samir Khomsi Kak")));
     }
-    @Bean
-    public GroupedOpenApi customApi() {
-        return GroupedOpenApi.builder().group("api").pathsToMatch("/api/**").build();
-    }
-
-    @Bean
-    public GroupedOpenApi actuatorApi() {
-        return GroupedOpenApi.builder().group("actuator").pathsToMatch("/actuator/**").build();
-    }
-
 }

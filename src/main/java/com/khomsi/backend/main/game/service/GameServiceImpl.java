@@ -31,24 +31,27 @@ public class GameServiceImpl implements GameService {
     private final GameRepository gameRepository;
     private final GameMapper gameMapper;
 
+    //TODO Write integration tests with cucumber for this endpoint
     @Override
     public GeneralGame getExtendedGamesByPage(GameCriteria gameCriteria) {
         int page = gameCriteria.getPage();
 
         Sort sorting = createSorting(gameCriteria.getSort());
         Pageable pagingSort = PageRequest.of(page, gameCriteria.getSize(), sorting);
-
         Specification<Game> specification = Specification.where(null);
         specification = specification.and(GameSpecifications.byTitle(gameCriteria.getTitle()));
         specification = specification.and(GameSpecifications.byMaxPrice(gameCriteria.getMaxPrice()));
-        specification = specification.and(GameSpecifications.byIds(GameSpecifications.parseIds(gameCriteria.getGenres()), "genres"));
-        specification = specification.and(GameSpecifications.byIds(GameSpecifications.parseIds(gameCriteria.getPlatforms()), "platforms"));
-        specification = specification.and(GameSpecifications.byIds(GameSpecifications.parseIds(gameCriteria.getTags()), "tags"));
-        specification = specification.and(GameSpecifications.byIds(GameSpecifications.parseIds(gameCriteria.getDevelopers()), "developer"));
-        specification = specification.and(GameSpecifications.byIds(GameSpecifications.parseIds(gameCriteria.getPublishers()), "publisher"));
+        specification = specification.and(GameSpecifications.byTagIds(gameCriteria.getTags()));
+        specification = specification.and(GameSpecifications.byField("genres",
+                "name", gameCriteria.getGenres()));
+        specification = specification.and(GameSpecifications.byField("platforms",
+                "name", gameCriteria.getPlatforms()));
+        specification = specification.and(GameSpecifications.byField("developer",
+                "name", gameCriteria.getDevelopers()));
+        specification = specification.and(GameSpecifications.byField("publisher",
+                "name", gameCriteria.getPublishers()));
 
         Page<Game> gamePage = gameRepository.findAll(specification, pagingSort);
-
         if (gamePage.isEmpty()) {
             throw new GlobalServiceException(HttpStatus.NOT_FOUND, "Games are not found in the database.");
         }
@@ -59,7 +62,7 @@ public class GameServiceImpl implements GameService {
         return GeneralGame.builder()
                 .games(shortGameModels)
                 .totalItems(gamePage.getTotalElements())
-                .totalPages(gamePage.getTotalPages())
+                .totalPages(gamePage.getTotalPages() - 1)
                 .currentPage(page)
                 .build();
     }

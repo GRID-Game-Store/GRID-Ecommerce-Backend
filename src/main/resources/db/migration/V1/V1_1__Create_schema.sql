@@ -1,6 +1,12 @@
+-- MySQL Workbench Forward Engineering
+
 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION';
+
+-- -----------------------------------------------------
+-- Schema GridDB
+-- -----------------------------------------------------
 
 -- -----------------------------------------------------
 -- Schema GridDB
@@ -14,7 +20,7 @@ USE `GridDB` ;
 CREATE TABLE IF NOT EXISTS `GridDB`.`users` (
     `id` VARCHAR(255) NOT NULL,
     `email` VARCHAR(255) NOT NULL,
-    `balance` DECIMAL NOT NULL,
+    `balance` DECIMAL(10,2) NOT NULL,
     PRIMARY KEY (`id`),
     UNIQUE INDEX `email_UNIQUE` (`email` ASC) VISIBLE)
     ENGINE = InnoDB;
@@ -72,22 +78,22 @@ CREATE TABLE IF NOT EXISTS `GridDB`.`games` (
 
 
 -- -----------------------------------------------------
--- Table `GridDB`.`users_library`
+-- Table `GridDB`.`user_has_games`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `GridDB`.`users_library` (
-    `users_id` VARCHAR(255) NOT NULL,
-    `games_id` INT NULL,
-    `purchase_date` DATETIME NULL,
-    `playtime` TIME NULL,
-    INDEX `fk_user_library_users_idx` (`users_id` ASC) VISIBLE,
-    INDEX `fk_user_library_games1_idx` (`games_id` ASC) VISIBLE,
-    PRIMARY KEY (`users_id`),
-    CONSTRAINT `fk_user_library_users`
+CREATE TABLE IF NOT EXISTS `GridDB`.`user_has_games` (
+                                                         `id` INT NOT NULL AUTO_INCREMENT,
+                                                         `users_id` VARCHAR(255) NOT NULL,
+    `games_id` INT NOT NULL,
+    `purchase_date` DATETIME NOT NULL,
+    `playtime` TIME NOT NULL,
+    PRIMARY KEY (`id`),
+    INDEX `fk_user_has_games_games1_idx` (`games_id` ASC) VISIBLE,
+    CONSTRAINT `fk_user_has_games_users1`
     FOREIGN KEY (`users_id`)
     REFERENCES `GridDB`.`users` (`id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
-    CONSTRAINT `fk_user_library_games1`
+    CONSTRAINT `fk_user_has_games_games1`
     FOREIGN KEY (`games_id`)
     REFERENCES `GridDB`.`games` (`game_id`)
     ON DELETE NO ACTION
@@ -237,16 +243,6 @@ CREATE TABLE IF NOT EXISTS `GridDB`.`tags` (
 
 
 -- -----------------------------------------------------
--- Table `GridDB`.`payment_methods`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `GridDB`.`payment_methods` (
-                                                          `payment_method_id` INT NOT NULL AUTO_INCREMENT,
-                                                          `payment_type` ENUM("PAYPAL", "MASTERCARD") NOT NULL,
-    PRIMARY KEY (`payment_method_id`))
-    ENGINE = InnoDB;
-
-
--- -----------------------------------------------------
 -- Table `GridDB`.`wishlist`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `GridDB`.`wishlist` (
@@ -274,19 +270,18 @@ CREATE TABLE IF NOT EXISTS `GridDB`.`wishlist` (
 -- Table `GridDB`.`transactions`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `GridDB`.`transactions` (
-                                                       `transaction_id` INT NOT NULL AUTO_INCREMENT,
-                                                       `purchase_date` DATETIME NOT NULL,
-                                                       `total_amount` DECIMAL NOT NULL,
-                                                       `payment_methods_id` INT NOT NULL,
-                                                       `users_id` VARCHAR(255) NOT NULL,
+    `transaction_id` VARCHAR(255) NOT NULL,
+    `users_id` VARCHAR(255) NOT NULL,
+    `balance_action` VARCHAR(60) NOT NULL,
+    `created_at` DATETIME NOT NULL,
+    `updated_at` DATETIME NULL,
+    `total_amount` DECIMAL(10,2) NOT NULL,
+    `payment_methods` VARCHAR(150) NOT NULL,
+    `paid` TINYINT NOT NULL,
+    `redirect_url` TEXT NULL,
+    `used_balance` DECIMAL(10,2) NULL,
     PRIMARY KEY (`transaction_id`),
-    INDEX `fk_transactions_payment_methods1_idx` (`payment_methods_id` ASC) VISIBLE,
     INDEX `fk_transactions_users1_idx` (`users_id` ASC) VISIBLE,
-    CONSTRAINT `fk_transactions_payment_methods1`
-    FOREIGN KEY (`payment_methods_id`)
-    REFERENCES `GridDB`.`payment_methods` (`payment_method_id`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
     CONSTRAINT `fk_transactions_users1`
     FOREIGN KEY (`users_id`)
     REFERENCES `GridDB`.`users` (`id`)
@@ -321,8 +316,8 @@ CREATE TABLE IF NOT EXISTS `GridDB`.`games_has_tags` (
 -- Table `GridDB`.`cart`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `GridDB`.`cart` (
-    `id` INT NOT NULL AUTO_INCREMENT,
-    `users_id` VARCHAR(255) NOT NULL,
+                                               `id` INT NOT NULL AUTO_INCREMENT,
+                                               `users_id` VARCHAR(255) NOT NULL,
     `games_id` INT NOT NULL,
     `created_date` DATE NULL,
     PRIMARY KEY (`id`),
@@ -339,6 +334,31 @@ CREATE TABLE IF NOT EXISTS `GridDB`.`cart` (
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
     ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `GridDB`.`transaction_games`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `GridDB`.`transaction_games` (
+                                                            `id` INT NOT NULL AUTO_INCREMENT,
+                                                            `games_id` INT NOT NULL,
+                                                            `price_on_pay` DECIMAL(10,2) NOT NULL,
+    `transactions_id` VARCHAR(255) NOT NULL,
+    PRIMARY KEY (`id`),
+    INDEX `fk_transaction_games_games1_idx` (`games_id` ASC) VISIBLE,
+    INDEX `fk_transaction_games_transactions1_idx` (`transactions_id` ASC) VISIBLE,
+    CONSTRAINT `fk_transaction_games_games1`
+    FOREIGN KEY (`games_id`)
+    REFERENCES `GridDB`.`games` (`game_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+    CONSTRAINT `fk_transaction_games_transactions1`
+    FOREIGN KEY (`transactions_id`)
+    REFERENCES `GridDB`.`transactions` (`transaction_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+    ENGINE = InnoDB;
+
 
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;

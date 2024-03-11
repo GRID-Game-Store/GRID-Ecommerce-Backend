@@ -1,7 +1,7 @@
 package com.khomsi.backend.main.user.model.entity;
 
 import com.khomsi.backend.additional.cart.model.entity.Cart;
-import com.khomsi.backend.additional.media.model.entity.GameMedia;
+import com.khomsi.backend.main.checkout.model.entity.Transaction;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
@@ -9,7 +9,9 @@ import jakarta.validation.constraints.Size;
 import lombok.*;
 
 import java.math.BigDecimal;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -34,4 +36,13 @@ public class UserInfo {
 
     @Min(0)
     private BigDecimal balance;
+
+    @OneToMany(mappedBy = "users")
+    @ToString.Exclude
+    private Set<Transaction> transactions = new LinkedHashSet<>();
+
+    @OneToMany(mappedBy = "user")
+    @ToString.Exclude
+    private Set<UserGames> userGames = new LinkedHashSet<>();
+
 }

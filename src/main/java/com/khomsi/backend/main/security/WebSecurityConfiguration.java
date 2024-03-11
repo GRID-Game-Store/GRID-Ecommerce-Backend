@@ -1,6 +1,7 @@
 package com.khomsi.backend.main.security;
 
 import com.khomsi.backend.main.security.keycloak.JwtAuthConverter;
+import com.khomsi.backend.main.user.model.entity.Role;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -29,8 +30,11 @@ public class WebSecurityConfiguration {
                         ).permitAll()
 
                         .requestMatchers("/api/v1/users/**", "/api/v1/users",
-                                "/api/v1/cart/**", "/api/v1/cart")
-                        .hasAnyRole("USER", "ADMIN")
+                                "/api/v1/cart/**", "/api/v1/cart",
+                                "/api/v1/checkout", "/api/v1/checkout/**",
+                                "/api/v1/transactions", "/api/v1/transactions/**"
+                        )
+                        .hasAnyRole(Role.USER.name(), Role.ADMIN.name())
                 )
                 .oauth2ResourceServer(oauth2ResourceServer -> oauth2ResourceServer.jwt(
                         jwt -> jwt.jwtAuthenticationConverter(jwtAuthConverter)))

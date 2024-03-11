@@ -2,8 +2,18 @@ server:
   port: 8082
   max-http-request-header-size: 10000
 app:
-  cors:
-    allowed-origins: http://localhost:3000
+  front-url: http://localhost:3000
+  payment:
+    unitAmount: "100"
+    currencyApi: https://bank.gov.ua/NBUStatService/v1/statdirectory/exchange?valcode=EUR
+    paypal:
+      base-api-url: https://api-m.sandbox.paypal.com
+      paypal-id: ${PAYPAL_CLIENT_ID}
+      paypal-secret: ${PAYPAL_SECRET_KEY}
+      currency_EURO: "EUR"
+    stripe:
+      currency: "uah"
+      stripe-secret: ${STRIPE_SECRET_KEY}
 jwt:
   auth:
     converter:
@@ -14,7 +24,8 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: http://localhost:8084/realms/GRID
+          #          issuer-uri: http://localhost:8084/realms/GRID
+          issuer-uri: http://auth.grid.domain-for-tests.com:8084/realms/GRID
   datasource:
     username: ${DB_USERNAME}
     url: ${DB_URL}
@@ -26,10 +37,10 @@ spring:
   flyway:
     enabled: 'false'
 springdoc:
-  show-actuator: true
   swagger-ui:
     disable-swagger-default-url: true
     path: /swagger
-logging:
-  level:
-    org.springframework.security: trace
+#logging:
+#  level:
+#    org.springframework: trace
+#    org.springframework.security: trace
