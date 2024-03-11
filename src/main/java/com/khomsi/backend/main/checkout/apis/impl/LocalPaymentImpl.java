@@ -5,6 +5,7 @@ import com.khomsi.backend.additional.cart.model.dto.CartItemDto;
 import com.khomsi.backend.additional.cart.service.CartService;
 import com.khomsi.backend.main.checkout.model.dto.stripe.CreatePaymentResponse;
 import com.khomsi.backend.main.checkout.model.dto.stripe.PaymentResponse;
+import com.khomsi.backend.main.checkout.model.entity.Transaction;
 import com.khomsi.backend.main.checkout.model.enums.BalanceAction;
 import com.khomsi.backend.main.checkout.model.enums.PaymentMethod;
 import com.khomsi.backend.main.checkout.service.TransactionService;
@@ -19,6 +20,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import static com.khomsi.backend.main.checkout.apis.impl.ApiResponseBuilder.buildFailureResponse;
@@ -55,6 +57,12 @@ public class LocalPaymentImpl implements LocalPaymentService {
 
     @Override
     public PaymentResponse capturePayment(String sessionId) {
+        UserInfo userInfo = userInfoService.getUserInfo();
+        Optional<Transaction> optionalTransaction = transactionService.getTransaction(sessionId, userInfo);
+        if (optionalTransaction.isEmpty()) {
+            return buildFailureResponse("Local payment captured failed for session ID: " + sessionId,
+                    HttpStatus.BAD_REQUEST);
+        }
         transactionService.completeTransaction(sessionId);
         return buildResponse(null,
                 "Local payment successfully captured for session ID: " + sessionId);
