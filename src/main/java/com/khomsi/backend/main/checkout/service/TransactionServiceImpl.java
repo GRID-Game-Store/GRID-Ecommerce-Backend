@@ -98,10 +98,7 @@ public class TransactionServiceImpl implements TransactionService {
     @Transactional
     public TransactionResponse returnTransactionToCart(String sessionId) {
         UserInfo userInfo = userInfoService.getUserInfo();
-        Optional<Transaction> optionalTransaction = userInfo.getTransactions()
-                .stream()
-                .filter(transaction -> transaction.getTransactionId().equals(sessionId) && !transaction.getPaid())
-                .findFirst();
+        Optional<Transaction> optionalTransaction = getTransaction(sessionId, userInfo);
 
         if (optionalTransaction.isPresent()) {
             Transaction transaction = optionalTransaction.get();
@@ -117,6 +114,13 @@ public class TransactionServiceImpl implements TransactionService {
         } else {
             return new TransactionResponse("Transaction with ID " + sessionId + " not found for revert.");
         }
+    }
+    @Override
+    public Optional<Transaction> getTransaction(String sessionId, UserInfo userInfo) {
+        return userInfo.getTransactions()
+                .stream()
+                .filter(transaction -> transaction.getTransactionId().equals(sessionId) && !transaction.getPaid())
+                .findFirst();
     }
 
     private void processCartTransaction(Transaction transaction) {
