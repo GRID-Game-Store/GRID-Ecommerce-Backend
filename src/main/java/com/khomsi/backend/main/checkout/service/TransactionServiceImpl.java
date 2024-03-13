@@ -112,9 +112,11 @@ public class TransactionServiceImpl implements TransactionService {
             transactionRepository.delete(transaction);
             return new TransactionResponse("Transaction successfully returned to cart.");
         } else {
-            return new TransactionResponse("Transaction with ID " + sessionId + " not found for revert.");
+            throw new GlobalServiceException(HttpStatus.NOT_FOUND, "Transaction with ID " +
+                    sessionId + " not found for revert.");
         }
     }
+
     @Override
     public Optional<Transaction> getTransaction(String sessionId, UserInfo userInfo) {
         return userInfo.getTransactions()
