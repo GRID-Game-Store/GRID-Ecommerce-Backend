@@ -11,7 +11,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.PositiveOrZero;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
@@ -33,6 +32,7 @@ public class GameController {
     public GeneralGame showAllGamesByPage(@Valid GameCriteria gameCriteria) {
         return gameService.getExtendedGamesByPage(gameCriteria);
     }
+
     @GetMapping("/genre")
     @Operation(summary = "Get games by genre")
     @ResponseStatus(HttpStatus.OK)

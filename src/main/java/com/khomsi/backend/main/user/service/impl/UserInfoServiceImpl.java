@@ -1,6 +1,8 @@
 package com.khomsi.backend.main.user.service.impl;
 
+import com.khomsi.backend.main.game.model.entity.Game;
 import com.khomsi.backend.main.handler.exception.GlobalServiceException;
+import com.khomsi.backend.main.user.model.entity.UserGames;
 import com.khomsi.backend.main.user.repository.UserInfoRepository;
 import com.khomsi.backend.main.user.model.dto.FullUserInfoDTO;
 import com.khomsi.backend.main.user.model.entity.UserInfo;
@@ -13,6 +15,8 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 
 import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -64,7 +68,17 @@ public class UserInfoServiceImpl implements UserInfoService {
     public UserInfo getExistingUser(String userInfo) {
         return userRepository.findUserInfoByExternalId(userInfo);
     }
+    @Override
+    public boolean checkIfGameIsOwnedByCurrentUser(Game game) {
+        // Fetch user and info about his games
+        UserInfo currentUser = getUserInfo();
+        Set<Game> userGames = currentUser.getUserGames().stream()
+                .map(UserGames::getGame)
+                .collect(Collectors.toSet());
 
+        // Check if this game is contacting for this user
+        return userGames.contains(game);
+    }
     @Override
     public UserInfo getUserInfo() {
         Jwt jwt = getJwt();
