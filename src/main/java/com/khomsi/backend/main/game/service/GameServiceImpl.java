@@ -117,14 +117,13 @@ public class GameServiceImpl implements GameService {
     @Override
     public List<PopularGameModel> getSpecialOffers(String query, int qty) {
         //TODO refactor the method in future
-        List<Game> games;
-        switch (query) {
-            case "release date" -> games = gameRepository.findGamesByEarliestReleaseDate();
-            case "sales" -> games = gameRepository.findGamesWithDiscount();
+        List<Game> games = switch (query) {
+            case "release date" -> gameRepository.findGamesByEarliestReleaseDate();
+            case "sales" -> gameRepository.findGamesWithDiscount();
             //TODO no metrics yet to use it not as a random
-            case "discount" -> games = getRandomGames(gameRepository.findAll(), qty);
+            case "discount" -> getRandomGames(gameRepository.findAll(), qty);
             default -> throw new GlobalServiceException(HttpStatus.NOT_FOUND, "Games are not found in database.");
-        }
+        };
         return games.stream()
                 .map(game -> {
                     boolean ownedByCurrentUser = userInfoService.checkIfGameIsOwnedByCurrentUser(game);
