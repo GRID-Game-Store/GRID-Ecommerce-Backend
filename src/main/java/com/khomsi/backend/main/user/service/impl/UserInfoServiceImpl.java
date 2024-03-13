@@ -1,9 +1,10 @@
 package com.khomsi.backend.main.user.service.impl;
 
 import com.khomsi.backend.main.handler.exception.GlobalServiceException;
-import com.khomsi.backend.main.user.repository.UserInfoRepository;
+import com.khomsi.backend.main.user.model.dto.BalanceUserInfoDTO;
 import com.khomsi.backend.main.user.model.dto.FullUserInfoDTO;
 import com.khomsi.backend.main.user.model.entity.UserInfo;
+import com.khomsi.backend.main.user.repository.UserInfoRepository;
 import com.khomsi.backend.main.user.service.UserInfoService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -39,6 +40,7 @@ public class UserInfoServiceImpl implements UserInfoService {
     public Jwt getJwt() {
         return (Jwt) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
+
     private FullUserInfoDTO getUserInfo(UserInfo existingUser, Jwt jwt) {
         return FullUserInfoDTO.builder()
                 .externalId(jwt.getSubject())
@@ -51,6 +53,12 @@ public class UserInfoServiceImpl implements UserInfoService {
                 // Add other user information based on JWT claims or user in db
                 .build();
     }
+
+    @Override
+    public BalanceUserInfoDTO getUserBalance() {
+        return BalanceUserInfoDTO.builder().balance(getCurrentUser().balance()).build();
+    }
+
     @Override
     public void checkPermissionToAction(String userId) {
         FullUserInfoDTO currentUser = getCurrentUser();
