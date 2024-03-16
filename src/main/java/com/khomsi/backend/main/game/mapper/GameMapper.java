@@ -6,9 +6,11 @@ import com.khomsi.backend.main.game.model.dto.ShortGameModel;
 import com.khomsi.backend.main.game.model.entity.Game;
 
 public interface GameMapper {
+    ShortGameModel toShortGame(Game game, boolean ownedByCurrentUser);
+
     ShortGameModel toShortGame(Game game);
 
-    PopularGameModel toPopularGame(Game game);
+    PopularGameModel toPopularGame(Game game, boolean ownedByCurrentUser);
 
-    GameModelWithGenreLimit toLimitGenreGame(Game game);
+    GameModelWithGenreLimit toLimitGenreGame(Game game, boolean ownedByCurrentUser);
 }

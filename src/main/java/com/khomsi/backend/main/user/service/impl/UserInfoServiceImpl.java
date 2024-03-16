@@ -1,10 +1,11 @@
 package com.khomsi.backend.main.user.service.impl;
 
+import com.khomsi.backend.main.game.model.entity.Game;
 import com.khomsi.backend.main.handler.exception.GlobalServiceException;
 import com.khomsi.backend.main.user.model.dto.BalanceUserInfoDTO;
+import com.khomsi.backend.main.user.repository.UserInfoRepository;
 import com.khomsi.backend.main.user.model.dto.FullUserInfoDTO;
 import com.khomsi.backend.main.user.model.entity.UserInfo;
-import com.khomsi.backend.main.user.repository.UserInfoRepository;
 import com.khomsi.backend.main.user.service.UserInfoService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,24 +24,28 @@ public class UserInfoServiceImpl implements UserInfoService {
 
     @Override
     public FullUserInfoDTO getCurrentUser() {
-        Jwt jwt = getJwt();
-        if (jwt == null) {
-            throw new GlobalServiceException(HttpStatus.UNAUTHORIZED, "User is not authenticated.");
+        try {
+            Jwt jwt = getJwt();
+            UserInfo existingUser = getExistingUser(jwt.getSubject());
+            if (existingUser == null) {
+                throw new GlobalServiceException(HttpStatus.BAD_REQUEST,
+                        "User is empty in external database to view full profile.");
+            }
+            return getUserInfo(existingUser, jwt);
+        } catch (GlobalServiceException ignored) {
+            return null;
         }
-        UserInfo existingUser = getExistingUser(jwt.getSubject());
-        if (existingUser == null) {
-            throw new GlobalServiceException(HttpStatus.BAD_REQUEST,
-                    "User is empty in external database to view full profile.");
-        }
-        return getUserInfo(existingUser, jwt);
     }
 
     //Get credential of auth user through keycloak
     @Override
     public Jwt getJwt() {
-        return (Jwt) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (principal instanceof Jwt jwt) {
+            return jwt;
+        }
+        throw new GlobalServiceException(HttpStatus.I_AM_A_TEAPOT, "Unsupported authentication method.");
     }
-
     private FullUserInfoDTO getUserInfo(UserInfo existingUser, Jwt jwt) {
         return FullUserInfoDTO.builder()
                 .externalId(jwt.getSubject())
@@ -71,6 +76,15 @@ public class UserInfoServiceImpl implements UserInfoService {
     @Override
     public UserInfo getExistingUser(String userInfo) {
         return userRepository.findUserInfoByExternalId(userInfo);
+    }
+
+    @Override
+    public boolean checkIfGameIsOwnedByCurrentUser(Game game) {
+        FullUserInfoDTO currentUser = getCurrentUser();
+        if (currentUser == null)
+            return false;
+        // Check if this game is contacting for this user
+        return userRepository.gameExistsInUserGames(currentUser.externalId(), game.getId()) > 0;
     }
 
     @Override

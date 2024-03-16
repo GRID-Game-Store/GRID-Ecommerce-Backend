@@ -5,27 +5,33 @@ import com.khomsi.backend.main.game.model.dto.GameModelWithGenreLimit;
 import com.khomsi.backend.main.game.model.dto.PopularGameModel;
 import com.khomsi.backend.main.game.model.dto.ShortGameModel;
 import com.khomsi.backend.main.game.model.entity.Game;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.stream.Collectors;
 
 @Component
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class GameMapperImpl implements GameMapper {
     @Override
-    public ShortGameModel toShortGame(Game game) {
+    public ShortGameModel toShortGame(Game game, boolean ownedByCurrentUser) {
         return ShortGameModel.builder()
                 .id(game.getId())
                 .title(game.getTitle())
                 .description(game.getDescription())
                 .coverImageUrl(game.getCoverImageUrl())
                 .price(game.getPrice())
+                .ownedByCurrentUser(ownedByCurrentUser)
                 .build();
     }
 
     @Override
-    public PopularGameModel toPopularGame(Game game) {
+    public ShortGameModel toShortGame(Game game) {
+        return toShortGame(game, false);
+    }
+
+    @Override
+    public PopularGameModel toPopularGame(Game game, boolean ownedByCurrentUser) {
         return PopularGameModel.builder()
                 .id(game.getId())
                 .title(game.getTitle())
@@ -33,11 +39,12 @@ public class GameMapperImpl implements GameMapper {
                 .coverImageUrl(game.getGameMedia().getBannerUrl())
                 .price(game.getPrice())
                 .genres(game.getGenres())
+                .ownedByCurrentUser(ownedByCurrentUser)
                 .build();
     }
 
     @Override
-    public GameModelWithGenreLimit toLimitGenreGame(Game game) {
+    public GameModelWithGenreLimit toLimitGenreGame(Game game, boolean ownedByCurrentUser) {
         return GameModelWithGenreLimit.builder()
                 .id(game.getId())
                 .title(game.getTitle())
@@ -45,6 +52,7 @@ public class GameMapperImpl implements GameMapper {
                 .coverImageUrl(game.getCoverImageUrl())
                 .price(game.getPrice())
                 .genres(game.getGenres().stream().limit(2).collect(Collectors.toSet()))
+                .ownedByCurrentUser(ownedByCurrentUser)
                 .build();
     }
 }

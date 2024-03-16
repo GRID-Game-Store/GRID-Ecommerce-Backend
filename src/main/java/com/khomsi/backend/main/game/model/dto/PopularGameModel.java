@@ -13,6 +13,7 @@ public record PopularGameModel(
         String description,
         BigDecimal price,
         String coverImageUrl,
-        Set<Genre> genres
+        Set<Genre> genres,
+        boolean ownedByCurrentUser
 ) {
 }
