@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>GRID Purchase Confirmation</title>
+    <style>
+        /* Добавьте стили здесь */
+    </style>
+</head>
+<body>
+<p th:text="'Hello, ' + ${email}"></p>
+<p>Thank you for purchase in GRID.</p>
+<img th:src="${gameBanner}" alt="Game Banner">
+<p th:text="${gameName}"></p>
+<p th:text="${gamePrice}"></p>
+<p th:text="${paymentMethod}"></p>
+<p>Best regards,</p>
+<p>GRID</p>
+<img src="https://drive.google.com/uc?id=1YjTVlX73V1CKhJxrgpQm3gZNmCFFoUEw" alt="Google Drive Image" />
+</body>
+</html>
+<!--TODO create a template style-->

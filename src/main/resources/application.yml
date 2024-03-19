@@ -20,6 +20,17 @@ jwt:
       resource-id: login-app
       principal-attribute: preferred_username
 spring:
+  mail:
+    host: smtp-mail.outlook.com
+    port: 587
+    username: ${EMAIL_USERNAME}
+    password: ${EMAIL_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
   security:
     oauth2:
       resourceserver:
@@ -42,5 +53,5 @@ springdoc:
     path: /swagger
 logging:
   level:
-#    org.springframework: trace
+    #    org.springframework: trace
     org.springframework.security: trace

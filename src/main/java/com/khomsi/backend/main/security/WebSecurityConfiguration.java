@@ -21,7 +21,8 @@ public class WebSecurityConfiguration {
         return http
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/swagger", "/swagger-ui/**",
-                                "/v3/api-docs/**", "/error").permitAll()
+                                //todo remove email link
+                                "/v3/api-docs/**", "/error", "/api/v1/email/**").permitAll()
 
                         .requestMatchers("/api/v1/games", "/api/v1/games/**",
                                 "/api/v1/genres/**", "/api/v1/genres",
