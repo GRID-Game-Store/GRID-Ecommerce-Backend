@@ -28,13 +28,13 @@ public class EmailTestController {
     @PostMapping("/send")
     @Operation(security = {@SecurityRequirement(name = BEARER_KEY_SECURITY_SCHEME)},
             summary = "Test email")
-    public String sendEmail() {
+    public String sendEmail(String email) {
         Game game = new Game();
         game.setTitle("Mafia: Definitive Edition");
         game.setPrice(BigDecimal.TEN);
         game.setCoverImageUrl("https://cdn.cloudflare.steamstatic.com/steam/apps/1030840/header.jpg?t=1632420251");
         emailService.sendPurchaseConfirmationEmail(Mail.builder()
-                .recipientEmail("samerx777888@gmail.com")
+                .recipientEmail(email)
                 .games(List.of(game))
                 .paymentMethod("Test payment")
                 .build());
