@@ -246,7 +246,7 @@ CREATE TABLE IF NOT EXISTS `GridDB`.`tags` (
 -- Table `GridDB`.`wishlist`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `GridDB`.`wishlist` (
-                                                   `wishlist_id` INT NOT NULL,
+                                                   `wishlist_id` INT NOT NULL AUTO_INCREMENT,
                                                    `users_id` VARCHAR(255) NOT NULL,
     `games_id` INT NOT NULL,
     `added_date` DATE NULL,
