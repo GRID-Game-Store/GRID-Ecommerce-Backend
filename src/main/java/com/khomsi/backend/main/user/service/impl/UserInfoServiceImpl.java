@@ -86,7 +86,6 @@ public class UserInfoServiceImpl implements UserInfoService {
         // Check if this game is contacting for this user
         return userRepository.gameExistsInUserGames(currentUser.externalId(), game.getId()) > 0;
     }
-
     @Override
     public UserInfo getUserInfo() {
         Jwt jwt = getJwt();
