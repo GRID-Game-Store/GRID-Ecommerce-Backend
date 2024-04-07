@@ -1,7 +1,11 @@
-package com.khomsi.backend.main.checkout.service;
+package com.khomsi.backend.main.email;
 
-import com.khomsi.backend.main.checkout.model.dto.Mail;
+import com.khomsi.backend.main.checkout.model.entity.Transaction;
+import com.khomsi.backend.main.checkout.model.entity.TransactionGames;
+import com.khomsi.backend.main.game.model.entity.Game;
 import com.khomsi.backend.main.handler.exception.GlobalServiceException;
+import com.khomsi.backend.main.user.model.dto.FullUserInfoDTO;
+import com.khomsi.backend.main.user.service.UserInfoService;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +18,9 @@ import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class EmailService {
@@ -22,25 +29,31 @@ public class EmailService {
     private final TemplateEngine templateEngine;
     @Value("${spring.mail.username}")
     private String mailSender;
+    private final UserInfoService userInfoService;
 
     @Async
-    public void sendPurchaseConfirmationEmail(Mail mail) {
+    public void sendPurchaseConfirmationEmail(Transaction transaction, String email) {
         try {
             MimeMessage message = emailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true);
-
-            helper.setTo(mail.recipientEmail());
+            FullUserInfoDTO userInfoDTO = userInfoService.getCurrentUser();
+            helper.setTo(email);
             helper.setFrom(mailSender);
             helper.setSubject("Thanks for purchase in GRID");
 
             Context context = new Context();
-            context.setVariable("email", mail.recipientEmail());
-            mail.games().forEach(game -> {
-                context.setVariable("gameBanner", game.getCoverImageUrl());
-                context.setVariable("gameName", game.getTitle());
-                context.setVariable("gamePrice", game.getPrice());
-            });
-            context.setVariable("paymentMethod", mail.paymentMethod());
+            context.setVariable("userName", userInfoDTO.givenName());
+            context.setVariable("orderId", transaction.getTransactionId());
+
+            // Reformat data for email
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
+            String formattedOrderDate = transaction.getUpdatedAt().format(formatter);
+            context.setVariable("orderDate", formattedOrderDate);
+            // Get the list of games from transaction and pass it as a context variable
+            List<Game> games = transaction.getTransactionGames().stream().map(TransactionGames::getGame).toList();
+            context.setVariable("games", games);
+
+            context.setVariable("totalPrice", transaction.getTotalAmount());
 
             String htmlContent = templateEngine.process("purchase_confirmation_email", context);
             helper.setText(htmlContent, true);
