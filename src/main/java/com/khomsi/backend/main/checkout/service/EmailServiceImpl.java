@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
@@ -42,26 +43,46 @@ public class EmailServiceImpl implements EmailService {
             helper.setFrom(mailSender);
             helper.setSubject("Thanks for purchase in GRID");
 
-            Context context = new Context();
-            context.setVariable("userName", userInfoDTO.givenName());
-            context.setVariable("orderId", transaction.getTransactionId());
-
-            // Reformat data for email
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
-            String formattedOrderDate = transaction.getUpdatedAt().format(formatter);
-            context.setVariable("orderDate", formattedOrderDate);
-            if (transaction.getTransactionGames() != null && !transaction.getTransactionGames().isEmpty()) {
-                // Get the list of games from transaction and pass it as a context variable
-                List<Game> games = transaction.getTransactionGames().stream().map(TransactionGames::getGame).toList();
-                context.setVariable("games", games);
-            }
-            context.setVariable("totalPrice", transaction.getTotalAmount());
-
-            String htmlContent = templateEngine.process("purchase_confirmation_email", context);
-            helper.setText(htmlContent, true);
-            emailSender.send(message);
+            Context context = prepareEmailContext(transaction, userInfoDTO);
+            String htmlContent = generateEmailContent("purchase_confirmation_email", context);
+            sendEmail(message, htmlContent);
         } catch (MessagingException e) {
             throw new GlobalServiceException(HttpStatus.BAD_REQUEST, e.getMessage());
         }
+    }
+
+    private Context prepareEmailContext(Transaction transaction, FullUserInfoDTO userInfoDTO) {
+        Context context = new Context();
+        context.setVariable("userName", userInfoDTO.givenName());
+        context.setVariable("orderId", transaction.getTransactionId());
+        String formattedOrderDate = formatDate(transaction.getUpdatedAt());
+        context.setVariable("orderDate", formattedOrderDate);
+        addTransactionGamesToContext(transaction, context);
+        context.setVariable("totalPrice", transaction.getTotalAmount());
+        return context;
+    }
+
+    private String formatDate(LocalDateTime dateTime) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
+        return dateTime.format(formatter);
+    }
+
+    private void addTransactionGamesToContext(Transaction transaction, Context context) {
+        if (transaction.getTransactionGames() != null && !transaction.getTransactionGames().isEmpty()) {
+            List<Game> games = transaction.getTransactionGames().stream()
+                    .map(TransactionGames::getGame)
+                    .toList();
+            context.setVariable("games", games);
+        }
+    }
+
+    private String generateEmailContent(String template, Context context) {
+        return templateEngine.process(template, context);
+    }
+
+    private void sendEmail(MimeMessage message, String htmlContent) throws MessagingException {
+        MimeMessageHelper helper = new MimeMessageHelper(message, true);
+        helper.setText(htmlContent, true);
+        emailSender.send(message);
     }
 }
