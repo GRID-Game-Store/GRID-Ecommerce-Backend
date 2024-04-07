@@ -1,4 +1,4 @@
-package com.khomsi.backend.main.email;
+package com.khomsi.backend.main.checkout.service;
 
 import com.khomsi.backend.main.checkout.model.entity.Transaction;
 import com.khomsi.backend.main.checkout.model.entity.TransactionGames;
@@ -23,7 +23,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class EmailService {
+public class EmailServiceImpl implements EmailService {
 
     private final JavaMailSender emailSender;
     private final TemplateEngine templateEngine;
@@ -32,12 +32,13 @@ public class EmailService {
     private final UserInfoService userInfoService;
 
     @Async
-    public void sendPurchaseConfirmationEmail(Transaction transaction, String email) {
+    @Override
+    public void sendPurchaseConfirmationEmail(Transaction transaction) {
         try {
             MimeMessage message = emailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true);
             FullUserInfoDTO userInfoDTO = userInfoService.getCurrentUser();
-            helper.setTo(email);
+            helper.setTo(userInfoDTO.email());
             helper.setFrom(mailSender);
             helper.setSubject("Thanks for purchase in GRID");
 
@@ -49,10 +50,11 @@ public class EmailService {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
             String formattedOrderDate = transaction.getUpdatedAt().format(formatter);
             context.setVariable("orderDate", formattedOrderDate);
-            // Get the list of games from transaction and pass it as a context variable
-            List<Game> games = transaction.getTransactionGames().stream().map(TransactionGames::getGame).toList();
-            context.setVariable("games", games);
-
+            if (transaction.getTransactionGames() != null && !transaction.getTransactionGames().isEmpty()) {
+                // Get the list of games from transaction and pass it as a context variable
+                List<Game> games = transaction.getTransactionGames().stream().map(TransactionGames::getGame).toList();
+                context.setVariable("games", games);
+            }
             context.setVariable("totalPrice", transaction.getTotalAmount());
 
             String htmlContent = templateEngine.process("purchase_confirmation_email", context);
