@@ -3,6 +3,7 @@ package com.khomsi.backend.main.checkout.service;
 import com.khomsi.backend.additional.cart.model.dto.CartDTO;
 import com.khomsi.backend.additional.cart.model.dto.CartItemDto;
 import com.khomsi.backend.additional.cart.service.CartService;
+import com.khomsi.backend.additional.wishlist.service.WishlistService;
 import com.khomsi.backend.main.checkout.mapper.TransactionMapper;
 import com.khomsi.backend.main.checkout.model.dto.TransactionDTO;
 import com.khomsi.backend.main.checkout.model.entity.Transaction;
@@ -43,6 +44,7 @@ public class TransactionServiceImpl implements TransactionService {
     private final UserInfoRepository userInfoRepository;
     private final UserGamesService userGamesService;
     private final EmailService emailService;
+    private final WishlistService wishlistService;
 
     @Override
     @Transactional
@@ -53,11 +55,15 @@ public class TransactionServiceImpl implements TransactionService {
         UserInfo user = transaction.getUsers();
         BalanceAction balanceAction = transaction.getBalanceAction();
         switch (balanceAction) {
-            case NO_ACTION -> userGamesService.getGamesFromTransactionToLibrary(user, transaction);
+            case NO_ACTION -> {
+                userGamesService.getGamesFromTransactionToLibrary(user, transaction);
+                deleteGamesFromWishlist(transaction);
+            }
             case PAYMENT_WITH_BALANCE -> {
                 BigDecimal newBalance = user.getBalance().subtract(transaction.getUsedBalance());
                 user.setBalance(newBalance);
                 userGamesService.getGamesFromTransactionToLibrary(user, transaction);
+                deleteGamesFromWishlist(transaction);
             }
             case BALANCE_RECHARGE -> {
                 BigDecimal newBalance = user.getBalance().add(transaction.getTotalAmount());
@@ -71,6 +77,14 @@ public class TransactionServiceImpl implements TransactionService {
         transaction.setRedirectUrl(null);
         emailService.sendPurchaseConfirmationEmail(transaction);
         transactionRepository.save(transaction);
+    }
+
+    private void deleteGamesFromWishlist(Transaction transaction) {
+        // Delete games from wishlist using stream
+        transaction.getTransactionGames().stream()
+                .map(TransactionGames::getGame)
+                .map(Game::getId)
+                .forEach(wishlistService::deleteGameFromWishlist);
     }
 
     @Override

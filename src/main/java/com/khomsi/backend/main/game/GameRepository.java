@@ -11,8 +11,6 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 
 public interface GameRepository extends JpaRepository<Game, Long>, JpaSpecificationExecutor<Game> {
-    Page<Game> findGameByTitleContainingIgnoreCase(@Param("title") String title, Pageable pageable);
-
     @Query("SELECT g FROM Game g JOIN g.genres genre WHERE genre.name = :genre")
     List<Game> findGamesByGenre(@Param("genre") String genre);
 
