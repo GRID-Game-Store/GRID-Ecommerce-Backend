@@ -43,6 +43,7 @@ public class TransactionServiceImpl implements TransactionService {
     private final TransactionMapper transactionMapper;
     private final UserInfoRepository userInfoRepository;
     private final UserGamesService userGamesService;
+    private final EmailService emailService;
     private final WishlistService wishlistService;
 
     @Override
@@ -74,6 +75,7 @@ public class TransactionServiceImpl implements TransactionService {
         transaction.setUpdatedAt(LocalDateTime.now());
         transaction.setPaid(true);
         transaction.setRedirectUrl(null);
+        emailService.sendPurchaseConfirmationEmail(transaction);
         transactionRepository.save(transaction);
     }
 
