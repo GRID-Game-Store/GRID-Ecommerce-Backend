@@ -10,6 +10,7 @@ public record ShortGameModel(
         String title,
         String description,
         BigDecimal price,
+        BigDecimal discount,
         String coverImageUrl,
         boolean ownedByCurrentUser
 ) {

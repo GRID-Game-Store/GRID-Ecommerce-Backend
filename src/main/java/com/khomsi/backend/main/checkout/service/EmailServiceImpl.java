@@ -2,9 +2,11 @@ package com.khomsi.backend.main.checkout.service;
 
 import com.khomsi.backend.main.checkout.model.entity.Transaction;
 import com.khomsi.backend.main.checkout.model.entity.TransactionGames;
+import com.khomsi.backend.main.game.model.dto.ShortGameModel;
 import com.khomsi.backend.main.game.model.entity.Game;
 import com.khomsi.backend.main.handler.exception.GlobalServiceException;
 import com.khomsi.backend.main.user.model.dto.FullUserInfoDTO;
+import com.khomsi.backend.main.user.model.entity.UserInfo;
 import com.khomsi.backend.main.user.service.UserInfoService;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
@@ -22,6 +24,9 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
+import static com.khomsi.backend.main.checkout.model.enums.EmailTemplates.DISCOUNT_NOTIFICATION;
+import static com.khomsi.backend.main.checkout.model.enums.EmailTemplates.PURCHASE_CONFIRMATION;
+
 @Service
 @RequiredArgsConstructor
 public class EmailServiceImpl implements EmailService {
@@ -37,22 +42,28 @@ public class EmailServiceImpl implements EmailService {
     public void sendPurchaseConfirmationEmail(Transaction transaction) {
         try {
             MimeMessage message = emailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(message, true);
             FullUserInfoDTO userInfoDTO = userInfoService.getCurrentUser();
-            helper.setTo(userInfoDTO.email());
-            helper.setFrom(mailSender);
-            helper.setSubject("Thanks for purchase in GRID");
-
-            Context context = prepareEmailContext(transaction, userInfoDTO);
-            String htmlContent = generateEmailContent("purchase_confirmation_email", context);
-            sendEmail(message, htmlContent);
+            prepareAndSendEmail(message, userInfoDTO.email(), PURCHASE_CONFIRMATION.getTemplateName(), prepareEmailContext(transaction));
         } catch (MessagingException e) {
             throw new GlobalServiceException(HttpStatus.BAD_REQUEST, e.getMessage());
         }
     }
 
-    private Context prepareEmailContext(Transaction transaction, FullUserInfoDTO userInfoDTO) {
+    @Async
+    @Override
+    public void sendDiscountNotificationEmail(List<ShortGameModel> discountedGames, UserInfo user) {
+        try {
+            MimeMessage message = emailSender.createMimeMessage();
+            prepareAndSendEmail(message, user.getEmail(), DISCOUNT_NOTIFICATION.getTemplateName(),
+                    prepareDiscountEmailContext(discountedGames, user));
+        } catch (MessagingException e) {
+            throw new GlobalServiceException(HttpStatus.BAD_REQUEST, e.getMessage());
+        }
+    }
+
+    private Context prepareEmailContext(Transaction transaction) {
         Context context = new Context();
+        FullUserInfoDTO userInfoDTO = userInfoService.getCurrentUser();
         context.setVariable("userName", userInfoDTO.givenName());
         context.setVariable("orderId", transaction.getTransactionId());
         String formattedOrderDate = formatDate(transaction.getUpdatedAt());
@@ -62,9 +73,11 @@ public class EmailServiceImpl implements EmailService {
         return context;
     }
 
-    private String formatDate(LocalDateTime dateTime) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
-        return dateTime.format(formatter);
+    private Context prepareDiscountEmailContext(List<ShortGameModel> discountedGames, UserInfo user) {
+        Context context = new Context();
+        context.setVariable("userName", user.getEmail());
+        context.setVariable("discountedGames", discountedGames);
+        return context;
     }
 
     private void addTransactionGamesToContext(Transaction transaction, Context context) {
@@ -76,13 +89,31 @@ public class EmailServiceImpl implements EmailService {
         }
     }
 
+    private String formatDate(LocalDateTime dateTime) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
+        return dateTime.format(formatter);
+    }
+
     private String generateEmailContent(String template, Context context) {
         return templateEngine.process(template, context);
     }
 
-    private void sendEmail(MimeMessage message, String htmlContent) throws MessagingException {
+    private void prepareAndSendEmail(MimeMessage message, String userEmail, String template, Context context) throws MessagingException {
         MimeMessageHelper helper = new MimeMessageHelper(message, true);
+        helper.setTo(userEmail);
+        helper.setFrom(mailSender);
+        helper.setSubject(getEmailSubject(template));
+        String htmlContent = generateEmailContent(template, context);
         helper.setText(htmlContent, true);
         emailSender.send(message);
+    }
+
+    private String getEmailSubject(String template) {
+        if (template.equalsIgnoreCase(PURCHASE_CONFIRMATION.getTemplateName())) {
+            return PURCHASE_CONFIRMATION.getSubject();
+        } else if (template.equalsIgnoreCase(DISCOUNT_NOTIFICATION.getTemplateName())) {
+            return DISCOUNT_NOTIFICATION.getSubject();
+        }
+        return "";
     }
 }
