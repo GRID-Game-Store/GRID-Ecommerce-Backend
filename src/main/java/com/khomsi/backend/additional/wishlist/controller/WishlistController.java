@@ -45,7 +45,7 @@ public class WishlistController {
                                                               @Min(1) @Max(Long.MAX_VALUE) Long gameId) {
         return wishlistService.deleteGameFromWishlist(gameId);
     }
-    @PostMapping("/check/{game-id}")
+    @GetMapping("/check/{game-id}")
     @Operation(security = {@SecurityRequirement(name = BEARER_KEY_SECURITY_SCHEME)},
             summary = "Check if game is already in wishlist and in library")
     public Boolean checkIfGameIsInWishlist(

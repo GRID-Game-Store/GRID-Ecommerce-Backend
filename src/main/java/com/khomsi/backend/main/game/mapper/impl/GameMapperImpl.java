@@ -21,6 +21,7 @@ public class GameMapperImpl implements GameMapper {
                 .description(game.getDescription())
                 .coverImageUrl(game.getCoverImageUrl())
                 .price(game.getPrice())
+                .discount(game.getDiscount())
                 .ownedByCurrentUser(ownedByCurrentUser)
                 .build();
     }
