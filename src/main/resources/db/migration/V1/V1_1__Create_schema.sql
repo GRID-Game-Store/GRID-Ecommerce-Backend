@@ -19,6 +19,7 @@ USE `GridDB` ;
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `GridDB`.`users` (
     `id` VARCHAR(255) NOT NULL,
+    `username` VARCHAR(255) NOT NULL,
     `email` VARCHAR(255) NOT NULL,
     `balance` DECIMAL(10,2) NOT NULL,
     PRIMARY KEY (`id`),
@@ -58,6 +59,7 @@ CREATE TABLE IF NOT EXISTS `GridDB`.`games` (
     `price` DECIMAL(10,2) NOT NULL DEFAULT 0.00,
     `discount` DECIMAL(10,2) NOT NULL DEFAULT 0.00,
     `permit_age` ENUM("0", "3", "7", "12", "16", "18", "!") NOT NULL DEFAULT '0',
+    `active` TINYINT NOT NULL DEFAULT 1,
     `cover_image_url` TEXT NULL,
     `developer_id` INT NOT NULL,
     `publisher_id` INT NOT NULL,
@@ -110,7 +112,7 @@ CREATE TABLE IF NOT EXISTS `GridDB`.`reviews` (
     `games_id` INT NOT NULL,
     `rating` INT NOT NULL,
     `comment` TEXT NOT NULL,
-    `review_date` DATE NOT NULL,
+    `review_date` DATETIME NOT NULL,
     PRIMARY KEY (`review_id`),
     INDEX `fk_reviews_users1_idx` (`users_id` ASC) VISIBLE,
     INDEX `fk_reviews_games1_idx` (`games_id` ASC) VISIBLE,
@@ -218,9 +220,9 @@ CREATE TABLE IF NOT EXISTS `GridDB`.`developers_has_publishers` (
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `GridDB`.`game_medias` (
                                                       `games_id` INT NOT NULL,
-                                                      `banner_url` TEXT NULL,
+                                                      `banner_url` TEXT NOT NULL,
                                                       `screenshot_url` TEXT NULL,
-                                                      `trailer` TEXT NULL,
+                                                      `trailer` TEXT NOT NULL,
                                                       `trailer_screenshot` TEXT NULL,
                                                       INDEX `fk_game_medias_games1_idx` (`games_id` ASC) VISIBLE,
     PRIMARY KEY (`games_id`),
@@ -249,7 +251,7 @@ CREATE TABLE IF NOT EXISTS `GridDB`.`wishlist` (
                                                    `wishlist_id` INT NOT NULL AUTO_INCREMENT,
                                                    `users_id` VARCHAR(255) NOT NULL,
     `games_id` INT NOT NULL,
-    `added_date` DATE NULL,
+    `added_date` DATETIME NULL,
     PRIMARY KEY (`wishlist_id`),
     INDEX `fk_users_has_games_games1_idx` (`games_id` ASC) VISIBLE,
     INDEX `fk_users_has_games_users1_idx` (`users_id` ASC) VISIBLE,

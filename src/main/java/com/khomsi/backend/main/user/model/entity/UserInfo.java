@@ -1,6 +1,7 @@
 package com.khomsi.backend.main.user.model.entity;
 
 import com.khomsi.backend.additional.cart.model.entity.Cart;
+import com.khomsi.backend.additional.review.model.entity.Review;
 import com.khomsi.backend.main.checkout.model.entity.Transaction;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
@@ -25,7 +26,9 @@ public class UserInfo {
     @Id
     @Column(name = "id", nullable = false)
     private String externalId;
-
+    @Size(max = 255)
+    @Column(name = "username", nullable = false)
+    private String username;
     @Size(max = 255)
     @NotNull
     @Column(name = "email", nullable = false)
@@ -45,4 +48,6 @@ public class UserInfo {
     @ToString.Exclude
     private Set<UserGames> userGames = new LinkedHashSet<>();
 
+    @OneToMany(mappedBy = "users")
+    private Set<Review> reviews = new LinkedHashSet<>();
 }
