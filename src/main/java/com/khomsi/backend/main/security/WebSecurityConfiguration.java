@@ -20,23 +20,22 @@ public class WebSecurityConfiguration {
     public SecurityFilterChain securityFilterChainConfig(HttpSecurity http) throws Exception {
         return http
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/swagger", "/swagger-ui/**",
-                                //todo remove email link
-                                "/v3/api-docs/**", "/error", "/api/v1/email/**").permitAll()
+                                .requestMatchers("/swagger", "/swagger-ui/**",
+                                        "/v3/api-docs/**", "/error").permitAll()
 
-                        .requestMatchers("/api/v1/games", "/api/v1/games/**",
-                                "/api/v1/genres/**", "/api/v1/genres",
-                                "/api/v1/platforms", "/api/v1/developers",
-                                "/api/v1/publishers", "/api/v1/tags"
-                        ).permitAll()
+                                .requestMatchers("/api/v1/games", "/api/v1/games/**",
+                                        "/api/v1/genres/**", "/api/v1/genres",
+                                        "/api/v1/platforms", "/api/v1/developers",
+                                        "/api/v1/publishers", "/api/v1/tags", "/api/v1/reviews/**"
+                                ).permitAll()
 
-                        .requestMatchers("/api/v1/users/**", "/api/v1/users",
-                                "/api/v1/cart/**", "/api/v1/cart",
-                                "/api/v1/checkout", "/api/v1/checkout/**",
-                                "/api/v1/transactions", "/api/v1/transactions/**",
-                                "/api/v1/wishlist", "/api/v1/wishlist/**"
-                        )
-                        .hasAnyRole(Role.USER.name(), Role.ADMIN.name())
+                                .requestMatchers("/api/v1/users/**", "/api/v1/users",
+                                        "/api/v1/cart/**", "/api/v1/cart",
+                                        "/api/v1/checkout", "/api/v1/checkout/**",
+                                        "/api/v1/transactions", "/api/v1/transactions/**",
+                                        "/api/v1/wishlist", "/api/v1/wishlist/**",
+                                        "/api/v1/reviews/*/**"
+                                ).hasAnyRole(Role.USER.name(), Role.ADMIN.name())
                 )
                 .oauth2ResourceServer(oauth2ResourceServer -> oauth2ResourceServer.jwt(
                         jwt -> jwt.jwtAuthenticationConverter(jwtAuthConverter)))
