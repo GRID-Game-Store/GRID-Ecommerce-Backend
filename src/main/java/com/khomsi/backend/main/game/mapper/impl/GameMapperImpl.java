@@ -39,6 +39,7 @@ public class GameMapperImpl implements GameMapper {
                 .description(game.getDescription())
                 .coverImageUrl(game.getGameMedia().getBannerUrl())
                 .price(game.getPrice())
+                .discount(game.getDiscount())
                 .genres(game.getGenres())
                 .ownedByCurrentUser(ownedByCurrentUser)
                 .build();

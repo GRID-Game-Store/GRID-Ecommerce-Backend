@@ -119,9 +119,9 @@ public class GameServiceImpl implements GameService {
         //TODO refactor the method in future
         List<Game> games = switch (query) {
             case "release date" -> gameRepository.findGamesByEarliestReleaseDate();
-            case "sales" -> gameRepository.findGamesWithDiscount();
+            case "discount" -> gameRepository.findGamesWithDiscount();
             //TODO no metrics yet to use it not as a random
-            case "discount" -> getRandomGames(gameRepository.findAll(), qty);
+            case "sales" -> getRandomGames(gameRepository.findAll(), qty);
             default -> throw new GlobalServiceException(HttpStatus.NOT_FOUND, "Games are not found in database.");
         };
         return games.stream()
