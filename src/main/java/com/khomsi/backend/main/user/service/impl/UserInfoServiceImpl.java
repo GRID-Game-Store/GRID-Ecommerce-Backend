@@ -10,6 +10,7 @@ import com.khomsi.backend.main.user.service.UserInfoService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
@@ -40,11 +41,12 @@ public class UserInfoServiceImpl implements UserInfoService {
     //Get credential of auth user through keycloak
     @Override
     public Jwt getJwt() {
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (principal instanceof Jwt jwt) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.isAuthenticated() && authentication.getPrincipal() instanceof Jwt jwt) {
             return jwt;
+        } else {
+            throw new GlobalServiceException(HttpStatus.I_AM_A_TEAPOT, "Unsupported authentication method.");
         }
-        throw new GlobalServiceException(HttpStatus.I_AM_A_TEAPOT, "Unsupported authentication method.");
     }
     private FullUserInfoDTO getUserInfo(UserInfo existingUser, Jwt jwt) {
         return FullUserInfoDTO.builder()

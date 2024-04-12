@@ -1,6 +1,6 @@
 server:
   port: 8082
-  max-http-request-header-size: 10000
+  max-http-request-header-size: 15000
 app:
   front-url: http://localhost:3000
   payment:
