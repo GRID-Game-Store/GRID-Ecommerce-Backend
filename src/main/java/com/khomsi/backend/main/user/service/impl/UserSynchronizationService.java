@@ -44,7 +44,7 @@ public class UserSynchronizationService {
     private UserInfo createUserInfoToDB(Jwt jwt) {
         UserInfo user = new UserInfo();
         user.setExternalId(jwt.getSubject());
-        user.setUsername(jwt.getClaimAsString("username"));
+        user.setUsername(jwt.getClaimAsString("preferred_username"));
         user.setBalance(BigDecimal.ZERO);
         // Set other user attributes based on JWT claims
         return user;
