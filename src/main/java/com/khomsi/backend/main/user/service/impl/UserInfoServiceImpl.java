@@ -66,6 +66,7 @@ public class UserInfoServiceImpl implements UserInfoService {
         return FullUserInfoDTO.builder()
                 .externalId(jwt.getSubject())
                 .email(jwt.getClaimAsString("email"))
+                .username(existingUser.getUsername())
                 .givenName(jwt.getClaimAsString("given_name"))
                 .familyName(jwt.getClaimAsString("family_name"))
                 .gender(jwt.getClaimAsString("gender"))
