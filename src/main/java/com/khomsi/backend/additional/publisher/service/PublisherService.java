@@ -6,4 +6,6 @@ import java.util.List;
 
 public interface PublisherService {
     List<Publisher> getAllPublishers();
+
+    Publisher findPublisherById(Long pubId);
 }
