@@ -56,6 +56,7 @@ CREATE TABLE IF NOT EXISTS `GridDB`.`games` (
     `description` TEXT NULL,
     `release_date` DATE NULL,
     `system_requirements` TEXT NULL,
+    `about_game` TEXT NULL,
     `price` DECIMAL(10,2) NOT NULL DEFAULT 0.00,
     `discount` DECIMAL(10,2) NOT NULL DEFAULT 0.00,
     `permit_age` ENUM("0", "3", "7", "12", "16", "18", "!") NOT NULL DEFAULT '0',

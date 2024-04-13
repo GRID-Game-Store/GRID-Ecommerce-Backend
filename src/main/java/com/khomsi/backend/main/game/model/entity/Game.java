@@ -45,10 +45,15 @@ public class Game {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
     @Column(name = "release_date")
     private LocalDate releaseDate;
-
+    @NotNull
+    @Column(name = "active", nullable = false)
+    private Boolean active;
     @Lob
     @Column(name = "system_requirements")
     private String systemRequirements;
+    @Lob
+    @Column(name = "about_game")
+    private String aboutGame;
 
     @Column(name = "price", precision = 10)
     private BigDecimal price;
@@ -62,7 +67,6 @@ public class Game {
     private BigDecimal discount;
 
     @NotNull
-    @Lob
     @Column(name = "permit_age", nullable = false)
     private String permitAge;
 
@@ -102,6 +106,7 @@ public class Game {
     private List<Cart> carts;
     @OneToOne(mappedBy = "games", cascade = CascadeType.ALL)
     private GameMedia gameMedia;
+
     public BigDecimal getPrice() {
         if (discount == null || price == null) {
             return price;

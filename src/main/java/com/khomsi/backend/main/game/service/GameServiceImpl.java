@@ -52,6 +52,8 @@ public class GameServiceImpl implements GameService {
                 "name", gameCriteria.getDevelopers()));
         specification = specification.and(GameSpecifications.byField("publisher",
                 "name", gameCriteria.getPublishers()));
+        specification = specification.and((root, query, criteriaBuilder)
+                -> criteriaBuilder.isTrue(root.get("active")));
 
         Page<Game> gamePage = gameRepository.findAll(specification, pagingSort);
         if (gamePage.isEmpty()) {
@@ -110,7 +112,7 @@ public class GameServiceImpl implements GameService {
 
     @Override
     public Game getGameById(Long gameId) {
-        return gameRepository.findById(gameId).orElseThrow(() ->
+        return gameRepository.findByIdAndActiveTrue(gameId).orElseThrow(() ->
                 new GlobalServiceException(HttpStatus.NOT_FOUND, "Game with id " + gameId + " is not found."));
     }
 
