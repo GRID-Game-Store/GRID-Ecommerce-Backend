@@ -15,4 +15,6 @@ public interface ReviewService {
     List<ReviewDTO> viewReview(Long gameId);
 
     ResponseEntity<ReviewResponse> deleteReview(Long reviewId);
+
+    ResponseEntity<ReviewDTO> getReviewForGameByUser(Long gameId);
 }

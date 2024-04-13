@@ -27,6 +27,13 @@ import static com.khomsi.backend.сonfig.ApplicationConfig.BEARER_KEY_SECURITY_S
 public class ReviewController {
     private final ReviewService reviewService;
 
+    @GetMapping("/get/{game-id}")
+    @Operation(security = {@SecurityRequirement(name = BEARER_KEY_SECURITY_SCHEME)},
+            summary = "Get my review for game")
+    public ResponseEntity<ReviewDTO> getReviewForGame(@PathVariable("game-id")
+                                                          @Min(1) @Max(Long.MAX_VALUE) Long gameId) {
+        return reviewService.getReviewForGameByUser(gameId);
+    }
     @PostMapping("/add/{game-id}")
     @Operation(security = {@SecurityRequirement(name = BEARER_KEY_SECURITY_SCHEME)},
             summary = "Add review to game")

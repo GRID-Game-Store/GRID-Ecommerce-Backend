@@ -32,79 +32,106 @@ public class ReviewServiceImpl implements ReviewService {
     @Override
     public ResponseEntity<ReviewResponse> addReview(Long gameId, ReviewRequest reviewRequest) {
         UserInfo existingUser = userInfoService.getUserInfo();
-        boolean doesNotHaveGameInLibrary = isGameNotInLibrary(gameId, existingUser);
-        boolean hasReviewedGame = isReviewedGame(gameId, existingUser);
-        // Handle the case where the user doesn't meet the conditions
-        if (doesNotHaveGameInLibrary || hasReviewedGame) {
-            throw new GlobalServiceException(HttpStatus.BAD_REQUEST, "User cannot review this game.");
-        }
         Game game = gameService.getGameById(gameId);
+        checkUserCanReview(existingUser, game);
+
         Review review = new Review(existingUser, game, reviewRequest.rating(), reviewRequest.comment());
         reviewRepository.save(review);
-        return new ResponseEntity<>(new ReviewResponse("Review with id " + review.getId() + " has been created!"),
-                HttpStatus.CREATED);
+
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(new ReviewResponse("Review with id " + review.getId() + " has been created!"));
     }
 
     @Override
     public ResponseEntity<ReviewResponse> editReview(Long reviewId, ReviewRequest reviewRequest) {
-        //If this game exists in library and has a review
         UserInfo existingUser = userInfoService.getUserInfo();
-        Review review = reviewRepository.findById(reviewId)
-                .orElseThrow(() -> new GlobalServiceException(HttpStatus.NOT_FOUND,
-                        "Review with id " + reviewId + " is not found."));
-        boolean doesNotHaveGameInLibrary = isGameNotInLibrary(review.getGames().getId(), existingUser);
-        boolean hasReviewedGame = isReviewedGame(review.getGames().getId(), existingUser);
-        // Handle the case where the user doesn't meet the conditions
-        if (doesNotHaveGameInLibrary || !hasReviewedGame) {
-            throw new GlobalServiceException(HttpStatus.BAD_REQUEST, "User cannot review this game.");
-        }
+        Review review = getReview(reviewId);
+        checkUserCanEditReview(existingUser, review);
+
         review.setComment(reviewRequest.comment());
         review.setRating(reviewRequest.rating());
         review.setReviewDate(LocalDateTime.now());
         reviewRepository.save(review);
+
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new ReviewResponse("Review with id " + review.getId() + " has been changed!"));
     }
 
     @Override
     public ResponseEntity<ReviewResponse> deleteReview(Long reviewId) {
-        if (!reviewRepository.existsById(reviewId))
-            throw new GlobalServiceException(HttpStatus.NOT_FOUND, "Review with id " + reviewId + " is not found.");
-        reviewRepository.deleteById(reviewId);
+        Review review = getReview(reviewId);
+        reviewRepository.delete(review);
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new ReviewResponse("Review with id " + reviewId + " was successfully deleted."));
     }
 
     @Override
+    public ResponseEntity<ReviewDTO> getReviewForGameByUser(Long gameId) {
+        UserInfo existingUser = userInfoService.getUserInfo();
+        Game game = gameService.getGameById(gameId);
+        Review review = reviewRepository.findByUsersAndGames(existingUser, game);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(mapReviewToDTO(review));
+    }
+
+    @Override
     public List<ReviewDTO> viewReview(Long gameId) {
         List<Review> reviews = reviewRepository.findAllByGameIdOrderByReviewDate(gameId);
-        // Map each Review to a ReviewDTO
         return reviews.stream()
-                .map(review -> {
-                    Game game = review.getGames();
-                    ShortGameModel shortGameModel = gameMapper.toShortGame(game, true);
-                    // Retrieve username from UserInfo
-                    String username = review.getUsers().getUsername();
-                    return new ReviewDTO(
-                            review.getId(),
-                            username,
-                            shortGameModel,
-                            review.getRating(),
-                            review.getComment(),
-                            review.getReviewDate()
-                    );
-                }).toList();
+                .map(this::mapReviewToDTO)
+                .toList();
     }
 
-    private boolean isReviewedGame(Long gameId, UserInfo existingUser) {
+    private void checkUserCanReview(UserInfo user, Game game) {
+        if (isGameNotInLibrary(game, user)) {
+            throw new GlobalServiceException(HttpStatus.BAD_REQUEST, "User cannot review this game.");
+        }
+        if (isReviewedGame(game, user)) {
+            throw new GlobalServiceException(HttpStatus.BAD_REQUEST, "User has already reviewed this game.");
+        }
+    }
+
+    private void checkUserCanEditReview(UserInfo user, Review review) {
+        if (!review.getUsers().equals(user)) {
+            throw new GlobalServiceException(HttpStatus.FORBIDDEN, "User cannot edit this review.");
+        }
+        boolean doesNotHaveGameInLibrary = isGameNotInLibrary(review.getGames(), user);
+        boolean hasReviewedGame = isReviewedGame(review.getGames(), user);
+        // Handle the case where the user doesn't meet the conditions
+        if (doesNotHaveGameInLibrary || !hasReviewedGame) {
+            throw new GlobalServiceException(HttpStatus.BAD_REQUEST, "User cannot review this game.");
+        }
+    }
+
+    private boolean isReviewedGame(Game game, UserInfo existingUser) {
         // Check if the user has already written a review for the game
         return existingUser.getReviews()
-                .stream().anyMatch(review -> review.getGames().getId().equals(gameId));
+                .stream().anyMatch(review -> review.getGames().equals(game));
     }
 
-    private boolean isGameNotInLibrary(Long gameId, UserInfo existingUser) {
+    private boolean isGameNotInLibrary(Game game, UserInfo existingUser) {
         // Check if the user has the game in their library
         return existingUser.getUserGames()
-                .stream().noneMatch(userGames -> userGames.getGame().getId().equals(gameId));
+                .stream().noneMatch(userGames -> userGames.getGame().equals(game));
+    }
+
+    private Review getReview(Long reviewId) {
+        return reviewRepository.findById(reviewId)
+                .orElseThrow(() -> new GlobalServiceException(HttpStatus.NOT_FOUND,
+                        "Review with id " + reviewId + " is not found."));
+    }
+
+    private ReviewDTO mapReviewToDTO(Review review) {
+        Game game = review.getGames();
+        ShortGameModel shortGameModel = gameMapper.toShortGame(game, true);
+        String username = review.getUsers().getUsername();
+        return new ReviewDTO(
+                review.getId(),
+                username,
+                shortGameModel,
+                review.getRating(),
+                review.getComment(),
+                review.getReviewDate()
+        );
     }
 }
