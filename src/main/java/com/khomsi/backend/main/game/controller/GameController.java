@@ -1,9 +1,6 @@
 package com.khomsi.backend.main.game.controller;
 
-import com.khomsi.backend.main.game.model.dto.GameCriteria;
-import com.khomsi.backend.main.game.model.dto.GameModelWithGenreLimit;
-import com.khomsi.backend.main.game.model.dto.GeneralGame;
-import com.khomsi.backend.main.game.model.dto.PopularGameModel;
+import com.khomsi.backend.main.game.model.dto.*;
 import com.khomsi.backend.main.game.model.entity.Game;
 import com.khomsi.backend.main.game.service.GameService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -87,9 +84,9 @@ public class GameController {
     @GetMapping("/{game-id}")
     @Operation(security = {@SecurityRequirement(name = BEARER_KEY_SECURITY_SCHEME)}, summary = "Get game by id")
     @ResponseStatus(HttpStatus.OK)
-    public Game showGameById(
+    public ExtendedGame showGameById(
             @PathVariable("game-id")
             @Min(1) @Max(Long.MAX_VALUE) Long gameId) {
-        return gameService.getGameById(gameId);
+        return gameService.getExtendedGameById(gameId);
     }
 }
