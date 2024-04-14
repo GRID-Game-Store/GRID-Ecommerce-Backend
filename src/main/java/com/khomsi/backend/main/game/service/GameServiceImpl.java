@@ -115,6 +115,12 @@ public class GameServiceImpl implements GameService {
     }
 
     @Override
+    public ExtendedGame getExtendedGameById(Long gameId) {
+        Game game = getGameById(gameId);
+        return new ExtendedGame(getGameById(gameId), userInfoService.checkIfGameIsOwnedByCurrentUser(game));
+    }
+
+    @Override
     public List<PopularGameModel> getSpecialOffers(String query, int qty) {
         //TODO refactor the method in future
         List<Game> games = switch (query) {
