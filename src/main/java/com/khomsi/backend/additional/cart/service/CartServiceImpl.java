@@ -34,7 +34,7 @@ public class CartServiceImpl implements CartService {
     @Override
     public CartResponse addToCart(Long gameId) {
         UserInfo existingUser = userInfoService.getUserInfo();
-        Game game = gameService.getGameById(gameId);
+        Game game = gameService.getActiveGameById(gameId);
         boolean gameAlreadyInLibrary = userGamesService.checkIfGameExists(existingUser, game);
         //Check if the game is already is library
         if (gameAlreadyInLibrary) {

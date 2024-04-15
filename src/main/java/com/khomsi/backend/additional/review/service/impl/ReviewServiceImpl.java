@@ -32,7 +32,7 @@ public class ReviewServiceImpl implements ReviewService {
     @Override
     public ResponseEntity<ReviewResponse> addReview(Long gameId, ReviewRequest reviewRequest) {
         UserInfo existingUser = userInfoService.getUserInfo();
-        Game game = gameService.getGameById(gameId);
+        Game game = gameService.getActiveGameById(gameId);
         checkUserCanReview(existingUser, game);
 
         Review review = new Review(existingUser, game, reviewRequest.rating(), reviewRequest.comment());
@@ -68,7 +68,7 @@ public class ReviewServiceImpl implements ReviewService {
     @Override
     public ResponseEntity<ReviewDTO> getReviewForGameByUser(Long gameId) {
         UserInfo existingUser = userInfoService.getUserInfo();
-        Game game = gameService.getGameById(gameId);
+        Game game = gameService.getActiveGameById(gameId);
         Review review = reviewRepository.findByUsersAndGames(existingUser, game);
         return ResponseEntity.status(HttpStatus.OK)
                 .body(mapReviewToDTO(review));

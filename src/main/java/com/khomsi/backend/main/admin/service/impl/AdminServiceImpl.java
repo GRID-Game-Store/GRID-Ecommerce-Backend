@@ -9,10 +9,12 @@ import com.khomsi.backend.additional.platform.PlatformRepository;
 import com.khomsi.backend.additional.publisher.model.entity.Publisher;
 import com.khomsi.backend.additional.publisher.service.PublisherService;
 import com.khomsi.backend.additional.tag.TagRepository;
-import com.khomsi.backend.main.admin.model.dto.GameInsertDTO;
+import com.khomsi.backend.main.admin.model.dto.GameDTO;
 import com.khomsi.backend.main.admin.model.response.AdminResponse;
 import com.khomsi.backend.main.admin.service.AdminService;
 import com.khomsi.backend.main.game.GameRepository;
+import com.khomsi.backend.main.game.model.dto.GameCriteria;
+import com.khomsi.backend.main.game.model.dto.GeneralGame;
 import com.khomsi.backend.main.game.model.entity.Game;
 import com.khomsi.backend.main.game.service.GameService;
 import com.khomsi.backend.main.handler.exception.GlobalServiceException;
@@ -37,15 +39,41 @@ public class AdminServiceImpl implements AdminService {
     private final GameRepository gameRepository;
     private final GameMediaRepository gameMediaRepository;
 
+    //TODO
+    // add transaction section (crud) per user. Add genres, platforms, dev, tags, publishers add|edit|delete
+    // add metrics for sales from paypal, stripe to view on main admin page
     @Override
     @Transactional
-    public AdminResponse addGameToDb(GameInsertDTO gameDTO) {
+    public AdminResponse addGameToDb(GameDTO gameDTO) {
         // Check if the game with the same title already exists
         if (gameRepository.existsGameByTitleIgnoreCase(gameDTO.title())) {
             throw new GlobalServiceException(HttpStatus.BAD_REQUEST,
                     "Game with title '" + gameDTO.title() + "' already exists");
         }
-        Game game = new Game();
+        // Create a new game entity
+        Game game = buildGameEntityFromDTO(new Game(), new GameMedia(), gameDTO);
+        // Save game in repository
+        game = gameRepository.save(game);
+        return AdminResponse.builder()
+                .response("Game with id " + game.getId() + " was added!")
+                .build();
+    }
+
+    @Transactional
+    @Override
+    public AdminResponse editGame(Long gameId, GameDTO gameDTO) {
+        Game game = gameService.getGameById(gameId);
+        // Edit entities with new data fields.
+        buildGameEntityFromDTO(game, game.getGameMedia(), gameDTO);
+        // Save the updated game entity
+        game = gameRepository.save(game);
+        return AdminResponse.builder()
+                .response("Game with id " + game.getId() + " was edited!")
+                .build();
+    }
+
+    // Helper method to build a Game entity from DTO
+    private Game buildGameEntityFromDTO(Game game, GameMedia gameMedia, GameDTO gameDTO) {
         game.setTitle(gameDTO.title());
         game.setDescription(gameDTO.description());
         game.setReleaseDate(gameDTO.releaseDate());
@@ -68,8 +96,7 @@ public class AdminServiceImpl implements AdminService {
         game.setGenres(findEntitiesByIds(gameDTO.genres(), genreRepository, "Genre"));
         game.setPlatforms(findEntitiesByIds(gameDTO.platforms(), platformRepository, "Platform"));
 
-        // Create object GameMedia from DTO
-        GameMedia gameMedia = new GameMedia();
+        // Object GameMedia from DTO
         gameMedia.setBannerUrl(gameDTO.bannerImageUrl());
         gameMedia.setTrailer(gameDTO.trailerUrl());
         gameMedia.setScreenshotUrl(gameDTO.screenshotUrl());
@@ -79,12 +106,30 @@ public class AdminServiceImpl implements AdminService {
         gameMedia = gameMediaRepository.save(gameMedia);
         //Create relationship
         game.setGameMedia(gameMedia);
-        // Save game in repository
-        game = gameRepository.save(game);
+        return game;
+    }
 
+    @Override
+    public Game getInvisibleGameById(Long gameId) {
+        return gameService.getGameById(gameId);
+    }
+
+    /*
+        Problem: with the game is deleted, everything supposed to be cascadetype-all, but
+        if the person has it in transaction or in library, it's not a good option
+        Instead, just disable it for view
+      @Override
+    public AdminResponse deleteGame(Long gameId) {
+        Game game = gameService.getGameById(gameId);
+        gameRepository.delete(game);
         return AdminResponse.builder()
-                .response("Game with id " + game.getId() + " was added!")
+                .response("Game with id " + game.getId() + " was deleted!")
                 .build();
+    }*/
+
+    @Override
+    public GeneralGame getExtendedGamesByPageForAdmin(GameCriteria gameCriteria) {
+        return gameService.getExtendedGamesByPage(gameCriteria, false);
     }
 
     @Override

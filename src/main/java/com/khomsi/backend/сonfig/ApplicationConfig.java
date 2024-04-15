@@ -44,13 +44,4 @@ public class ApplicationConfig {
     public RestTemplate restTemplate() {
         return new RestTemplate();
     }
-    @Bean
-    public OpenAPI openAPI() {
-        return new OpenAPI().components(new Components()
-                .addSecuritySchemes(BEARER_KEY_SECURITY_SCHEME,
-                new SecurityScheme().type(SecurityScheme.Type.HTTP).scheme("bearer").bearerFormat("JWT")))
-                .info(new Info().title("Application GRID REST API")
-                        .description("GRID Application that allows CRUD operations")
-                        .version("1.0").contact(new Contact().name("Samir Khomsi Kak")));
-    }
 }

@@ -1,7 +1,6 @@
 package com.khomsi.backend.main.game.controller;
 
 import com.khomsi.backend.main.game.model.dto.*;
-import com.khomsi.backend.main.game.model.entity.Game;
 import com.khomsi.backend.main.game.service.GameService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -30,7 +29,7 @@ public class GameController {
     @Operation(security = {@SecurityRequirement(name = BEARER_KEY_SECURITY_SCHEME)}, summary = "Get all games")
     @ResponseStatus(HttpStatus.OK)
     public GeneralGame showAllGamesByPage(@Valid GameCriteria gameCriteria) {
-        return gameService.getExtendedGamesByPage(gameCriteria);
+        return gameService.getExtendedGamesByPage(gameCriteria, true);
     }
 
     @GetMapping("/genre")

@@ -156,7 +156,7 @@ public class TransactionServiceImpl implements TransactionService {
 
         // Set games to user's transaction
         cartItemDtoList.forEach(cartItemDto -> {
-            Game game = gameService.getGameById(cartItemDto.game().id());
+            Game game = gameService.getActiveGameById(cartItemDto.game().id());
             TransactionGames orderItem = new TransactionGames();
             orderItem.setPriceOnPay(cartItemDto.game().price());
             orderItem.setGame(game);

@@ -19,6 +19,7 @@ public class WebSecurityConfiguration {
     @Bean
     public SecurityFilterChain securityFilterChainConfig(HttpSecurity http) throws Exception {
         return http
+                //TODO change access to admin and manages for swagger
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/swagger", "/swagger-ui/**",
                                 "/v3/api-docs/**", "/error").permitAll()
