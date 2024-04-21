@@ -10,6 +10,8 @@ public record ShortUserInfoDTO(
         @NotBlank
         String externalId,
         @NotBlank
+        String username,
+        @NotBlank
         String email,
         BigDecimal balance
 ) {

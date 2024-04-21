@@ -22,10 +22,6 @@ import static com.khomsi.backend.main.utils.SortingUtils.createSorting;
 public class AdminTransactionServiceImpl implements AdminTransactionService {
     private final TransactionRepository transactionRepository;
     private final TransactionMapper transactionMapper;
-
-    //TODO
-    // add 'edit', 'delete|cancel' transaction. Add genres, platforms, dev, tags, publishers add|edit|delete
-    // add metrics for sales from paypal, stripe to view on main admin page
     @Override
     public AdminModelResponse getAllTransactions(EntityModelRequest entityModelRequest) {
         int page = entityModelRequest.getPage();
@@ -40,7 +36,7 @@ public class AdminTransactionServiceImpl implements AdminTransactionService {
         return AdminModelResponse.builder()
                 .entities(transactions)
                 .totalItems(transactionPage.getTotalElements())
-                .totalPages(transactionPage.getTotalPages() - 1)
+                .totalPages(transactionPage.getTotalPages())
                 .currentPage(page)
                 .build();
     }

@@ -108,7 +108,10 @@ public class AdminGameServiceImpl implements AdminGameService {
         game.setGameMedia(gameMedia);
         return game;
     }
-
+    @Override
+    public Game getInvisibleGameById(Long gameId) {
+        return gameService.getGameById(gameId);
+    }
     @Override
     public List<GameModelWithGenreLimit> searchGamesByTitleWithoutActiveCheck(String text, int qty) {
         return gameRepository.findSimilarTitlesWithoutActiveCheck(gameService.transformWord(text)).stream()

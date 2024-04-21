@@ -43,7 +43,7 @@ public class AdminUserServiceImpl implements AdminUserService {
         return AdminModelResponse.builder()
                 .entities(users)
                 .totalItems(userInfoPage.getTotalElements())
-                .totalPages(userInfoPage.getTotalPages() - 1)
+                .totalPages(userInfoPage.getTotalPages())
                 .currentPage(page)
                 .build();
     }

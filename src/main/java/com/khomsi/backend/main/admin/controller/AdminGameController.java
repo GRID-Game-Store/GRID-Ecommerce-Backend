@@ -6,6 +6,7 @@ import com.khomsi.backend.main.admin.service.AdminGameService;
 import com.khomsi.backend.main.game.model.dto.GameCriteria;
 import com.khomsi.backend.main.game.model.dto.GameModelWithGenreLimit;
 import com.khomsi.backend.main.game.model.dto.GeneralGame;
+import com.khomsi.backend.main.game.model.entity.Game;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -35,7 +36,14 @@ public class AdminGameController {
     public GeneralGame showAllGamesByPage(@Valid GameCriteria gameCriteria) {
         return adminGameService.getExtendedGamesByPageForAdmin(gameCriteria);
     }
-
+    @GetMapping("/{game-id}")
+    @Operation(security = {@SecurityRequirement(name = BEARER_KEY_SECURITY_SCHEME)}, summary = "Get game by id")
+    @ResponseStatus(HttpStatus.OK)
+    public Game showGameById(
+            @PathVariable("game-id")
+            @Min(1) @Max(Long.MAX_VALUE) Long gameId) {
+        return adminGameService.getInvisibleGameById(gameId);
+    }
     @GetMapping("/search")
     @Operation(security = {@SecurityRequirement(name = BEARER_KEY_SECURITY_SCHEME)}, summary = "Get game by title")
     @ResponseStatus(HttpStatus.OK)

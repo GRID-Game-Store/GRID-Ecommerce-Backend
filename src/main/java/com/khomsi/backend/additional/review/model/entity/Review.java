@@ -1,6 +1,5 @@
 package com.khomsi.backend.additional.review.model.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.khomsi.backend.main.game.model.entity.Game;
 import com.khomsi.backend.main.user.model.entity.UserInfo;
 import jakarta.persistence.*;
@@ -11,7 +10,6 @@ import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Getter

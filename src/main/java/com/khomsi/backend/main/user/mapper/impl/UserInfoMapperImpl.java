@@ -18,6 +18,7 @@ public class UserInfoMapperImpl implements UserInfoMapper {
     public ShortUserInfoDTO toShortUserInfoDTO(UserInfo userInfo) {
         return ShortUserInfoDTO.builder()
                 .externalId(userInfo.getExternalId())
+                .username(userInfo.getUsername())
                 .email(userInfo.getEmail())
                 .balance(userInfo.getBalance())
                 .build();

@@ -1,13 +1,12 @@
 package com.khomsi.backend.additional.review.service.impl;
 
 import com.khomsi.backend.additional.review.ReviewRepository;
+import com.khomsi.backend.additional.review.mapper.ReviewMapper;
 import com.khomsi.backend.additional.review.model.dto.ReviewDTO;
 import com.khomsi.backend.additional.review.model.dto.ReviewRequest;
 import com.khomsi.backend.additional.review.model.dto.ReviewResponse;
 import com.khomsi.backend.additional.review.model.entity.Review;
 import com.khomsi.backend.additional.review.service.ReviewService;
-import com.khomsi.backend.main.game.mapper.GameMapper;
-import com.khomsi.backend.main.game.model.dto.ShortGameModel;
 import com.khomsi.backend.main.game.model.entity.Game;
 import com.khomsi.backend.main.game.service.GameService;
 import com.khomsi.backend.main.handler.exception.GlobalServiceException;
@@ -27,7 +26,7 @@ public class ReviewServiceImpl implements ReviewService {
     private final ReviewRepository reviewRepository;
     private final UserInfoService userInfoService;
     private final GameService gameService;
-    private final GameMapper gameMapper;
+    private final ReviewMapper reviewMapper;
 
     @Override
     public ResponseEntity<ReviewResponse> addReview(Long gameId, ReviewRequest reviewRequest) {
@@ -60,6 +59,8 @@ public class ReviewServiceImpl implements ReviewService {
     @Override
     public ResponseEntity<ReviewResponse> deleteReview(Long reviewId) {
         Review review = getReview(reviewId);
+        UserInfo existingUser = userInfoService.getUserInfo();
+        checkIfCurrentUser(existingUser, review);
         reviewRepository.delete(review);
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new ReviewResponse("Review with id " + reviewId + " was successfully deleted."));
@@ -71,14 +72,14 @@ public class ReviewServiceImpl implements ReviewService {
         Game game = gameService.getActiveGameById(gameId);
         Review review = reviewRepository.findByUsersAndGames(existingUser, game);
         return ResponseEntity.status(HttpStatus.OK)
-                .body(mapReviewToDTO(review));
+                .body(reviewMapper.toReviewToDTO(review));
     }
 
     @Override
     public List<ReviewDTO> viewReview(Long gameId) {
         List<Review> reviews = reviewRepository.findAllByGameIdOrderByReviewDate(gameId);
         return reviews.stream()
-                .map(this::mapReviewToDTO)
+                .map(reviewMapper::toReviewToDTO)
                 .toList();
     }
 
@@ -91,10 +92,14 @@ public class ReviewServiceImpl implements ReviewService {
         }
     }
 
-    private void checkUserCanEditReview(UserInfo user, Review review) {
-        if (!review.getUsers().equals(user)) {
+    private void checkIfCurrentUser(UserInfo existingUser, Review review) {
+        if (!review.getUsers().equals(existingUser)) {
             throw new GlobalServiceException(HttpStatus.FORBIDDEN, "User cannot edit this review.");
         }
+    }
+
+    private void checkUserCanEditReview(UserInfo user, Review review) {
+        checkIfCurrentUser(user, review);
         boolean doesNotHaveGameInLibrary = isGameNotInLibrary(review.getGames(), user);
         boolean hasReviewedGame = isReviewedGame(review.getGames(), user);
         // Handle the case where the user doesn't meet the conditions
@@ -119,19 +124,5 @@ public class ReviewServiceImpl implements ReviewService {
         return reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new GlobalServiceException(HttpStatus.NOT_FOUND,
                         "Review with id " + reviewId + " is not found."));
-    }
-
-    private ReviewDTO mapReviewToDTO(Review review) {
-        Game game = review.getGames();
-        ShortGameModel shortGameModel = gameMapper.toShortGame(game, true);
-        String username = review.getUsers().getUsername();
-        return new ReviewDTO(
-                review.getId(),
-                username,
-                shortGameModel,
-                review.getRating(),
-                review.getComment(),
-                review.getReviewDate()
-        );
     }
 }
