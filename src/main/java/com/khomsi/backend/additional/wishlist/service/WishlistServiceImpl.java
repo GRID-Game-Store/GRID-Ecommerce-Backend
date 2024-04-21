@@ -3,7 +3,7 @@ package com.khomsi.backend.additional.wishlist.service;
 import com.khomsi.backend.additional.wishlist.WishlistRepository;
 import com.khomsi.backend.additional.wishlist.model.entity.Wishlist;
 import com.khomsi.backend.additional.wishlist.model.response.WishListResponse;
-import com.khomsi.backend.main.checkout.service.EmailService;
+import com.khomsi.backend.main.utils.email.service.EmailService;
 import com.khomsi.backend.main.game.mapper.GameMapper;
 import com.khomsi.backend.main.game.model.dto.ShortGameModel;
 import com.khomsi.backend.main.game.model.entity.Game;

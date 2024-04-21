@@ -3,7 +3,7 @@ package com.khomsi.backend.main.user.service.impl;
 import com.khomsi.backend.main.checkout.model.entity.Transaction;
 import com.khomsi.backend.main.checkout.model.entity.TransactionGames;
 import com.khomsi.backend.main.game.model.entity.Game;
-import com.khomsi.backend.main.user.mapper.UserGamesMapper;
+import com.khomsi.backend.main.user.mapper.UserInfoMapper;
 import com.khomsi.backend.main.user.model.dto.UserShortGamesDTO;
 import com.khomsi.backend.main.user.model.entity.UserGames;
 import com.khomsi.backend.main.user.model.entity.UserInfo;
@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 public class UserGamesServiceImpl implements UserGamesService {
     private final UserGamesRepository userGamesRepository;
     private final UserInfoService userInfoService;
-    private final UserGamesMapper userGamesMapper;
+    private final UserInfoMapper userInfoMapper;
 
     @Override
     public List<UserShortGamesDTO> getAllUserGames() {
@@ -33,7 +33,7 @@ public class UserGamesServiceImpl implements UserGamesService {
         UserInfo user = userInfoService.getUserInfo();
         List<UserGames> userGames = userGamesRepository.findAllByUserOrderByPurchaseDateDesc(user);
         return userGames.stream()
-                .map(userGamesMapper::toUserShortGame)
+                .map(userInfoMapper::toUserShortGame)
                 .collect(Collectors.toList());
     }
 

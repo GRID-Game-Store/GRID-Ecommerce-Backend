@@ -13,6 +13,7 @@ import com.khomsi.backend.main.checkout.model.enums.PaymentMethod;
 import com.khomsi.backend.main.checkout.model.response.TransactionResponse;
 import com.khomsi.backend.main.checkout.repository.TransactionGamesRepository;
 import com.khomsi.backend.main.checkout.repository.TransactionRepository;
+import com.khomsi.backend.main.utils.email.service.EmailService;
 import com.khomsi.backend.main.game.model.entity.Game;
 import com.khomsi.backend.main.game.service.GameService;
 import com.khomsi.backend.main.handler.exception.GlobalServiceException;

@@ -2,7 +2,8 @@ package com.khomsi.backend.main.checkout.model.enums;
 
 public enum EmailTemplates {
     PURCHASE_CONFIRMATION("purchase_confirmation_email", "Thanks for purchase in GRID"),
-    DISCOUNT_NOTIFICATION("discount_notification_email", "Discount Notification");
+    DISCOUNT_NOTIFICATION("discount_notification_email", "Discount Notification"),
+    BALANCE_NOTIFICATION("balance_update_notification_email", "Balance Notification");
 
     private final String templateName;
     private final String subject;
