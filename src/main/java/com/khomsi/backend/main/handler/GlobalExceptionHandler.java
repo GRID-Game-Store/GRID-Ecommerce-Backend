@@ -5,7 +5,6 @@ import com.khomsi.backend.main.handler.exception.GlobalServiceException;
 import org.springframework.data.mapping.PropertyReferenceException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.oauth2.server.resource.InvalidBearerTokenException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.server.ResponseStatusException;
@@ -17,7 +16,6 @@ import java.util.Map;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
-    //TODO change this handler to handel all exceptions in once
     @ExceptionHandler(GlobalServiceException.class)
     public ResponseEntity<?> handleResponseStatusException(
             GlobalServiceException e
@@ -25,34 +23,18 @@ public class GlobalExceptionHandler {
         return createDefaultErrorResponse(e);
     }
 
-    @ExceptionHandler(InvalidBearerTokenException.class)
-    public ResponseEntity<?> handleInvalidBearerTokenException(InvalidBearerTokenException e) {
-        return createInvalidBearerTokenExceptionResponse(e);
-    }
-
     @ExceptionHandler(PropertyReferenceException.class)
     public ResponseEntity<?> handlePropertyReferenceException(PropertyReferenceException e) {
-        return createPropertyReferenceExceptionResponse(e);
+        return createExceptionResponse(e, HttpStatus.BAD_REQUEST);
     }
 
-    private ResponseEntity<?> createInvalidBearerTokenExceptionResponse(InvalidBearerTokenException e) {
-        String errorMessage = "Invalid JWT token: " + e.getMessage();
+    private ResponseEntity<?> createExceptionResponse(RuntimeException e, HttpStatus httpStatus) {
+        String errorMessage = e.getMessage();
         Map<String, Object> responseBody = new LinkedHashMap<>();
         responseBody.put("timestamp", LocalDateTime.now());
-        responseBody.put("status", HttpStatus.UNAUTHORIZED.value());
-        responseBody.put("error", "Unauthorized");
+        responseBody.put("status", httpStatus);
         responseBody.put("message", errorMessage);
-        return new ResponseEntity<>(responseBody, HttpStatus.UNAUTHORIZED);
-    }
-
-    private ResponseEntity<?> createPropertyReferenceExceptionResponse(PropertyReferenceException e) {
-        String errorMessage = "No property '" + e.getPropertyName() + "' found.";
-        Map<String, Object> responseBody = new LinkedHashMap<>();
-        responseBody.put("timestamp", LocalDateTime.now());
-        responseBody.put("status", HttpStatus.BAD_REQUEST.value());
-        responseBody.put("error", "Bad Request");
-        responseBody.put("message", errorMessage);
-        return new ResponseEntity<>(responseBody, HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(responseBody, httpStatus);
     }
 
     private ResponseEntity<?> createDefaultErrorResponse(ResponseStatusException e) {

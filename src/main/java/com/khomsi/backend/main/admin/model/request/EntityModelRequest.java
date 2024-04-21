@@ -11,7 +11,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 public class EntityModelRequest {
-    //TODO add gameId also
     @PositiveOrZero
     int page = 0;
     @Min(1)

@@ -11,6 +11,7 @@ import java.util.Set;
 
 public record GameRequest(
         @NotEmpty
+        @NotNull
         String title,
         String description,
         LocalDate releaseDate,

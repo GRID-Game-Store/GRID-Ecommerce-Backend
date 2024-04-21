@@ -3,6 +3,7 @@ package com.khomsi.backend.additional.review.service;
 import com.khomsi.backend.additional.review.model.dto.ReviewDTO;
 import com.khomsi.backend.additional.review.model.dto.ReviewRequest;
 import com.khomsi.backend.additional.review.model.dto.ReviewResponse;
+import com.khomsi.backend.additional.review.model.entity.Review;
 import org.springframework.http.ResponseEntity;
 
 import java.util.List;
@@ -17,4 +18,6 @@ public interface ReviewService {
     ResponseEntity<ReviewResponse> deleteReview(Long reviewId);
 
     ResponseEntity<ReviewDTO> getReviewForGameByUser(Long gameId);
+
+    Review getReview(Long reviewId);
 }

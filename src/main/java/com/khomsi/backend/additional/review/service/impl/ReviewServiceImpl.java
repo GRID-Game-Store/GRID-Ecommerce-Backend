@@ -119,8 +119,8 @@ public class ReviewServiceImpl implements ReviewService {
         return existingUser.getUserGames()
                 .stream().noneMatch(userGames -> userGames.getGame().equals(game));
     }
-
-    private Review getReview(Long reviewId) {
+    @Override
+    public Review getReview(Long reviewId) {
         return reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new GlobalServiceException(HttpStatus.NOT_FOUND,
                         "Review with id " + reviewId + " is not found."));

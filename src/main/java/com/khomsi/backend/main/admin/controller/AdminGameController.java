@@ -36,6 +36,7 @@ public class AdminGameController {
     public GeneralGame showAllGamesByPage(@Valid GameCriteria gameCriteria) {
         return adminGameService.getExtendedGamesByPageForAdmin(gameCriteria);
     }
+
     @GetMapping("/{game-id}")
     @Operation(security = {@SecurityRequirement(name = BEARER_KEY_SECURITY_SCHEME)}, summary = "Get game by id")
     @ResponseStatus(HttpStatus.OK)
@@ -44,6 +45,7 @@ public class AdminGameController {
             @Min(1) @Max(Long.MAX_VALUE) Long gameId) {
         return adminGameService.getInvisibleGameById(gameId);
     }
+
     @GetMapping("/search")
     @Operation(security = {@SecurityRequirement(name = BEARER_KEY_SECURITY_SCHEME)}, summary = "Get game by title")
     @ResponseStatus(HttpStatus.OK)
@@ -57,14 +59,14 @@ public class AdminGameController {
     @PostMapping("/add")
     @Operation(security = {@SecurityRequirement(name = BEARER_KEY_SECURITY_SCHEME)}, summary = "Add game to db")
     @ResponseStatus(HttpStatus.CREATED)
-    public AdminResponse addGameToDb(@RequestBody GameRequest gameRequest) {
+    public AdminResponse addGameToDb(@Valid @RequestBody GameRequest gameRequest) {
         return adminGameService.addGameToDb(gameRequest);
     }
 
     @PutMapping("/edit/{game-id}")
     @Operation(security = {@SecurityRequirement(name = BEARER_KEY_SECURITY_SCHEME)}, summary = "Edit game to db")
     @ResponseStatus(HttpStatus.CREATED)
-    public AdminResponse editGameToDb(@PathVariable("game-id") Long gameId, @RequestBody GameRequest gameRequest) {
+    public AdminResponse editGameToDb(@PathVariable("game-id") Long gameId, @Valid @RequestBody GameRequest gameRequest) {
         return adminGameService.editGame(gameId, gameRequest);
     }
 

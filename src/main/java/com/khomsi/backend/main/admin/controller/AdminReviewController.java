@@ -1,7 +1,9 @@
 package com.khomsi.backend.main.admin.controller;
 
 import com.khomsi.backend.main.admin.model.request.EntityModelRequest;
+import com.khomsi.backend.main.admin.model.request.ReviewRequest;
 import com.khomsi.backend.main.admin.model.response.AdminModelResponse;
+import com.khomsi.backend.main.admin.model.response.AdminResponse;
 import com.khomsi.backend.main.admin.service.AdminReviewService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -28,8 +30,25 @@ public class AdminReviewController {
     @Operation(security = {@SecurityRequirement(name = BEARER_KEY_SECURITY_SCHEME)}, summary = "Get all reviews for game")
     @ResponseStatus(HttpStatus.OK)
     public AdminModelResponse showAllReviewsByGame(@PathVariable("game-id")
-                                                        @Min(1) @Max(Long.MAX_VALUE) Long gameId,
-                                                        @Valid EntityModelRequest entityModelRequest) {
+                                                   @Min(1) @Max(Long.MAX_VALUE) Long gameId,
+                                                   @Valid EntityModelRequest entityModelRequest) {
         return adminReviewService.getAllReviewsByGame(gameId, entityModelRequest);
+    }
+
+    @PostMapping("/edit")
+    @Operation(security = {@SecurityRequirement(name = BEARER_KEY_SECURITY_SCHEME)},
+            summary = "Edit review on game")
+    @ResponseStatus(HttpStatus.OK)
+    public AdminResponse editReviewOnGame(@Valid @RequestBody ReviewRequest reviewRequest) {
+        return adminReviewService.editReview(reviewRequest);
+    }
+
+    @DeleteMapping("/{review-id}")
+    @Operation(security = {@SecurityRequirement(name = BEARER_KEY_SECURITY_SCHEME)},
+            summary = "Delete review from game")
+    @ResponseStatus(HttpStatus.OK)
+    public AdminResponse deleteReviewFromGame(@PathVariable("review-id")
+                                              @Min(1) @Max(Long.MAX_VALUE) Long reviewId) {
+        return adminReviewService.deleteReview(reviewId);
     }
 }

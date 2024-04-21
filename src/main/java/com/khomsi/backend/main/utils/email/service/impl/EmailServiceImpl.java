@@ -61,13 +61,6 @@ public class EmailServiceImpl implements EmailService {
         }
     }
 
-    private void prepareAndSendBalanceUpdateEmail(MimeMessage message, String userEmail, BigDecimal oldBalance, BigDecimal newBalance) throws MessagingException {
-        Context context = new Context();
-        context.setVariable("oldBalance", oldBalance);
-        context.setVariable("newBalance", newBalance);
-        prepareAndSendEmail(message, userEmail, BALANCE_NOTIFICATION.getTemplateName(), context);
-    }
-
     @Async
     @Override
     public void sendDiscountNotificationEmail(List<ShortGameModel> discountedGames, UserInfo user) {
@@ -78,6 +71,26 @@ public class EmailServiceImpl implements EmailService {
         } catch (MessagingException e) {
             throw new GlobalServiceException(HttpStatus.BAD_REQUEST, e.getMessage());
         }
+    }
+
+    @Async
+    @Override
+    public void sendWarningEmail(String notification, UserInfo user) {
+        try {
+            MimeMessage message = emailSender.createMimeMessage();
+            Context context = new Context();
+            context.setVariable("notification", notification);
+            prepareAndSendEmail(message, user.getEmail(), WARNING_NOTIFICATION.getTemplateName(), context);
+        } catch (MessagingException e) {
+            throw new GlobalServiceException(HttpStatus.BAD_REQUEST, e.getMessage());
+        }
+    }
+
+    private void prepareAndSendBalanceUpdateEmail(MimeMessage message, String userEmail, BigDecimal oldBalance, BigDecimal newBalance) throws MessagingException {
+        Context context = new Context();
+        context.setVariable("oldBalance", oldBalance);
+        context.setVariable("newBalance", newBalance);
+        prepareAndSendEmail(message, userEmail, BALANCE_NOTIFICATION.getTemplateName(), context);
     }
 
     private Context prepareEmailContext(Transaction transaction) {
@@ -132,9 +145,10 @@ public class EmailServiceImpl implements EmailService {
             return PURCHASE_CONFIRMATION.getSubject();
         } else if (template.equalsIgnoreCase(DISCOUNT_NOTIFICATION.getTemplateName())) {
             return DISCOUNT_NOTIFICATION.getSubject();
-        }
-        else if (template.equalsIgnoreCase(BALANCE_NOTIFICATION.getTemplateName())) {
+        } else if (template.equalsIgnoreCase(BALANCE_NOTIFICATION.getTemplateName())) {
             return BALANCE_NOTIFICATION.getSubject();
+        } else if (template.equalsIgnoreCase(WARNING_NOTIFICATION.getTemplateName())) {
+            return WARNING_NOTIFICATION.getSubject();
         }
         return "";
     }

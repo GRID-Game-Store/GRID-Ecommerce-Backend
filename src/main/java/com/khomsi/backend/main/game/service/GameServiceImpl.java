@@ -22,7 +22,7 @@ import java.util.Random;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static com.khomsi.backend.main.utils.SortingUtils.createSorting;
+import static com.khomsi.backend.main.utils.Utils.createSorting;
 
 @Service
 @Slf4j

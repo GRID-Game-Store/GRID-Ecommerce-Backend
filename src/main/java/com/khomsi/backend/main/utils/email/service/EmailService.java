@@ -18,4 +18,7 @@ public interface EmailService {
 
     @Async
     void sendDiscountNotificationEmail(List<ShortGameModel> discountedGames, UserInfo user);
+
+    @Async
+    void sendWarningEmail(String notification, UserInfo user);
 }

@@ -19,7 +19,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.util.List;
 
-import static com.khomsi.backend.main.utils.SortingUtils.createSorting;
+import static com.khomsi.backend.main.utils.Utils.createSorting;
 
 @Service
 @RequiredArgsConstructor
