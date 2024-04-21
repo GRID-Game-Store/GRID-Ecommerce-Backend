@@ -25,4 +25,6 @@ public interface GameService {
     List<PopularGameModel> getSpecialOffers(String query, int qty);
 
     List<GameModelWithGenreLimit> searchGamesByTitle(String text, int qty);
+
+    String transformWord(String word);
 }

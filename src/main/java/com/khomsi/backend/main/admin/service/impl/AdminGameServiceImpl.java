@@ -9,11 +9,13 @@ import com.khomsi.backend.additional.platform.PlatformRepository;
 import com.khomsi.backend.additional.publisher.model.entity.Publisher;
 import com.khomsi.backend.additional.publisher.service.PublisherService;
 import com.khomsi.backend.additional.tag.TagRepository;
-import com.khomsi.backend.main.admin.model.dto.GameDTO;
+import com.khomsi.backend.main.admin.model.request.GameRequest;
 import com.khomsi.backend.main.admin.model.response.AdminResponse;
-import com.khomsi.backend.main.admin.service.AdminService;
+import com.khomsi.backend.main.admin.service.AdminGameService;
 import com.khomsi.backend.main.game.GameRepository;
+import com.khomsi.backend.main.game.mapper.GameMapper;
 import com.khomsi.backend.main.game.model.dto.GameCriteria;
+import com.khomsi.backend.main.game.model.dto.GameModelWithGenreLimit;
 import com.khomsi.backend.main.game.model.dto.GeneralGame;
 import com.khomsi.backend.main.game.model.entity.Game;
 import com.khomsi.backend.main.game.service.GameService;
@@ -24,12 +26,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class AdminServiceImpl implements AdminService {
+public class AdminGameServiceImpl implements AdminGameService {
     private final DeveloperService developerService;
     private final PublisherService publisherService;
     private final TagRepository tagRepository;
@@ -38,20 +41,17 @@ public class AdminServiceImpl implements AdminService {
     private final GameService gameService;
     private final GameRepository gameRepository;
     private final GameMediaRepository gameMediaRepository;
-
-    //TODO
-    // add transaction section (crud) per user. Add genres, platforms, dev, tags, publishers add|edit|delete
-    // add metrics for sales from paypal, stripe to view on main admin page
+    private final GameMapper gameMapper;
     @Override
     @Transactional
-    public AdminResponse addGameToDb(GameDTO gameDTO) {
+    public AdminResponse addGameToDb(GameRequest gameRequest) {
         // Check if the game with the same title already exists
-        if (gameRepository.existsGameByTitleIgnoreCase(gameDTO.title())) {
+        if (gameRepository.existsGameByTitleIgnoreCase(gameRequest.title())) {
             throw new GlobalServiceException(HttpStatus.BAD_REQUEST,
-                    "Game with title '" + gameDTO.title() + "' already exists");
+                    "Game with title '" + gameRequest.title() + "' already exists");
         }
-        // Create a new game entity
-        Game game = buildGameEntityFromDTO(new Game(), new GameMedia(), gameDTO);
+        // Create a new game entities
+        Game game = buildGameEntityFromDTO(new Game(), new GameMedia(), gameRequest);
         // Save game in repository
         game = gameRepository.save(game);
         return AdminResponse.builder()
@@ -61,46 +61,46 @@ public class AdminServiceImpl implements AdminService {
 
     @Transactional
     @Override
-    public AdminResponse editGame(Long gameId, GameDTO gameDTO) {
+    public AdminResponse editGame(Long gameId, GameRequest gameRequest) {
         Game game = gameService.getGameById(gameId);
         // Edit entities with new data fields.
-        buildGameEntityFromDTO(game, game.getGameMedia(), gameDTO);
-        // Save the updated game entity
+        buildGameEntityFromDTO(game, game.getGameMedia(), gameRequest);
+        // Save the updated game entities
         game = gameRepository.save(game);
         return AdminResponse.builder()
                 .response("Game with id " + game.getId() + " was edited!")
                 .build();
     }
 
-    // Helper method to build a Game entity from DTO
-    private Game buildGameEntityFromDTO(Game game, GameMedia gameMedia, GameDTO gameDTO) {
-        game.setTitle(gameDTO.title());
-        game.setDescription(gameDTO.description());
-        game.setReleaseDate(gameDTO.releaseDate());
-        game.setSystemRequirements(gameDTO.systemRequirements());
-        game.setAboutGame(gameDTO.aboutGame());
-        game.setPrice(gameDTO.price());
-        game.setActive(gameDTO.active());
-        game.setDiscount(gameDTO.discount());
-        game.setPermitAge(gameDTO.permitAge().getValue());
-        game.setCoverImageUrl(gameDTO.coverImageUrl());
+    // Helper method to build a Game entities from DTO
+    private Game buildGameEntityFromDTO(Game game, GameMedia gameMedia, GameRequest gameRequest) {
+        game.setTitle(gameRequest.title());
+        game.setDescription(gameRequest.description());
+        game.setReleaseDate(gameRequest.releaseDate());
+        game.setSystemRequirements(gameRequest.systemRequirements());
+        game.setAboutGame(gameRequest.aboutGame());
+        game.setPrice(gameRequest.price());
+        game.setActive(gameRequest.active());
+        game.setDiscount(gameRequest.discount());
+        game.setPermitAge(gameRequest.permitAge().getValue());
+        game.setCoverImageUrl(gameRequest.coverImageUrl());
 
         // Set developer and publisher
-        Developer developer = developerService.findDeveloperById(gameDTO.developer());
+        Developer developer = developerService.findDeveloperById(gameRequest.developer());
         game.setDeveloper(developer);
 
-        Publisher publisher = publisherService.findPublisherById(gameDTO.publisher());
+        Publisher publisher = publisherService.findPublisherById(gameRequest.publisher());
         game.setPublisher(publisher);
 
-        game.setTags(findEntitiesByIds(gameDTO.tags(), tagRepository, "Tag"));
-        game.setGenres(findEntitiesByIds(gameDTO.genres(), genreRepository, "Genre"));
-        game.setPlatforms(findEntitiesByIds(gameDTO.platforms(), platformRepository, "Platform"));
+        game.setTags(findEntitiesByIds(gameRequest.tags(), tagRepository, "Tag"));
+        game.setGenres(findEntitiesByIds(gameRequest.genres(), genreRepository, "Genre"));
+        game.setPlatforms(findEntitiesByIds(gameRequest.platforms(), platformRepository, "Platform"));
 
         // Object GameMedia from DTO
-        gameMedia.setBannerUrl(gameDTO.bannerImageUrl());
-        gameMedia.setTrailer(gameDTO.trailerUrl());
-        gameMedia.setScreenshotUrl(gameDTO.screenshotUrl());
-        gameMedia.setTrailerScreenshot(gameDTO.trailerScreenshotUrl());
+        gameMedia.setBannerUrl(gameRequest.bannerImageUrl());
+        gameMedia.setTrailer(gameRequest.trailerUrl());
+        gameMedia.setScreenshotUrl(gameRequest.screenshotUrl());
+        gameMedia.setTrailerScreenshot(gameRequest.trailerScreenshotUrl());
         gameMedia.setGames(game);
         // Save to media db
         gameMedia = gameMediaRepository.save(gameMedia);
@@ -110,22 +110,12 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
-    public Game getInvisibleGameById(Long gameId) {
-        return gameService.getGameById(gameId);
+    public List<GameModelWithGenreLimit> searchGamesByTitleWithoutActiveCheck(String text, int qty) {
+        return gameRepository.findSimilarTitlesWithoutActiveCheck(gameService.transformWord(text)).stream()
+                .map(game -> gameMapper.toLimitGenreGame(game, false))
+                .limit(qty)
+                .toList();
     }
-
-    /*
-        Problem: with the game is deleted, everything supposed to be cascadetype-all, but
-        if the person has it in transaction or in library, it's not a good option
-        Instead, just disable it for view
-      @Override
-    public AdminResponse deleteGame(Long gameId) {
-        Game game = gameService.getGameById(gameId);
-        gameRepository.delete(game);
-        return AdminResponse.builder()
-                .response("Game with id " + game.getId() + " was deleted!")
-                .build();
-    }*/
 
     @Override
     public GeneralGame getExtendedGamesByPageForAdmin(GameCriteria gameCriteria) {

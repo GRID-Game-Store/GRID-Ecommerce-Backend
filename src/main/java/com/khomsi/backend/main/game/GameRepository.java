@@ -21,6 +21,9 @@ public interface GameRepository extends JpaRepository<Game, Long>, JpaSpecificat
 
     @Query(value = "SELECT g FROM Game g WHERE UPPER(g.title) LIKE CONCAT('%', UPPER(:text), '%') AND g.active = true")
     List<Game> findSimilarTitles(@Param("text") String text);
+    @Query(value = "SELECT g FROM Game g WHERE UPPER(g.title) LIKE CONCAT('%', UPPER(:text), '%')")
+    List<Game> findSimilarTitlesWithoutActiveCheck(@Param("text") String text);
+
 
     boolean existsGameByTitleIgnoreCase(String title);
 

@@ -1,4 +1,4 @@
-package com.khomsi.backend.main.admin.model.dto;
+package com.khomsi.backend.main.admin.model.request;
 
 import com.khomsi.backend.main.game.model.entity.PermitAge;
 import jakarta.validation.constraints.Min;
@@ -9,7 +9,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Set;
 
-public record GameDTO(
+public record GameRequest(
         @NotEmpty
         String title,
         String description,
