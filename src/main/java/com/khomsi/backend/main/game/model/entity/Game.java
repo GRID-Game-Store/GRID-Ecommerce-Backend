@@ -8,7 +8,11 @@ import com.khomsi.backend.additional.genre.model.entity.Genre;
 import com.khomsi.backend.additional.media.model.entity.GameMedia;
 import com.khomsi.backend.additional.platform.model.entity.Platform;
 import com.khomsi.backend.additional.publisher.model.entity.Publisher;
+import com.khomsi.backend.additional.review.model.entity.Review;
 import com.khomsi.backend.additional.tag.model.entity.Tag;
+import com.khomsi.backend.additional.wishlist.model.entity.Wishlist;
+import com.khomsi.backend.main.checkout.model.entity.TransactionGames;
+import com.khomsi.backend.main.user.model.entity.UserGames;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -17,6 +21,7 @@ import lombok.*;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -80,32 +85,48 @@ public class Game {
     @JoinColumn(name = "developer_id", nullable = false)
     private Developer developer;
 
-    @ManyToMany
+    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     @JoinTable(name = "games_has_tags",
             joinColumns = @JoinColumn(name = "games_id")
             , inverseJoinColumns = @JoinColumn(name = "tags_id"))
     @ToString.Exclude
     private Set<Tag> tags;
 
-    @ManyToMany
+    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     @JoinTable(name = "games_has_genres",
             joinColumns = @JoinColumn(name = "games_id")
             , inverseJoinColumns = @JoinColumn(name = "genres_id"))
     @ToString.Exclude
     private Set<Genre> genres;
 
-    @ManyToMany
+    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     @JoinTable(name = "games_has_platforms",
             joinColumns = @JoinColumn(name = "games_id")
             , inverseJoinColumns = @JoinColumn(name = "platforms_id"))
     @ToString.Exclude
     private Set<Platform> platforms;
     @JsonIgnore
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "games")
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "games", cascade = CascadeType.ALL)
     @ToString.Exclude
     private List<Cart> carts;
     @OneToOne(mappedBy = "games", cascade = CascadeType.ALL)
     private GameMedia gameMedia;
+
+    @OneToMany(mappedBy = "games", cascade = CascadeType.ALL)
+    @ToString.Exclude
+    private Set<Review> review;
+
+    @OneToOne(mappedBy = "game", cascade = CascadeType.ALL)
+    @ToString.Exclude
+    private TransactionGames transactionGames;
+
+    @OneToMany(mappedBy = "game", cascade = CascadeType.ALL)
+    @ToString.Exclude
+    private Set<UserGames> userHasGames;
+
+    @OneToMany(mappedBy = "games", cascade = CascadeType.ALL)
+    @ToString.Exclude
+    private Set<Wishlist> wishlists;
 
     public BigDecimal getPrice() {
         if (discount == null || price == null) {

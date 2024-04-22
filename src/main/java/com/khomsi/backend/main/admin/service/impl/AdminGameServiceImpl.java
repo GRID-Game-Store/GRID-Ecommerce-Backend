@@ -42,6 +42,7 @@ public class AdminGameServiceImpl implements AdminGameService {
     private final GameRepository gameRepository;
     private final GameMediaRepository gameMediaRepository;
     private final GameMapper gameMapper;
+
     @Override
     @Transactional
     public AdminResponse addGameToDb(GameRequest gameRequest) {
@@ -108,16 +109,26 @@ public class AdminGameServiceImpl implements AdminGameService {
         game.setGameMedia(gameMedia);
         return game;
     }
+
     @Override
     public Game getInvisibleGameById(Long gameId) {
         return gameService.getGameById(gameId);
     }
+
     @Override
     public List<GameModelWithGenreLimit> searchGamesByTitleWithoutActiveCheck(String text, int qty) {
         return gameRepository.findSimilarTitlesWithoutActiveCheck(gameService.transformWord(text)).stream()
                 .map(game -> gameMapper.toLimitGenreGame(game, false))
                 .limit(qty)
                 .toList();
+    }
+    @Override
+    public AdminResponse deleteGame(Long gameId) {
+        Game game = gameService.getGameById(gameId);
+        gameRepository.delete(game);
+        return AdminResponse.builder()
+                .response("Game with id " + game.getId() + " was deleted!")
+                .build();
     }
 
     @Override

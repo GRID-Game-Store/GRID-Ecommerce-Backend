@@ -79,4 +79,13 @@ public class AdminGameController {
                                               @RequestParam(value = "activate") boolean activate) {
         return adminGameService.toggleGameActiveStatus(gameId, activate);
     }
+
+    @DeleteMapping("/delete/{game-id}")
+    @Operation(security = {@SecurityRequirement(name = BEARER_KEY_SECURITY_SCHEME)},
+            summary = "Delete game by id")
+    @ResponseStatus(HttpStatus.OK)
+    public AdminResponse deleteGameById(@PathVariable("game-id")
+                                        @Min(1) @Max(Long.MAX_VALUE) Long gameId) {
+        return adminGameService.deleteGame(gameId);
+    }
 }

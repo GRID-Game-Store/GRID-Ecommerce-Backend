@@ -18,6 +18,8 @@ public interface AdminGameService {
 
     List<GameModelWithGenreLimit> searchGamesByTitleWithoutActiveCheck(String text, int qty);
 
+    AdminResponse deleteGame(Long gameId);
+
     GeneralGame getExtendedGamesByPageForAdmin(GameCriteria gameCriteria);
 
     AdminResponse toggleGameActiveStatus(Long gameId, boolean active);

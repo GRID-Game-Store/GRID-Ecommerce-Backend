@@ -43,7 +43,7 @@ public class AdminReviewController {
         return adminReviewService.editReview(reviewRequest);
     }
 
-    @DeleteMapping("/{review-id}")
+    @DeleteMapping("/delete/{review-id}")
     @Operation(security = {@SecurityRequirement(name = BEARER_KEY_SECURITY_SCHEME)},
             summary = "Delete review from game")
     @ResponseStatus(HttpStatus.OK)
