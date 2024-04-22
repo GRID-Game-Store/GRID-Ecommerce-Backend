@@ -85,21 +85,21 @@ public class Game {
     @JoinColumn(name = "developer_id", nullable = false)
     private Developer developer;
 
-    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE,  CascadeType.REFRESH})
     @JoinTable(name = "games_has_tags",
             joinColumns = @JoinColumn(name = "games_id")
             , inverseJoinColumns = @JoinColumn(name = "tags_id"))
     @ToString.Exclude
     private Set<Tag> tags;
 
-    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE,  CascadeType.REFRESH})
     @JoinTable(name = "games_has_genres",
             joinColumns = @JoinColumn(name = "games_id")
             , inverseJoinColumns = @JoinColumn(name = "genres_id"))
     @ToString.Exclude
     private Set<Genre> genres;
 
-    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE,  CascadeType.REFRESH})
     @JoinTable(name = "games_has_platforms",
             joinColumns = @JoinColumn(name = "games_id")
             , inverseJoinColumns = @JoinColumn(name = "platforms_id"))

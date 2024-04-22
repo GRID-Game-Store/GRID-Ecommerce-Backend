@@ -119,7 +119,7 @@ END;
 //
 DELIMITER ;
 
-######### insert_developer TRIGGER ############
+######### insert_developer PROCEDURE ############
 DELIMITER #
 CREATE PROCEDURE insert_developer(
     IN p_developer_name VARCHAR(255)
@@ -138,7 +138,7 @@ BEGIN
 END;
 #
 DELIMITER ;
-######### insert_publisher TRIGGER ############
+######### insert_publisher PROCEDURE ############
 DELIMITER #
 CREATE PROCEDURE insert_publisher(
     IN p_publisher_name VARCHAR(255)
@@ -157,7 +157,7 @@ BEGIN
 END;
 #
 DELIMITER ;
-######### insert_genre TRIGGER ############
+######### insert_genre PROCEDURE ############
 DELIMITER //
 CREATE PROCEDURE insert_genre(
     IN p_genres VARCHAR(255)

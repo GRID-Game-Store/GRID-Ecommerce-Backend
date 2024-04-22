@@ -7,6 +7,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
+import java.util.Objects;
 import java.util.Set;
 
 @Builder
@@ -27,8 +28,24 @@ public class Platform {
     @Column(name = "name", nullable = false)
     private String name;
 
-    @ManyToMany(mappedBy = "platforms")
+    @ManyToMany(mappedBy = "platforms", cascade = {CascadeType.PERSIST, CascadeType.DETACH})
     @JsonIgnore
     private Set<Game> games;
 
+    @PreRemove
+    public void removePlatforms() {
+        games.forEach(game -> game.getPlatforms().removeIf(e -> e.equals(this)));
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        if (this == object) return true;
+        if (!(object instanceof Platform platform)) return false;
+        return getId() != null && getId().equals(platform.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(Platform.class);
+    }
 }

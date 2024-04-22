@@ -3,6 +3,7 @@ package com.khomsi.backend.additional.tag.service;
 import com.khomsi.backend.additional.tag.TagRepository;
 import com.khomsi.backend.additional.tag.model.entity.Tag;
 import com.khomsi.backend.main.handler.exception.GlobalServiceException;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -30,6 +31,7 @@ public class TagServiceImpl implements TagService {
         tagRepository.save(tag);
     }
     @Override
+    @Transactional
     public void deleteTag(Tag tag) {
         tagRepository.delete(tag);
     }

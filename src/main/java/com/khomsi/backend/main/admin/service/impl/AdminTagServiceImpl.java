@@ -8,6 +8,7 @@ import com.khomsi.backend.main.admin.model.response.AdminResponse;
 import com.khomsi.backend.main.admin.service.AdminTagService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor

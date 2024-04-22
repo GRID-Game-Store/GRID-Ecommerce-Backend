@@ -3,7 +3,7 @@ package com.khomsi.backend.main.admin.controller;
 import com.khomsi.backend.main.admin.model.request.EntityEditRequest;
 import com.khomsi.backend.main.admin.model.request.EntityInsertRequest;
 import com.khomsi.backend.main.admin.model.response.AdminResponse;
-import com.khomsi.backend.main.admin.service.AdminTagService;
+import com.khomsi.backend.main.admin.service.AdminGenreService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -18,35 +18,35 @@ import org.springframework.web.bind.annotation.*;
 import static com.khomsi.backend.сonfig.ApplicationConfig.BEARER_KEY_SECURITY_SCHEME;
 
 @RestController
-@Tag(name = "Admin-Tag", description = "CRUD operation for Admin-Tag Controller")
-@RequestMapping("/api/v1/admin/tags")
+@Tag(name = "Admin-Genre", description = "CRUD operation for Admin-Genre Controller")
+@RequestMapping("/api/v1/admin/genres")
 @Validated
 @RequiredArgsConstructor
-public class AdminTagController {
-    private final AdminTagService adminTagService;
+public class AdminGenreController {
+    private final AdminGenreService adminGenreService;
 
     @PostMapping("/add")
     @Operation(security = {@SecurityRequirement(name = BEARER_KEY_SECURITY_SCHEME)},
-            summary = "Add tag to db")
+            summary = "Add genre to db")
     @ResponseStatus(HttpStatus.CREATED)
-    public AdminResponse addTag(@Valid @RequestBody EntityInsertRequest entityInsertRequest) {
-        return adminTagService.addTag(entityInsertRequest);
+    public AdminResponse addGenre(@Valid @RequestBody EntityInsertRequest entityInsertRequest) {
+        return adminGenreService.addGenre(entityInsertRequest);
     }
 
     @PostMapping("/edit")
     @Operation(security = {@SecurityRequirement(name = BEARER_KEY_SECURITY_SCHEME)},
-            summary = "Edit tag")
+            summary = "Edit genre")
     @ResponseStatus(HttpStatus.OK)
-    public AdminResponse editTag(@Valid @RequestBody EntityEditRequest entityEditRequest) {
-        return adminTagService.editTag(entityEditRequest);
+    public AdminResponse editGenre(@Valid @RequestBody EntityEditRequest entityEditRequest) {
+        return adminGenreService.editGenre(entityEditRequest);
     }
 
-    @DeleteMapping("/delete/{tag-id}")
+    @DeleteMapping("/delete/{genre-id}")
     @Operation(security = {@SecurityRequirement(name = BEARER_KEY_SECURITY_SCHEME)},
-            summary = "Delete tag")
+            summary = "Delete genre")
     @ResponseStatus(HttpStatus.OK)
-    public AdminResponse deleteTag(@PathVariable("tag-id")
-                                   @Min(1) @Max(Long.MAX_VALUE) Long tagId) {
-        return adminTagService.deleteTag(tagId);
+    public AdminResponse deleteGenre(@PathVariable("genre-id")
+                                     @Min(1) @Max(Long.MAX_VALUE) Long id) {
+        return adminGenreService.deleteGenre(id);
     }
 }
