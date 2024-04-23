@@ -20,10 +20,9 @@ public class TransactionGames {
     private Long id;
 
     @NotNull
-    @OneToOne
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "games_id", nullable = false)
-    private Game game;
-
+    private Game games;
     @NotNull
     @Column(name = "price_on_pay", nullable = false, precision = 10, scale = 2)
     private BigDecimal priceOnPay;

@@ -83,7 +83,7 @@ public class TransactionServiceImpl implements TransactionService {
     private void deleteGamesFromWishlist(Transaction transaction) {
         // Delete games from wishlist using stream
         transaction.getTransactionGames().stream()
-                .map(TransactionGames::getGame)
+                .map(TransactionGames::getGames)
                 .map(Game::getId)
                 .forEach(wishlistService::deleteGameFromWishlist);
     }
@@ -122,7 +122,7 @@ public class TransactionServiceImpl implements TransactionService {
 
             Set<TransactionGames> transactionGamesList = transaction.getTransactionGames();
             transactionGamesList.stream()
-                    .map(TransactionGames::getGame)
+                    .map(TransactionGames::getGames)
                     .map(Game::getId)
                     .forEach(cartService::addToCart);
 
@@ -160,7 +160,7 @@ public class TransactionServiceImpl implements TransactionService {
             Game game = gameService.getActiveGameById(cartItemDto.game().id());
             TransactionGames orderItem = new TransactionGames();
             orderItem.setPriceOnPay(cartItemDto.game().price());
-            orderItem.setGame(game);
+            orderItem.setGames(game);
             orderItem.setTransactions(transaction);
             transactionGamesRepository.save(orderItem);
         });

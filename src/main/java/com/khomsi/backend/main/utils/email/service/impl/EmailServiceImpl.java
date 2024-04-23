@@ -115,7 +115,7 @@ public class EmailServiceImpl implements EmailService {
     private void addTransactionGamesToContext(Transaction transaction, Context context) {
         if (transaction.getTransactionGames() != null && !transaction.getTransactionGames().isEmpty()) {
             List<Game> games = transaction.getTransactionGames().stream()
-                    .map(TransactionGames::getGame)
+                    .map(TransactionGames::getGames)
                     .toList();
             context.setVariable("games", games);
         }

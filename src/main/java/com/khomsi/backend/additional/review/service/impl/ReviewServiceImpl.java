@@ -68,6 +68,7 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override
     public ResponseEntity<ReviewDTO> getReviewForGameByUser(Long gameId) {
+        //TODO сыпит 500 "com.khomsi.backend.additional.review.model.entity.Review.getUsers()" because "review" is null
         UserInfo existingUser = userInfoService.getUserInfo();
         Game game = gameService.getActiveGameById(gameId);
         Review review = reviewRepository.findByUsersAndGames(existingUser, game);

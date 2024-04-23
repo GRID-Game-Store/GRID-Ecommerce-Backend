@@ -112,21 +112,24 @@ public class Game {
     @OneToOne(mappedBy = "games", cascade = CascadeType.ALL)
     private GameMedia gameMedia;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "games", cascade = CascadeType.ALL)
     @ToString.Exclude
     private Set<Review> review;
 
-    @OneToOne(mappedBy = "game", cascade = CascadeType.ALL)
-    @ToString.Exclude
-    private TransactionGames transactionGames;
-
+    @JsonIgnore
     @OneToMany(mappedBy = "game", cascade = CascadeType.ALL)
     @ToString.Exclude
     private Set<UserGames> userHasGames;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "games", cascade = CascadeType.ALL)
     @ToString.Exclude
     private Set<Wishlist> wishlists;
+    @JsonIgnore
+    @OneToMany(mappedBy = "games", cascade = CascadeType.ALL)
+    @ToString.Exclude
+    private Set<TransactionGames> transactionGames;
 
     public BigDecimal getPrice() {
         if (discount == null || price == null) {

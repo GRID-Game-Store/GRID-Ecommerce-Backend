@@ -41,7 +41,7 @@ public class UserGamesServiceImpl implements UserGamesService {
     public void getGamesFromTransactionToLibrary(UserInfo user, Transaction transaction) {
         Set<TransactionGames> transactionGamesList = transaction.getTransactionGames();
         Set<UserGames> userGames = new LinkedHashSet<>();
-        transactionGamesList.forEach(transactionGames -> userGames.add(createUserGames(user, transactionGames.getGame())));
+        transactionGamesList.forEach(transactionGames -> userGames.add(createUserGames(user, transactionGames.getGames())));
         userGamesRepository.saveAll(userGames);
         user.setUserGames(userGames);
     }
