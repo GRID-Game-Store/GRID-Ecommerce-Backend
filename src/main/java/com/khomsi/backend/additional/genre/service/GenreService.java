@@ -14,4 +14,6 @@ public interface GenreService {
     void saveGenreToDb(Genre genre);
     @Transactional
     void deleteGenre(Genre genre);
+
+    boolean isGenreNameExistsIgnoreCase(String name);
 }

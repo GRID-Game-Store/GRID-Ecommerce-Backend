@@ -27,6 +27,11 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
+    public boolean isTagNameExistsIgnoreCase(String name) {
+        return tagRepository.findByNameIgnoreCase(name).isPresent();
+    }
+
+    @Override
     public void saveTagToDb(Tag tag) {
         tagRepository.save(tag);
     }

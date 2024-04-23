@@ -10,6 +10,8 @@ public interface TagService {
 
     Tag getTagById(Long tagId);
 
+    boolean isTagNameExistsIgnoreCase(String name);
+
     void saveTagToDb(Tag tag);
     @Transactional
     void deleteTag(Tag tag);

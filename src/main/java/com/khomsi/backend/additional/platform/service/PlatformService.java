@@ -13,4 +13,6 @@ public interface PlatformService {
     void savePlatformToDb(Platform platform);
     @Transactional
     void deletePlatform(Platform taplatform);
+
+    boolean isPlatformNameExistsIgnoreCase(String name);
 }

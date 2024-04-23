@@ -36,4 +36,8 @@ public class PlatformServiceImpl implements PlatformService {
     public void deletePlatform(Platform platform) {
         platformRepository.delete(platform);
     }
+    @Override
+    public boolean isPlatformNameExistsIgnoreCase(String name) {
+        return platformRepository.findByNameIgnoreCase(name).isPresent();
+    }
 }

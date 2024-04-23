@@ -36,4 +36,8 @@ public class GenreServiceImpl implements GenreService {
     public void deleteGenre(Genre genre) {
         genreRepository.delete(genre);
     }
+    @Override
+    public boolean isGenreNameExistsIgnoreCase(String name) {
+        return genreRepository.findByNameIgnoreCase(name).isPresent();
+    }
 }
