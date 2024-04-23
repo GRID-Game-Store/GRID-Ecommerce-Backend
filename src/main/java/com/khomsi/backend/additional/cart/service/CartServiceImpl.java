@@ -24,7 +24,6 @@ import java.util.List;
 @Service
 @Transactional
 @RequiredArgsConstructor
-//TODO test this service all
 public class CartServiceImpl implements CartService {
     private final CartRepository cartRepository;
     private final UserInfoService userInfoService;
@@ -34,7 +33,6 @@ public class CartServiceImpl implements CartService {
 
     @Override
     public CartResponse addToCart(Long gameId) {
-        //TODO check the method since it saves the game that is in library and transactions
         UserInfo existingUser = userInfoService.getUserInfo();
         Game game = gameService.getActiveGameById(gameId);
         boolean gameAlreadyInLibrary = userGamesService.checkIfGameExists(existingUser, game);
@@ -73,17 +71,15 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    //TODO doesn't delete
     public CartResponse deleteCartItem(Long itemID) {
         Cart cart = cartRepository.findById(itemID).orElseThrow(() ->
                 new GlobalServiceException(HttpStatus.NOT_FOUND, "Cart id is invalid : " + itemID));
-//        userInfoService.checkPermissionToAction(cart.getUser().getExternalId());
-        cartRepository.delete(cart);
+        userInfoService.checkPermissionToAction(cart.getUser().getExternalId());
+        cartRepository.deleteById(itemID);
         return new CartResponse("Cart item with id " + itemID + " was successfully deleted!");
     }
 
     @Override
-    //TODO doesn't delete
     public CartResponse cleanCartItems() {
         FullUserInfoDTO currentUser = userInfoService.getCurrentUser();
         String externalId = currentUser.externalId();

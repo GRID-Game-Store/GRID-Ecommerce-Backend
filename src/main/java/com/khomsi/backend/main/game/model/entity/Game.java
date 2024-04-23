@@ -106,7 +106,7 @@ public class Game {
     @ToString.Exclude
     private Set<Platform> platforms;
     @JsonIgnore
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "games", cascade = CascadeType.ALL)
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "games", cascade = CascadeType.ALL)
     @ToString.Exclude
     private List<Cart> carts;
     @OneToOne(mappedBy = "games", cascade = CascadeType.ALL)

@@ -344,20 +344,20 @@ CREATE TABLE IF NOT EXISTS `GridDB`.`cart` (
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `GridDB`.`transaction_games` (
                                                             `id` INT NOT NULL AUTO_INCREMENT,
-                                                            `games_id` INT NOT NULL,
                                                             `price_on_pay` DECIMAL(10,2) NOT NULL,
     `transactions_id` VARCHAR(255) NOT NULL,
+    `games_id` INT NOT NULL,
     PRIMARY KEY (`id`),
-    INDEX `fk_transaction_games_games1_idx` (`games_id` ASC) VISIBLE,
     INDEX `fk_transaction_games_transactions1_idx` (`transactions_id` ASC) VISIBLE,
-    CONSTRAINT `fk_transaction_games_games1`
-    FOREIGN KEY (`games_id`)
-    REFERENCES `GridDB`.`games` (`game_id`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
+    INDEX `fk_transaction_games_games1_idx` (`games_id` ASC) VISIBLE,
     CONSTRAINT `fk_transaction_games_transactions1`
     FOREIGN KEY (`transactions_id`)
     REFERENCES `GridDB`.`transactions` (`transaction_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+    CONSTRAINT `fk_transaction_games_games1`
+    FOREIGN KEY (`games_id`)
+    REFERENCES `GridDB`.`games` (`game_id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
     ENGINE = InnoDB;
