@@ -46,11 +46,7 @@ public class AdminGameServiceImpl implements AdminGameService {
     @Override
     @Transactional
     public AdminResponse addGameToDb(GameRequest gameRequest) {
-        // Check if the game with the same title already exists
-        if (gameRepository.existsGameByTitleIgnoreCase(gameRequest.title())) {
-            throw new GlobalServiceException(HttpStatus.BAD_REQUEST,
-                    "Game with title '" + gameRequest.title() + "' already exists");
-        }
+        checkIfGameExists(gameRequest);
         // Create a new game entities
         Game game = buildGameEntityFromDTO(new Game(), new GameMedia(), gameRequest);
         // Save game in repository
@@ -64,6 +60,8 @@ public class AdminGameServiceImpl implements AdminGameService {
     @Override
     public AdminResponse editGame(Long gameId, GameRequest gameRequest) {
         Game game = gameService.getGameById(gameId);
+        // Check if the game with the same title already exists
+        checkIfGameExists(gameRequest);
         // Edit entities with new data fields.
         buildGameEntityFromDTO(game, game.getGameMedia(), gameRequest);
         // Save the updated game entities
@@ -74,6 +72,14 @@ public class AdminGameServiceImpl implements AdminGameService {
     }
 
     // Helper method to build a Game entities from DTO
+
+    private void checkIfGameExists(GameRequest gameRequest) {
+        // Check if the game with the same title already exists
+        if (gameRepository.existsGameByTitleIgnoreCase(gameRequest.title())) {
+            throw new GlobalServiceException(HttpStatus.BAD_REQUEST,
+                    "Game with title '" + gameRequest.title() + "' already exists");
+        }
+    }
     private Game buildGameEntityFromDTO(Game game, GameMedia gameMedia, GameRequest gameRequest) {
         game.setTitle(gameRequest.title());
         game.setDescription(gameRequest.description());
