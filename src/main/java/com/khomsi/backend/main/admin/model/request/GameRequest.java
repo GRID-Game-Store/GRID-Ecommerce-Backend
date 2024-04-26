@@ -1,5 +1,6 @@
 package com.khomsi.backend.main.admin.model.request;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.khomsi.backend.main.game.model.entity.PermitAge;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotEmpty;
@@ -14,6 +15,7 @@ public record GameRequest(
         @NotNull
         String title,
         String description,
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
         LocalDate releaseDate,
         String systemRequirements,
         @NotNull
