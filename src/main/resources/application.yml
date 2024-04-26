@@ -2,6 +2,12 @@ server:
   port: 8082
   max-http-request-header-size: 15000
 app:
+  googleai:
+    gemini:
+      baseurl: https://generativelanguage.googleapis.com
+    api:
+      model: "gemini-pro"
+      key: ${GOOGLE_AI_KEY}
   front-url: http://localhost:3000
   payment:
     unitAmount: "100"
