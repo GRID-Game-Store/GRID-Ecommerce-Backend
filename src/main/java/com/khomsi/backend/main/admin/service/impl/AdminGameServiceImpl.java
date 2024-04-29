@@ -3,12 +3,15 @@ package com.khomsi.backend.main.admin.service.impl;
 import com.khomsi.backend.additional.developer.model.entity.Developer;
 import com.khomsi.backend.additional.developer.service.DeveloperService;
 import com.khomsi.backend.additional.genre.GenreRepository;
+import com.khomsi.backend.additional.genre.model.entity.Genre;
 import com.khomsi.backend.additional.media.GameMediaRepository;
 import com.khomsi.backend.additional.media.model.entity.GameMedia;
 import com.khomsi.backend.additional.platform.PlatformRepository;
+import com.khomsi.backend.additional.platform.model.entity.Platform;
 import com.khomsi.backend.additional.publisher.model.entity.Publisher;
 import com.khomsi.backend.additional.publisher.service.PublisherService;
 import com.khomsi.backend.additional.tag.TagRepository;
+import com.khomsi.backend.additional.tag.model.entity.Tag;
 import com.khomsi.backend.main.admin.model.request.GameRequest;
 import com.khomsi.backend.main.admin.model.response.AdminResponse;
 import com.khomsi.backend.main.admin.service.AdminGameService;
@@ -80,6 +83,7 @@ public class AdminGameServiceImpl implements AdminGameService {
                     "Game with title '" + gameRequest.title() + "' already exists");
         }
     }
+
     private Game buildGameEntityFromDTO(Game game, GameMedia gameMedia, GameRequest gameRequest) {
         game.setTitle(gameRequest.title());
         game.setDescription(gameRequest.description());
@@ -99,9 +103,20 @@ public class AdminGameServiceImpl implements AdminGameService {
         Publisher publisher = publisherService.findPublisherById(gameRequest.publisher());
         game.setPublisher(publisher);
 
-        game.setTags(findEntitiesByIds(gameRequest.tags(), tagRepository, "Tag"));
-        game.setGenres(findEntitiesByIds(gameRequest.genres(), genreRepository, "Genre"));
-        game.setPlatforms(findEntitiesByIds(gameRequest.platforms(), platformRepository, "Platform"));
+        // Convert IDs to Tag entities
+        Set<Tag> tags = findEntitiesByIds(gameRequest.tags().stream()
+                .map(Tag::getId).collect(Collectors.toSet()), tagRepository, "Tag");
+        game.setTags(tags);
+
+        // Convert IDs to Genre entities
+        Set<Genre> genres = findEntitiesByIds(gameRequest.genres().stream()
+                .map(Genre::getId).collect(Collectors.toSet()), genreRepository, "Genre");
+        game.setGenres(genres);
+
+        // Convert IDs to Platform entities
+        Set<Platform> platforms = findEntitiesByIds(gameRequest.platforms().stream()
+                .map(Platform::getId).collect(Collectors.toSet()), platformRepository, "Platform");
+        game.setPlatforms(platforms);
 
         // Object GameMedia from DTO
         gameMedia.setBannerUrl(gameRequest.bannerImageUrl());
@@ -114,6 +129,13 @@ public class AdminGameServiceImpl implements AdminGameService {
         //Create relationship
         game.setGameMedia(gameMedia);
         return game;
+    }
+    private <T, ID> Set<T> findEntitiesByIds(Set<ID> ids, JpaRepository<T, ID> repository, String entityName) {
+        return ids.stream()
+                .map(id -> repository.findById(id)
+                        .orElseThrow(() -> new GlobalServiceException(HttpStatus.NOT_FOUND,
+                                entityName + " with id " + id + " not found")))
+                .collect(Collectors.toSet());
     }
 
     @Override
@@ -128,6 +150,7 @@ public class AdminGameServiceImpl implements AdminGameService {
                 .limit(qty)
                 .toList();
     }
+
     @Override
     public AdminResponse deleteGame(Long gameId) {
         Game game = gameService.getGameById(gameId);
@@ -155,13 +178,5 @@ public class AdminGameServiceImpl implements AdminGameService {
             String status = active ? "already activated" : "already deactivated";
             return AdminResponse.builder().response("Game with id " + gameId + " is " + status + "!").build();
         }
-    }
-
-    private <T> Set<T> findEntitiesByIds(Set<Long> ids, JpaRepository<T, Long> repository, String entityName) {
-        return ids.stream()
-                .map(id -> repository.findById(id)
-                        .orElseThrow(() -> new GlobalServiceException(HttpStatus.NOT_FOUND,
-                                entityName + " with id " + id + " not found")))
-                .collect(Collectors.toSet());
     }
 }
