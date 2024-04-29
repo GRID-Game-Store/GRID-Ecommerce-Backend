@@ -16,7 +16,7 @@ public class TransactionGamesMapperImpl implements TransactionGamesMapper {
     public TransactionGamesDTO transactionGamesToTransactionGamesDTO(TransactionGames transactionGames) {
         return TransactionGamesDTO.builder()
                 .id(transactionGames.getId())
-                .games(gameMapper.toShortGame(transactionGames.getGame()))
+                .games(gameMapper.toShortGame(transactionGames.getGames()))
                 .priceOnPay(transactionGames.getPriceOnPay())
                 .build();
     }

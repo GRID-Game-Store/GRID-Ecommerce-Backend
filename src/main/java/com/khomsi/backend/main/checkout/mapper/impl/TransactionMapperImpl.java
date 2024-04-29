@@ -17,6 +17,7 @@ public class TransactionMapperImpl implements TransactionMapper {
     public TransactionDTO transactionToTransactionDTO(Transaction transaction) {
         return TransactionDTO.builder()
                 .transactionId(transaction.getTransactionId())
+                .userId(transaction.getUsers().getExternalId())
                 .createdAt(transaction.getCreatedAt())
                 .totalAmount(transaction.getTotalAmount())
                 .paymentMethods(transaction.getPaymentMethods())

@@ -22,8 +22,7 @@ import java.util.Random;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static org.springframework.data.domain.Sort.Direction.ASC;
-import static org.springframework.data.domain.Sort.Direction.DESC;
+import static com.khomsi.backend.main.utils.Utils.createSorting;
 
 @Service
 @Slf4j
@@ -35,10 +34,10 @@ public class GameServiceImpl implements GameService {
 
     //TODO Write integration tests with cucumber for this endpoint
     @Override
-    public GeneralGame getExtendedGamesByPage(GameCriteria gameCriteria) {
+    public GeneralGame getExtendedGamesByPage(GameCriteria gameCriteria, boolean applyActiveFilter) {
         int page = gameCriteria.getPage();
 
-        Sort sorting = createSorting(gameCriteria.getSort());
+        Sort sorting = createSorting(gameCriteria.getSort(), "id");
         Pageable pagingSort = PageRequest.of(page, gameCriteria.getSize(), sorting);
         Specification<Game> specification = Specification.where(null);
         specification = specification.and(GameSpecifications.byTitle(gameCriteria.getTitle()));
@@ -52,6 +51,11 @@ public class GameServiceImpl implements GameService {
                 "name", gameCriteria.getDevelopers()));
         specification = specification.and(GameSpecifications.byField("publisher",
                 "name", gameCriteria.getPublishers()));
+        // Check if the active filter should be applied
+        if (applyActiveFilter) {
+            specification = specification.and((root, query, criteriaBuilder)
+                    -> criteriaBuilder.isTrue(root.get("active")));
+        }
 
         Page<Game> gamePage = gameRepository.findAll(specification, pagingSort);
         if (gamePage.isEmpty()) {
@@ -109,6 +113,12 @@ public class GameServiceImpl implements GameService {
     }
 
     @Override
+    public Game getActiveGameById(Long gameId) {
+        return gameRepository.findByIdAndActiveTrue(gameId).orElseThrow(() ->
+                new GlobalServiceException(HttpStatus.NOT_FOUND, "Game with id " + gameId + " is not found."));
+    }
+
+    @Override
     public Game getGameById(Long gameId) {
         return gameRepository.findById(gameId).orElseThrow(() ->
                 new GlobalServiceException(HttpStatus.NOT_FOUND, "Game with id " + gameId + " is not found."));
@@ -116,8 +126,8 @@ public class GameServiceImpl implements GameService {
 
     @Override
     public ExtendedGame getExtendedGameById(Long gameId) {
-        Game game = getGameById(gameId);
-        return new ExtendedGame(getGameById(gameId), userInfoService.checkIfGameIsOwnedByCurrentUser(game));
+        Game game = getActiveGameById(gameId);
+        return new ExtendedGame(getActiveGameById(gameId), userInfoService.checkIfGameIsOwnedByCurrentUser(game));
     }
 
     @Override
@@ -150,8 +160,8 @@ public class GameServiceImpl implements GameService {
                 .toList();
     }
 
-
-    private String transformWord(String word) {
+    @Override
+    public String transformWord(String word) {
         return word.chars()
                 .mapToObj(c -> String.valueOf((char) c))
                 .collect(Collectors.joining("%", "", "%"));
@@ -163,11 +173,5 @@ public class GameServiceImpl implements GameService {
                         .distinct()
                         .limit(gameQuantity)
                         .mapToObj(gameModels::get).toList();
-    }
-
-    private Sort createSorting(String[] sort) {
-        return (sort != null && sort.length == 2) ?
-                Sort.by(sort[1].equalsIgnoreCase("asc") ? ASC : DESC, sort[0]) :
-                Sort.by(DESC, "id");
     }
 }

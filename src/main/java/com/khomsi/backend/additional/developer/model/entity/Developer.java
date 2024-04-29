@@ -27,7 +27,7 @@ public class Developer {
     @Column(name = "name", nullable = false)
     private String name;
 
-    @OneToMany(mappedBy = "developer")
+    @OneToMany(mappedBy = "developer", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
     private Set<Game> games;
 }

@@ -13,6 +13,7 @@ import com.khomsi.backend.main.checkout.model.enums.PaymentMethod;
 import com.khomsi.backend.main.checkout.model.response.TransactionResponse;
 import com.khomsi.backend.main.checkout.repository.TransactionGamesRepository;
 import com.khomsi.backend.main.checkout.repository.TransactionRepository;
+import com.khomsi.backend.main.utils.email.service.EmailService;
 import com.khomsi.backend.main.game.model.entity.Game;
 import com.khomsi.backend.main.game.service.GameService;
 import com.khomsi.backend.main.handler.exception.GlobalServiceException;
@@ -82,7 +83,7 @@ public class TransactionServiceImpl implements TransactionService {
     private void deleteGamesFromWishlist(Transaction transaction) {
         // Delete games from wishlist using stream
         transaction.getTransactionGames().stream()
-                .map(TransactionGames::getGame)
+                .map(TransactionGames::getGames)
                 .map(Game::getId)
                 .forEach(wishlistService::deleteGameFromWishlist);
     }
@@ -121,7 +122,7 @@ public class TransactionServiceImpl implements TransactionService {
 
             Set<TransactionGames> transactionGamesList = transaction.getTransactionGames();
             transactionGamesList.stream()
-                    .map(TransactionGames::getGame)
+                    .map(TransactionGames::getGames)
                     .map(Game::getId)
                     .forEach(cartService::addToCart);
 
@@ -156,10 +157,10 @@ public class TransactionServiceImpl implements TransactionService {
 
         // Set games to user's transaction
         cartItemDtoList.forEach(cartItemDto -> {
-            Game game = gameService.getGameById(cartItemDto.game().id());
+            Game game = gameService.getActiveGameById(cartItemDto.game().id());
             TransactionGames orderItem = new TransactionGames();
             orderItem.setPriceOnPay(cartItemDto.game().price());
-            orderItem.setGame(game);
+            orderItem.setGames(game);
             orderItem.setTransactions(transaction);
             transactionGamesRepository.save(orderItem);
         });

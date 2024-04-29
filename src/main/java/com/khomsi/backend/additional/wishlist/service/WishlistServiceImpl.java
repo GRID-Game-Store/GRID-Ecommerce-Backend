@@ -3,7 +3,7 @@ package com.khomsi.backend.additional.wishlist.service;
 import com.khomsi.backend.additional.wishlist.WishlistRepository;
 import com.khomsi.backend.additional.wishlist.model.entity.Wishlist;
 import com.khomsi.backend.additional.wishlist.model.response.WishListResponse;
-import com.khomsi.backend.main.checkout.service.EmailService;
+import com.khomsi.backend.main.utils.email.service.EmailService;
 import com.khomsi.backend.main.game.mapper.GameMapper;
 import com.khomsi.backend.main.game.model.dto.ShortGameModel;
 import com.khomsi.backend.main.game.model.entity.Game;
@@ -55,7 +55,7 @@ public class WishlistServiceImpl implements WishlistService {
 
     @Override
     public ResponseEntity<WishListResponse> createWishlist(Long gameId) {
-        Game game = gameService.getGameById(gameId);
+        Game game = gameService.getActiveGameById(gameId);
         if (checkIfGamesIsInWishlist(game.getId())) {
             return new ResponseEntity<>(new WishListResponse("Game already exists in wishlist!"), HttpStatus.BAD_REQUEST);
         }
@@ -68,7 +68,7 @@ public class WishlistServiceImpl implements WishlistService {
     @Override
     public ResponseEntity<WishListResponse> deleteGameFromWishlist(Long gameId) {
         UserInfo user = userInfoService.getUserInfo();
-        Game game = gameService.getGameById(gameId);
+        Game game = gameService.getActiveGameById(gameId);
         Wishlist wishlist = wishlistRepository.findByUsersAndGames(user, game);
         if (wishlist == null) {
             return new ResponseEntity<>(new WishListResponse("Game is not found in wishlist!"), HttpStatus.NOT_FOUND);
@@ -80,7 +80,7 @@ public class WishlistServiceImpl implements WishlistService {
     @Override
     public boolean checkIfGamesIsInWishlist(Long gameId) {
         UserInfo user = userInfoService.getUserInfo();
-        Game game = gameService.getGameById(gameId);
+        Game game = gameService.getActiveGameById(gameId);
         // Check if the game exists in the user's wishlist
         boolean isInWishlist = wishlistRepository.existsByUsersAndGames(user, game);
         // Check if the game exists in the user's library

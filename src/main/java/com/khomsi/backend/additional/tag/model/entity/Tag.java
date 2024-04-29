@@ -7,6 +7,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
+import java.util.Objects;
 import java.util.Set;
 
 @Builder
@@ -26,8 +27,24 @@ public class Tag {
     @NotNull
     @Column(name = "name", nullable = false)
     private String name;
-
     @ManyToMany(mappedBy = "tags")
     @JsonIgnore
     private Set<Game> games;
+
+    @PreRemove
+    public void removeTags() {
+        games.forEach(game -> game.getTags().removeIf(e -> e.equals(this)));
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        if (this == object) return true;
+        if (!(object instanceof Tag tag)) return false;
+        return getId() != null && getId().equals(tag.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(Tag.class);
+    }
 }
