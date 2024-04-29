@@ -1,6 +1,9 @@
 package com.khomsi.backend.main.admin.model.request;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.khomsi.backend.additional.genre.model.entity.Genre;
+import com.khomsi.backend.additional.platform.model.entity.Platform;
+import com.khomsi.backend.additional.tag.model.entity.Tag;
 import com.khomsi.backend.main.game.model.entity.PermitAge;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotEmpty;
@@ -41,9 +44,9 @@ public record GameRequest(
         @Min(1)
         Long publisher,
         @NotNull
-        Set<Long> tags,
+        Set<Tag> tags,
         @NotNull
-        Set<Long> genres,
+        Set<Genre> genres,
         @NotNull
-        Set<Long> platforms) {
+        Set<Platform> platforms) {
 }
