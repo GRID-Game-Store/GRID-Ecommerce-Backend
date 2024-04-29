@@ -3,11 +3,10 @@ server:
   max-http-request-header-size: 15000
 app:
   googleai:
-    gemini:
-      baseurl: https://generativelanguage.googleapis.com
     api:
-      model: "gemini-pro"
-      key: ${GOOGLE_AI_KEY}
+      model: "gemini-1.5-pro-preview-0409"
+      projectId: "hopeful-flame-421519"
+      location: "us-central1"
   front-url: http://localhost:3000
   payment:
     unitAmount: "100"
@@ -41,7 +40,6 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          #          issuer-uri: http://localhost:8084/realms/GRID
           issuer-uri: http://auth.grid.domain-for-tests.com:8084/realms/GRID
   datasource:
     username: ${DB_USERNAME}

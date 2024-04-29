@@ -22,7 +22,9 @@ public class WebSecurityConfiguration {
                 //TODO change access to admin and manages for swagger
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/swagger", "/swagger-ui/**",
-                                "/v3/api-docs/**", "/error").permitAll()
+                                "/v3/api-docs/**",
+                                "/error",
+                                "/chat", "/chat/**").permitAll()
 
                         .requestMatchers("/api/v1/games", "/api/v1/games/**",
                                 "/api/v1/genres/**", "/api/v1/genres",

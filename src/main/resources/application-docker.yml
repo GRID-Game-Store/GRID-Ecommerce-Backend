@@ -4,9 +4,9 @@ server:
 app:
   googleai:
     api:
-      model: "gemini-pro"
-      baseurl: https://generativelanguage.googleapis.com
-      key: ${GOOGLE_AI_KEY}
+      model: "gemini-1.5-pro-preview-0409"
+      projectId: "hopeful-flame-421519"
+      location: "us-central1"
   front-url: http://localhost:3000
   payment:
     unitAmount: "100"

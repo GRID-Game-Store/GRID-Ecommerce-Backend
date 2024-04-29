@@ -30,40 +30,40 @@ services:
       - "8082:8082"
     depends_on:
       - mysql
-      - keycloak
+#      - keycloak
     env_file:
       - src/main/resources/db/db.env
     volumes:
       - ./target:/app/target
     networks:
       - grid-network
-  keycloak:
-    container_name: keycloak
-    image: quay.io/keycloak/keycloak:23.0.4
-    env_file:
-      - src/main/resources/imports/keycloak.env
-    build:
-      context: ../../..
-      dockerfile: Dockerfile
-    ports:
-      - "8084:8080"
-    healthcheck:
-      test: "curl -f http://localhost:8084/health/ready || exit 1"
-    depends_on:
-      - keycloakdb
-    command: -v start-dev --import-realm --features=account3,declarative-user-profile
-    volumes:
-      - ./src/main/resources/imports:/opt/keycloak/data/import/
-      - ./src/main/resources/imports:/opt/keycloak/providers/
-    networks:
-      - grid-network
-  keycloakdb:
-    container_name: keycloakdb
-    image: postgres:latest
-    env_file:
-      - src/main/resources/imports/keycloak.env
-    networks:
-      - grid-network
+#  keycloak:
+#    container_name: keycloak
+#    image: quay.io/keycloak/keycloak:23.0.4
+#    env_file:
+#      - src/main/resources/imports/keycloak.env
+#    build:
+#      context: ../../..
+#      dockerfile: Dockerfile
+#    ports:
+#      - "8084:8080"
+#    healthcheck:
+#      test: "curl -f http://localhost:8084/health/ready || exit 1"
+#    depends_on:
+#      - keycloakdb
+#    command: -v start-dev --import-realm --features=account3,declarative-user-profile
+#    volumes:
+#      - ./src/main/resources/imports:/opt/keycloak/data/import/
+#      - ./src/main/resources/imports:/opt/keycloak/providers/
+#    networks:
+#      - grid-network
+#  keycloakdb:
+#    container_name: keycloakdb
+#    image: postgres:latest
+#    env_file:
+#      - src/main/resources/imports/keycloak.env
+#    networks:
+#      - grid-network
 networks:
   grid-network:
     driver: bridge
