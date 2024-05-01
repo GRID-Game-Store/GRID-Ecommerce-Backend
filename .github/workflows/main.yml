@@ -27,16 +27,16 @@ jobs:
         run: cd ./src/main/resources && ls
       - name: Stop all docker containers 
         continue-on-error: true
-        run: docker stop $(docker ps -q)
-      - name: Remove frontend container 
+        run: docker stop $(docker ps -q) 
+      - name: Remove backend and DB containers  
         continue-on-error: true
-        run: docker rm grid-backend
+        run: docker rm grid-backend && docker rm grid-mysql
       - name: Docker build 
         run: docker build .
       - name: Docker compose up
         run: docker compose up -d 
-      - name: All stoped containers restart
+      - name: Set auto start
         continue-on-error: true
-        run: docker restart $(docker ps -a -q)
+        run: docker update --restart unless-stopped $(docker ps -q)
 
                   
