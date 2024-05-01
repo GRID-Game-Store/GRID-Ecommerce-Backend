@@ -1,0 +1,42 @@
+name: Java CI
+
+on:
+  workflow_dispatch: 
+  push:
+    branches:
+      - "main"
+
+
+jobs:
+  build:
+    runs-on: self-hosted
+
+    strategy:
+      matrix:
+        java-version: [17.x]
+        
+    steps:
+      - uses: actions/checkout@v1
+      - name: Check docker containers 
+        run: docker ps
+      - name: Delete .env default files 
+        run: cd ./src/main/resources && rm -rf application-docker.yml && rm -rf keys.env 
+      - name: Сopy .env default files 
+        run:  cd ./../../ && cp application-docker.yml ./_work/backend/backend/src/main/resources && cp keys.env ./_work/backend/backend/src/main/resources
+      - name: Сopy .env default files 
+        run: cd ./src/main/resources && ls
+      - name: Stop all docker containers 
+        continue-on-error: true
+        run: docker stop $(docker ps -q)
+      - name: Remove frontend container 
+        continue-on-error: true
+        run: docker rm grid-backend
+      - name: Docker build 
+        run: docker build .
+      - name: Docker compose up
+        run: docker compose up -d 
+      - name: All stoped containers restart
+        continue-on-error: true
+        run: docker restart $(docker ps -a -q)
+
+                  
