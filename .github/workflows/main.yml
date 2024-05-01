@@ -22,7 +22,7 @@ jobs:
       - name: Delete .env default files 
         run: cd ./src/main/resources && rm -rf application-docker.yml && rm -rf keys.env 
       - name: Сopy .env default files 
-        run:  cd ./../../ && cp application-docker.yml ./_work/backend/backend/src/main/resources && cp keys.env ./_work/backend/backend/src/main/resources
+        run:  cd ../../../ && cp application-docker.yml ./_work/backend/backend/src/main/resources && cp keys.env ./_work/backend/backend/src/main/resources
       - name: Сopy .env default files 
         run: cd ./src/main/resources && ls
       - name: Stop all docker containers 
