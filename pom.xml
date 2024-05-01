@@ -5,8 +5,8 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.2.0-SNAPSHOT</version>
-        <relativePath/>
+        <version>3.2.5</version>
+        <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.khomsi</groupId>
     <artifactId>grid</artifactId>
@@ -16,11 +16,16 @@
     <description>Game Store project for Spring Boot</description>
     <properties>
         <java.version>17</java.version>
-        <cucumber.version>7.14.0</cucumber.version>
-        <testcontainers.version>1.19.1</testcontainers.version>
+        <cucumber.version>7.16.1</cucumber.version>
+        <testcontainers.version>1.19.7</testcontainers.version>
         <mapstruct.version>1.5.5.Final</mapstruct.version>
         <maven.compiler.source>19</maven.compiler.source>
         <maven.compiler.target>19</maven.compiler.target>
+        <springdoc.version>2.3.0</springdoc.version>
+        <flyway.version>9.22.3</flyway.version>
+        <stripe.version>24.16.0-beta.1</stripe.version>
+        <mockito.version>5.2.0</mockito.version>
+        <mockitoall.version>1.10.19</mockitoall.version>
     </properties>
     <dependencies>
         <dependency>
@@ -60,7 +65,7 @@
         <dependency>
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-            <version>2.1.0</version>
+            <version>${springdoc.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -74,7 +79,7 @@
         <dependency>
             <groupId>org.flywaydb</groupId>
             <artifactId>flyway-mysql</artifactId>
-            <version>9.22.3</version>
+            <version>${flyway.version}</version>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
@@ -94,18 +99,18 @@
         <dependency>
             <groupId>com.stripe</groupId>
             <artifactId>stripe-java</artifactId>
-            <version>24.16.0-beta.1</version>
+            <version>${stripe.version}</version>
         </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-all</artifactId>
-            <version>1.10.19</version>
+            <version>${mockitoall.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-inline</artifactId>
-            <version>5.2.0</version>
+            <version>${mockito.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
