@@ -1,6 +1,6 @@
 server:
   port: 8082
-  max-http-request-header-size: 10000
+  max-http-request-header-size: 15000
 app:
   front-url: http://localhost:3000
   payment:
@@ -20,6 +20,17 @@ jwt:
       resource-id: login-app
       principal-attribute: preferred_username
 spring:
+  mail:
+    host: smtp-mail.outlook.com
+    port: 587
+    username: ${EMAIL_USERNAME}
+    password: ${EMAIL_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
   security:
     oauth2:
       resourceserver:
@@ -40,7 +51,7 @@ springdoc:
   swagger-ui:
     disable-swagger-default-url: true
     path: /swagger
-#logging:
-#  level:
-#    org.springframework: trace
-#    org.springframework.security: trace
+logging:
+  level:
+    #    org.springframework: trace
+    org.springframework.security: trace

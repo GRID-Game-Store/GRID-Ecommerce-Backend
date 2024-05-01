@@ -1,5 +1,6 @@
 package com.khomsi.backend.main.user.controller;
 
+import com.khomsi.backend.main.user.model.dto.BalanceUserInfoDTO;
 import com.khomsi.backend.main.user.model.dto.FullUserInfoDTO;
 import com.khomsi.backend.main.user.model.dto.UserShortGamesDTO;
 import com.khomsi.backend.main.user.service.UserGamesService;
@@ -9,6 +10,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -34,6 +36,14 @@ public class UserController {
     @ResponseStatus(HttpStatus.OK)
     public FullUserInfoDTO showUserInformation() {
         return userInfoService.getCurrentUser();
+    }
+
+    @GetMapping("/balance")
+    @Operation(security = {@SecurityRequirement(name = BEARER_KEY_SECURITY_SCHEME)},
+            summary = "Get user's balance")
+    @ResponseStatus(HttpStatus.OK)
+    public BalanceUserInfoDTO showUserBalance() {
+        return userInfoService.getUserBalance();
     }
 
     @GetMapping("/games")

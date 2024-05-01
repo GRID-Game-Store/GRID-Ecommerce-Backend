@@ -6,4 +6,6 @@ import java.util.List;
 
 public interface DeveloperService {
     List<Developer> getAllDevelopers();
+
+    Developer findDeveloperById(Long devId);
 }

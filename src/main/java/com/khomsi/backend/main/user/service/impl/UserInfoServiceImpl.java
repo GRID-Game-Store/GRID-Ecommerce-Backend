@@ -1,13 +1,16 @@
 package com.khomsi.backend.main.user.service.impl;
 
+import com.khomsi.backend.main.game.model.entity.Game;
 import com.khomsi.backend.main.handler.exception.GlobalServiceException;
-import com.khomsi.backend.main.user.repository.UserInfoRepository;
+import com.khomsi.backend.main.user.model.dto.BalanceUserInfoDTO;
 import com.khomsi.backend.main.user.model.dto.FullUserInfoDTO;
 import com.khomsi.backend.main.user.model.entity.UserInfo;
+import com.khomsi.backend.main.user.repository.UserInfoRepository;
 import com.khomsi.backend.main.user.service.UserInfoService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
@@ -22,27 +25,48 @@ public class UserInfoServiceImpl implements UserInfoService {
 
     @Override
     public FullUserInfoDTO getCurrentUser() {
-        Jwt jwt = getJwt();
-        if (jwt == null) {
-            throw new GlobalServiceException(HttpStatus.UNAUTHORIZED, "User is not authenticated.");
+        try {
+            Jwt jwt = getJwt();
+            UserInfo existingUser = getExistingUser(jwt.getSubject());
+            if (existingUser == null) {
+                throw new GlobalServiceException(HttpStatus.BAD_REQUEST,
+                        "User is empty in external database to view full profile.");
+            }
+            return getUserInfo(existingUser, jwt);
+        } catch (GlobalServiceException ignored) {
+            return null;
         }
-        UserInfo existingUser = getExistingUser(jwt.getSubject());
-        if (existingUser == null) {
-            throw new GlobalServiceException(HttpStatus.BAD_REQUEST,
-                    "User is empty in external database to view full profile.");
+    }
+
+    @Override
+    public UserInfo getUserInfo() {
+        try {
+            Jwt jwt = getJwt();
+            if (jwt == null) {
+                throw new GlobalServiceException(HttpStatus.UNAUTHORIZED, "User is not authenticated.");
+            }
+            return getExistingUser(jwt.getSubject());
+        } catch (GlobalServiceException ignored) {
+            return null;
         }
-        return getUserInfo(existingUser, jwt);
     }
 
     //Get credential of auth user through keycloak
     @Override
     public Jwt getJwt() {
-        return (Jwt) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.isAuthenticated() && authentication.getPrincipal() instanceof Jwt jwt) {
+            return jwt;
+        } else {
+            throw new GlobalServiceException(HttpStatus.I_AM_A_TEAPOT, "Unsupported authentication method.");
+        }
     }
+
     private FullUserInfoDTO getUserInfo(UserInfo existingUser, Jwt jwt) {
         return FullUserInfoDTO.builder()
                 .externalId(jwt.getSubject())
                 .email(jwt.getClaimAsString("email"))
+                .username(existingUser.getUsername())
                 .givenName(jwt.getClaimAsString("given_name"))
                 .familyName(jwt.getClaimAsString("family_name"))
                 .gender(jwt.getClaimAsString("gender"))
@@ -51,6 +75,12 @@ public class UserInfoServiceImpl implements UserInfoService {
                 // Add other user information based on JWT claims or user in db
                 .build();
     }
+
+    @Override
+    public BalanceUserInfoDTO getUserBalance() {
+        return BalanceUserInfoDTO.builder().balance(getCurrentUser().balance()).build();
+    }
+
     @Override
     public void checkPermissionToAction(String userId) {
         FullUserInfoDTO currentUser = getCurrentUser();
@@ -66,11 +96,11 @@ public class UserInfoServiceImpl implements UserInfoService {
     }
 
     @Override
-    public UserInfo getUserInfo() {
-        Jwt jwt = getJwt();
-        if (jwt == null) {
-            throw new GlobalServiceException(HttpStatus.UNAUTHORIZED, "User is not authenticated.");
-        }
-        return getExistingUser(jwt.getSubject());
+    public boolean checkIfGameIsOwnedByCurrentUser(Game game) {
+        FullUserInfoDTO currentUser = getCurrentUser();
+        if (currentUser == null)
+            return false;
+        // Check if this game is contacting for this user
+        return userRepository.gameExistsInUserGames(currentUser.externalId(), game.getId()) > 0;
     }
 }

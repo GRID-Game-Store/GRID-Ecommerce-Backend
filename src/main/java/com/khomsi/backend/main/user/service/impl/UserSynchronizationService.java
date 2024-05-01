@@ -26,7 +26,7 @@ public class UserSynchronizationService {
     private void syncWithDatabase(final Jwt jwt) {
         String userId = jwt.getSubject();
         UserInfo user = userInfoServiceImpl.getExistingUser(userId);
-        //Create user and his library
+        //Create user
         if (user == null) {
             user = createUserInfoToDB(jwt);
         }
@@ -44,6 +44,7 @@ public class UserSynchronizationService {
     private UserInfo createUserInfoToDB(Jwt jwt) {
         UserInfo user = new UserInfo();
         user.setExternalId(jwt.getSubject());
+        user.setUsername(jwt.getClaimAsString("preferred_username"));
         user.setBalance(BigDecimal.ZERO);
         // Set other user attributes based on JWT claims
         return user;

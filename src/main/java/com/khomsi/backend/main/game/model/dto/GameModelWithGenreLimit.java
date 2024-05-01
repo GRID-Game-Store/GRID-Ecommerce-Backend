@@ -13,6 +13,7 @@ public record GameModelWithGenreLimit(
         String description,
         BigDecimal price,
         String coverImageUrl,
-        Set<Genre> genres
+        Set<Genre> genres,
+        boolean ownedByCurrentUser
 ) {
 }

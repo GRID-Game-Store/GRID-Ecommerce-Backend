@@ -10,6 +10,8 @@ public record FullUserInfoDTO(
         String externalId,
         @NotBlank
         String email,
+        @NotBlank
+        String username,
         String birthdate,
         @NotBlank
         String givenName,

@@ -6,6 +6,7 @@ import com.khomsi.backend.main.game.mapper.GameMapper;
 import com.khomsi.backend.main.game.model.dto.*;
 import com.khomsi.backend.main.game.model.entity.Game;
 import com.khomsi.backend.main.handler.exception.GlobalServiceException;
+import com.khomsi.backend.main.user.service.UserInfoService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -21,8 +22,7 @@ import java.util.Random;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static org.springframework.data.domain.Sort.Direction.ASC;
-import static org.springframework.data.domain.Sort.Direction.DESC;
+import static com.khomsi.backend.main.utils.Utils.createSorting;
 
 @Service
 @Slf4j
@@ -30,13 +30,14 @@ import static org.springframework.data.domain.Sort.Direction.DESC;
 public class GameServiceImpl implements GameService {
     private final GameRepository gameRepository;
     private final GameMapper gameMapper;
+    private final UserInfoService userInfoService;
 
     //TODO Write integration tests with cucumber for this endpoint
     @Override
-    public GeneralGame getExtendedGamesByPage(GameCriteria gameCriteria) {
+    public GeneralGame getExtendedGamesByPage(GameCriteria gameCriteria, boolean applyActiveFilter) {
         int page = gameCriteria.getPage();
 
-        Sort sorting = createSorting(gameCriteria.getSort());
+        Sort sorting = createSorting(gameCriteria.getSort(), "id");
         Pageable pagingSort = PageRequest.of(page, gameCriteria.getSize(), sorting);
         Specification<Game> specification = Specification.where(null);
         specification = specification.and(GameSpecifications.byTitle(gameCriteria.getTitle()));
@@ -50,14 +51,21 @@ public class GameServiceImpl implements GameService {
                 "name", gameCriteria.getDevelopers()));
         specification = specification.and(GameSpecifications.byField("publisher",
                 "name", gameCriteria.getPublishers()));
+        // Check if the active filter should be applied
+        if (applyActiveFilter) {
+            specification = specification.and((root, query, criteriaBuilder)
+                    -> criteriaBuilder.isTrue(root.get("active")));
+        }
 
         Page<Game> gamePage = gameRepository.findAll(specification, pagingSort);
         if (gamePage.isEmpty()) {
             throw new GlobalServiceException(HttpStatus.NOT_FOUND, "Games are not found in the database.");
         }
         List<ShortGameModel> shortGameModels = gamePage
-                .map(gameMapper::toShortGame)
-                .getContent();
+                .map(game -> {
+                    boolean ownedByCurrentUser = userInfoService.checkIfGameIsOwnedByCurrentUser(game);
+                    return gameMapper.toShortGame(game, ownedByCurrentUser);
+                }).getContent();
 
         return GeneralGame.builder()
                 .games(shortGameModels)
@@ -78,24 +86,36 @@ public class GameServiceImpl implements GameService {
                     return genres.size() <= 2;
                 })
                 .limit(qty)
-                .map(gameMapper::toLimitGenreGame)
-                .toList();
+                .map(game -> {
+                    boolean ownedByCurrentUser = userInfoService.checkIfGameIsOwnedByCurrentUser(game);
+                    return gameMapper.toLimitGenreGame(game, ownedByCurrentUser);
+                }).toList();
     }
 
     @Override
     public List<PopularGameModel> getPopularQtyOfGames(int gameQuantity) {
         List<PopularGameModel> shortGameModels = gameRepository.findAll().stream()
-                .map(gameMapper::toPopularGame)
-                .toList();
+                .map(game -> {
+                    boolean ownedByCurrentUser = userInfoService.checkIfGameIsOwnedByCurrentUser(game);
+                    return gameMapper.toPopularGame(game, ownedByCurrentUser);
+                }).toList();
         return getRandomGames(shortGameModels, gameQuantity);
     }
 
     @Override
     public List<GameModelWithGenreLimit> getRandomQtyOfGames(int gameQuantity) {
         List<GameModelWithGenreLimit> shortGameModels = gameRepository.findAll().stream()
-                .map(gameMapper::toLimitGenreGame)
-                .toList();
+                .map(game -> {
+                    boolean ownedByCurrentUser = userInfoService.checkIfGameIsOwnedByCurrentUser(game);
+                    return gameMapper.toLimitGenreGame(game, ownedByCurrentUser);
+                }).toList();
         return getRandomGames(shortGameModels, gameQuantity);
+    }
+
+    @Override
+    public Game getActiveGameById(Long gameId) {
+        return gameRepository.findByIdAndActiveTrue(gameId).orElseThrow(() ->
+                new GlobalServiceException(HttpStatus.NOT_FOUND, "Game with id " + gameId + " is not found."));
     }
 
     @Override
@@ -105,18 +125,26 @@ public class GameServiceImpl implements GameService {
     }
 
     @Override
+    public ExtendedGame getExtendedGameById(Long gameId) {
+        Game game = getActiveGameById(gameId);
+        return new ExtendedGame(getActiveGameById(gameId), userInfoService.checkIfGameIsOwnedByCurrentUser(game));
+    }
+
+    @Override
     public List<PopularGameModel> getSpecialOffers(String query, int qty) {
         //TODO refactor the method in future
-        List<Game> games;
-        switch (query) {
-            case "release date" -> games = gameRepository.findGamesByEarliestReleaseDate();
-            case "sales" -> games = gameRepository.findGamesWithDiscount();
+        List<Game> games = switch (query) {
+            case "release date" -> gameRepository.findGamesByEarliestReleaseDate();
+            case "discount" -> gameRepository.findGamesWithDiscount();
             //TODO no metrics yet to use it not as a random
-            case "discount" -> games = getRandomGames(gameRepository.findAll(), qty);
+            case "sales" -> getRandomGames(gameRepository.findAll(), qty);
             default -> throw new GlobalServiceException(HttpStatus.NOT_FOUND, "Games are not found in database.");
-        }
+        };
         return games.stream()
-                .map(gameMapper::toPopularGame)
+                .map(game -> {
+                    boolean ownedByCurrentUser = userInfoService.checkIfGameIsOwnedByCurrentUser(game);
+                    return gameMapper.toPopularGame(game, ownedByCurrentUser);
+                })
                 .limit(qty)
                 .toList();
     }
@@ -124,12 +152,16 @@ public class GameServiceImpl implements GameService {
     @Override
     public List<GameModelWithGenreLimit> searchGamesByTitle(String text, int qty) {
         return gameRepository.findSimilarTitles(transformWord(text)).stream()
-                .map(gameMapper::toLimitGenreGame)
+                .map(game -> {
+                    boolean ownedByCurrentUser = userInfoService.checkIfGameIsOwnedByCurrentUser(game);
+                    return gameMapper.toLimitGenreGame(game, ownedByCurrentUser);
+                })
                 .limit(qty)
                 .toList();
     }
 
-    private String transformWord(String word) {
+    @Override
+    public String transformWord(String word) {
         return word.chars()
                 .mapToObj(c -> String.valueOf((char) c))
                 .collect(Collectors.joining("%", "", "%"));
@@ -141,11 +173,5 @@ public class GameServiceImpl implements GameService {
                         .distinct()
                         .limit(gameQuantity)
                         .mapToObj(gameModels::get).toList();
-    }
-
-    private Sort createSorting(String[] sort) {
-        return (sort != null && sort.length == 2) ?
-                Sort.by(sort[1].equalsIgnoreCase("asc") ? ASC : DESC, sort[0]) :
-                Sort.by(DESC, "id");
     }
 }

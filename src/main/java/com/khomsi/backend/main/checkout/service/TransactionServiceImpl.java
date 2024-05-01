@@ -3,6 +3,7 @@ package com.khomsi.backend.main.checkout.service;
 import com.khomsi.backend.additional.cart.model.dto.CartDTO;
 import com.khomsi.backend.additional.cart.model.dto.CartItemDto;
 import com.khomsi.backend.additional.cart.service.CartService;
+import com.khomsi.backend.additional.wishlist.service.WishlistService;
 import com.khomsi.backend.main.checkout.mapper.TransactionMapper;
 import com.khomsi.backend.main.checkout.model.dto.TransactionDTO;
 import com.khomsi.backend.main.checkout.model.entity.Transaction;
@@ -12,6 +13,7 @@ import com.khomsi.backend.main.checkout.model.enums.PaymentMethod;
 import com.khomsi.backend.main.checkout.model.response.TransactionResponse;
 import com.khomsi.backend.main.checkout.repository.TransactionGamesRepository;
 import com.khomsi.backend.main.checkout.repository.TransactionRepository;
+import com.khomsi.backend.main.utils.email.service.EmailService;
 import com.khomsi.backend.main.game.model.entity.Game;
 import com.khomsi.backend.main.game.service.GameService;
 import com.khomsi.backend.main.handler.exception.GlobalServiceException;
@@ -42,6 +44,8 @@ public class TransactionServiceImpl implements TransactionService {
     private final TransactionMapper transactionMapper;
     private final UserInfoRepository userInfoRepository;
     private final UserGamesService userGamesService;
+    private final EmailService emailService;
+    private final WishlistService wishlistService;
 
     @Override
     @Transactional
@@ -52,11 +56,15 @@ public class TransactionServiceImpl implements TransactionService {
         UserInfo user = transaction.getUsers();
         BalanceAction balanceAction = transaction.getBalanceAction();
         switch (balanceAction) {
-            case NO_ACTION -> userGamesService.getGamesFromTransactionToLibrary(user, transaction);
+            case NO_ACTION -> {
+                userGamesService.getGamesFromTransactionToLibrary(user, transaction);
+                deleteGamesFromWishlist(transaction);
+            }
             case PAYMENT_WITH_BALANCE -> {
                 BigDecimal newBalance = user.getBalance().subtract(transaction.getUsedBalance());
                 user.setBalance(newBalance);
                 userGamesService.getGamesFromTransactionToLibrary(user, transaction);
+                deleteGamesFromWishlist(transaction);
             }
             case BALANCE_RECHARGE -> {
                 BigDecimal newBalance = user.getBalance().add(transaction.getTotalAmount());
@@ -68,7 +76,16 @@ public class TransactionServiceImpl implements TransactionService {
         transaction.setUpdatedAt(LocalDateTime.now());
         transaction.setPaid(true);
         transaction.setRedirectUrl(null);
+        emailService.sendPurchaseConfirmationEmail(transaction);
         transactionRepository.save(transaction);
+    }
+
+    private void deleteGamesFromWishlist(Transaction transaction) {
+        // Delete games from wishlist using stream
+        transaction.getTransactionGames().stream()
+                .map(TransactionGames::getGames)
+                .map(Game::getId)
+                .forEach(wishlistService::deleteGameFromWishlist);
     }
 
     @Override
@@ -105,16 +122,18 @@ public class TransactionServiceImpl implements TransactionService {
 
             Set<TransactionGames> transactionGamesList = transaction.getTransactionGames();
             transactionGamesList.stream()
-                    .map(TransactionGames::getGame)
+                    .map(TransactionGames::getGames)
                     .map(Game::getId)
                     .forEach(cartService::addToCart);
 
             transactionRepository.delete(transaction);
             return new TransactionResponse("Transaction successfully returned to cart.");
         } else {
-            return new TransactionResponse("Transaction with ID " + sessionId + " not found for revert.");
+            throw new GlobalServiceException(HttpStatus.NOT_FOUND, "Transaction with ID " +
+                    sessionId + " not found for revert.");
         }
     }
+
     @Override
     public Optional<Transaction> getTransaction(String sessionId, UserInfo userInfo) {
         return userInfo.getTransactions()
@@ -138,10 +157,10 @@ public class TransactionServiceImpl implements TransactionService {
 
         // Set games to user's transaction
         cartItemDtoList.forEach(cartItemDto -> {
-            Game game = gameService.getGameById(cartItemDto.game().id());
+            Game game = gameService.getActiveGameById(cartItemDto.game().id());
             TransactionGames orderItem = new TransactionGames();
             orderItem.setPriceOnPay(cartItemDto.game().price());
-            orderItem.setGame(game);
+            orderItem.setGames(game);
             orderItem.setTransactions(transaction);
             transactionGamesRepository.save(orderItem);
         });
