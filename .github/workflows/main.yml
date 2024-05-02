@@ -30,7 +30,7 @@ jobs:
         continue-on-error: true
         run: docker rm grid-backend && docker rm grid-mysql
       - name: Docker build 
-        run: docker build .
+        run: docker build . --no-cache --pull
       - name: Docker compose up
         run: docker compose up -d 
       - name: Set auto start
