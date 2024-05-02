@@ -1,7 +1,6 @@
 package com.khomsi.backend.main.ai.model.dto;
 
 import lombok.Builder;
-import lombok.ToString;
 
 import java.math.BigDecimal;
 import java.util.StringJoiner;
