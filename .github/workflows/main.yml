@@ -28,9 +28,7 @@ jobs:
         run: docker stop $(docker ps -q) 
       - name: Remove backend and DB containers  
         continue-on-error: true
-        run: docker rm grid-backend && docker rm grid-mysql
-      - name: Docker build 
-        run: docker build . --no-cache --pull
+        run: docker rm grid-backend && docker rm grid-mysql && docker rmi -f $(docker images -aq) 
       - name: Docker compose up
         run: docker compose up -d 
       - name: Set auto start
