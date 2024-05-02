@@ -4,9 +4,10 @@ server:
 app:
   googleai:
     api:
-      model: "gemini-1.5-pro-preview-0409"
-      projectId: "hopeful-flame-421519"
-      location: "us-central1"
+      prompt-template: ${GOOGLE_API_TEXT_PROMPT}
+      model: ${GOOGLE_API_MODEL}
+      projectId: ${GOOGLE_API_PROJECT_ID}
+      location: ${GOOGLE_API_LOCATION}
   front-url: http://localhost:3000
   payment:
     unitAmount: "100"

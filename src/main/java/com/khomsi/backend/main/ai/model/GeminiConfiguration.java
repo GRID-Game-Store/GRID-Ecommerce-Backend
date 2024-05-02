@@ -1,4 +1,4 @@
-package com.khomsi.backend.main.ai;
+package com.khomsi.backend.main.ai.model;
 
 import com.google.cloud.vertexai.VertexAI;
 import com.google.cloud.vertexai.generativeai.ChatSession;
@@ -23,8 +23,7 @@ public class GeminiConfiguration {
     }
     @Bean
     public GenerativeModel geminiProGenerativeModel(VertexAI vertexAI) {
-        return new GenerativeModel(modelName,
-                vertexAI);
+        return new GenerativeModel(modelName, vertexAI);
     }
     @Bean
     @Scope

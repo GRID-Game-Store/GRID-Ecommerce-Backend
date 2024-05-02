@@ -1,6 +1,7 @@
 package com.khomsi.backend.main.game.mapper.impl;
 
 import com.khomsi.backend.main.game.mapper.GameMapper;
+import com.khomsi.backend.main.ai.model.dto.AiChatGameModel;
 import com.khomsi.backend.main.game.model.dto.GameModelWithGenreLimit;
 import com.khomsi.backend.main.game.model.dto.PopularGameModel;
 import com.khomsi.backend.main.game.model.dto.ShortGameModel;
@@ -30,6 +31,15 @@ public class GameMapperImpl implements GameMapper {
     @Override
     public ShortGameModel toShortGame(Game game) {
         return toShortGame(game, false);
+    }
+
+    @Override
+    public AiChatGameModel toAiChatGameModel(Game game) {
+        return AiChatGameModel.builder()
+                .id(game.getId())
+                .title(game.getTitle())
+                .price(game.getPrice())
+                .build();
     }
 
     @Override
