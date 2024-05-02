@@ -33,6 +33,7 @@ services:
 #      - keycloak
     env_file:
       - src/main/resources/db/db.env
+      - src/main/resources/keys.env
     volumes:
       - ./target:/app/target
     networks:
