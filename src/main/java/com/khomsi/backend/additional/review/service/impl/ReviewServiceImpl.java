@@ -68,8 +68,10 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override
     public ResponseEntity<ReviewDTO> getReviewForGameByUser(Long gameId) {
-        //TODO сыпит 500 "com.khomsi.backend.additional.review.model.entity.Review.getUsers()" because "review" is null
         UserInfo existingUser = userInfoService.getUserInfo();
+        if (existingUser == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
         Game game = gameService.getActiveGameById(gameId);
         Review review = reviewRepository.findByUsersAndGames(existingUser, game);
         return ResponseEntity.status(HttpStatus.OK)
@@ -120,6 +122,7 @@ public class ReviewServiceImpl implements ReviewService {
         return existingUser.getUserGames()
                 .stream().noneMatch(userGames -> userGames.getGame().equals(game));
     }
+
     @Override
     public Review getReview(Long reviewId) {
         return reviewRepository.findById(reviewId)
