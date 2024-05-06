@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -32,4 +33,6 @@ public interface GameRepository extends JpaRepository<Game, Long>, JpaSpecificat
 
     @Query("select g from Game g WHERE g.active = true")
     List<Game> findAllActiveGames();
+    @Query("SELECT MAX(g.price) FROM Game g")
+    BigDecimal findMaxPrice();
 }
