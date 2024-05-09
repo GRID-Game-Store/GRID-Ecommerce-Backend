@@ -11,6 +11,12 @@ import java.math.BigDecimal;
 import java.util.List;
 
 public interface GameSpecifications {
+    static Specification<Game> byIdList(List<Integer> ids) {
+        return (root, query, criteriaBuilder) ->
+                ids != null && !ids.isEmpty() ?
+                        root.get("id").in(ids) :
+                        criteriaBuilder.conjunction();
+    }
     static Specification<Game> byTitle(String title) {
         return (root, query, criteriaBuilder) ->
                 title != null ?

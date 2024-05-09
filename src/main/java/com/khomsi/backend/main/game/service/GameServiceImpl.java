@@ -41,7 +41,9 @@ public class GameServiceImpl implements GameService {
         Sort sorting = createSorting(gameCriteria.getSort(), "id");
         Pageable pagingSort = PageRequest.of(page, gameCriteria.getSize(), sorting);
         Specification<Game> specification = Specification.where(null);
-        specification = specification.and(GameSpecifications.byTitle(gameCriteria.getTitle()));
+        String transformedWord = (gameCriteria.getTitle() != null) ? transformWord(gameCriteria.getTitle()) : "";
+        specification = specification.and(GameSpecifications.byIdList(gameCriteria.getId()));
+        specification = specification.and(GameSpecifications.byTitle(transformedWord));
         specification = specification.and(GameSpecifications.byMaxPrice(gameCriteria.getMaxPrice()));
         specification = specification.and(GameSpecifications.byTagIds(gameCriteria.getTags()));
         specification = specification.and(GameSpecifications.byField("genres",

@@ -19,6 +19,7 @@ public class GameCriteria {
     @Min(1)
     @Max(Integer.MAX_VALUE)
     int size = 5;
+    List<Integer> id;
     String title;
     BigDecimal maxPrice;
     List<Integer> tags;
