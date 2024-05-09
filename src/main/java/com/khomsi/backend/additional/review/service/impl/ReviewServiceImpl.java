@@ -73,7 +73,8 @@ public class ReviewServiceImpl implements ReviewService {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
         Game game = gameService.getActiveGameById(gameId);
-        Review review = reviewRepository.findByUsersAndGames(existingUser, game);
+        Review review = reviewRepository.findByUsersAndGames(existingUser, game).orElseThrow(() ->
+                new GlobalServiceException(HttpStatus.NOT_FOUND, "Review is not found for this user."));
         return ResponseEntity.status(HttpStatus.OK)
                 .body(reviewMapper.toReviewToDTO(review));
     }
