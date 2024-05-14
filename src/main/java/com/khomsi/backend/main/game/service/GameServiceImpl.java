@@ -17,6 +17,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
@@ -40,7 +41,9 @@ public class GameServiceImpl implements GameService {
         Sort sorting = createSorting(gameCriteria.getSort(), "id");
         Pageable pagingSort = PageRequest.of(page, gameCriteria.getSize(), sorting);
         Specification<Game> specification = Specification.where(null);
-        specification = specification.and(GameSpecifications.byTitle(gameCriteria.getTitle()));
+        String transformedWord = (gameCriteria.getTitle() != null) ? transformWord(gameCriteria.getTitle()) : "";
+        specification = specification.and(GameSpecifications.byIdList(gameCriteria.getId()));
+        specification = specification.and(GameSpecifications.byTitle(transformedWord));
         specification = specification.and(GameSpecifications.byMaxPrice(gameCriteria.getMaxPrice()));
         specification = specification.and(GameSpecifications.byTagIds(gameCriteria.getTags()));
         specification = specification.and(GameSpecifications.byField("genres",
@@ -61,6 +64,8 @@ public class GameServiceImpl implements GameService {
         if (gamePage.isEmpty()) {
             throw new GlobalServiceException(HttpStatus.NOT_FOUND, "Games are not found in the database.");
         }
+        BigDecimal maxPrice = gameRepository.findMaxPrice();
+
         List<ShortGameModel> shortGameModels = gamePage
                 .map(game -> {
                     boolean ownedByCurrentUser = userInfoService.checkIfGameIsOwnedByCurrentUser(game);
@@ -71,6 +76,7 @@ public class GameServiceImpl implements GameService {
                 .games(shortGameModels)
                 .totalItems(gamePage.getTotalElements())
                 .totalPages(gamePage.getTotalPages() - 1)
+                .maxPrice(maxPrice)
                 .currentPage(page)
                 .build();
     }

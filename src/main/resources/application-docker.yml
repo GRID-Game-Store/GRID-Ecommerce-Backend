@@ -2,6 +2,12 @@ server:
   port: 8082
   max-http-request-header-size: 15000
 app:
+  googleai:
+    api:
+      prompt-template: ${GOOGLE_API_TEXT_PROMPT}
+      model: ${GOOGLE_API_MODEL}
+      projectId: ${GOOGLE_API_PROJECT_ID}
+      location: ${GOOGLE_API_LOCATION}
   front-url: http://localhost:3000
   payment:
     unitAmount: "100"

@@ -9,12 +9,13 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface ReviewRepository extends JpaRepository<Review, Long> {
     @Query("SELECT r FROM Review r WHERE r.games.id = :gameId order by r.reviewDate DESC")
     List<Review> findAllByGameIdOrderByReviewDate(Long gameId);
 
-    Review findByUsersAndGames(UserInfo user, Game game);
+    Optional<Review> findByUsersAndGames(UserInfo user, Game game);
 
     Page<Review> findAllByGamesId(Long gameId, Pageable pageable);
 }

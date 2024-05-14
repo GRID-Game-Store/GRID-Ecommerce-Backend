@@ -30,6 +30,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -64,7 +65,8 @@ public class AdminGameServiceImpl implements AdminGameService {
     public AdminResponse editGame(Long gameId, GameRequest gameRequest) {
         Game game = gameService.getGameById(gameId);
         // Check if the game with the same title already exists
-        checkIfGameExists(gameRequest);
+        if (!Objects.equals(game.getTitle(), gameRequest.title()))
+            checkIfGameExists(gameRequest);
         // Edit entities with new data fields.
         buildGameEntityFromDTO(game, game.getGameMedia(), gameRequest);
         // Save the updated game entities
@@ -75,7 +77,6 @@ public class AdminGameServiceImpl implements AdminGameService {
     }
 
     // Helper method to build a Game entities from DTO
-
     private void checkIfGameExists(GameRequest gameRequest) {
         // Check if the game with the same title already exists
         if (gameRepository.existsGameByTitleIgnoreCase(gameRequest.title())) {
@@ -130,6 +131,7 @@ public class AdminGameServiceImpl implements AdminGameService {
         game.setGameMedia(gameMedia);
         return game;
     }
+
     private <T, ID> Set<T> findEntitiesByIds(Set<ID> ids, JpaRepository<T, ID> repository, String entityName) {
         return ids.stream()
                 .map(id -> repository.findById(id)

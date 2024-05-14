@@ -1,5 +1,6 @@
 package com.khomsi.backend.main.game.mapper;
 
+import com.khomsi.backend.main.ai.model.dto.AiChatGameModel;
 import com.khomsi.backend.main.game.model.dto.GameModelWithGenreLimit;
 import com.khomsi.backend.main.game.model.dto.PopularGameModel;
 import com.khomsi.backend.main.game.model.dto.ShortGameModel;
@@ -9,6 +10,8 @@ public interface GameMapper {
     ShortGameModel toShortGame(Game game, boolean ownedByCurrentUser);
 
     ShortGameModel toShortGame(Game game);
+
+    AiChatGameModel toAiChatGameModel(Game game);
 
     PopularGameModel toPopularGame(Game game, boolean ownedByCurrentUser);
 
