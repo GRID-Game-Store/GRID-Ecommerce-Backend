@@ -15,4 +15,8 @@ public interface UserInfoRepository extends JpaRepository<UserInfo, Long> {
             WHERE users_id = :userId AND games_id = :gameId
             """)
     Long gameExistsInUserGames(String userId, Long gameId);
+    @Query(nativeQuery = true, value = """
+            SELECT COUNT(DISTINCT users_id) FROM user_has_games
+            """)
+    Long countUsersWithAtLeastOneGame();
 }

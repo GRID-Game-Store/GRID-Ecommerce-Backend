@@ -8,6 +8,8 @@ public interface AdminMetricService {
 
     Map<String, Long> getTotalUsersOnWebsite();
 
+    Map<String, Long> getTotalUsersWithGamesOnWebsite();
+
     Map<String, BigDecimal> getTotalRevenueByGameId(Long gameId);
 
     Map<String, Object> getRevenueSummaryForYear(int year);
