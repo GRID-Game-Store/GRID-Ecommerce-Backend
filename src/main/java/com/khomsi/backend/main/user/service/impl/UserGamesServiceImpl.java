@@ -10,6 +10,7 @@ import com.khomsi.backend.main.user.model.entity.UserInfo;
 import com.khomsi.backend.main.user.repository.UserGamesRepository;
 import com.khomsi.backend.main.user.service.UserGamesService;
 import com.khomsi.backend.main.user.service.UserInfoService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -38,6 +39,7 @@ public class UserGamesServiceImpl implements UserGamesService {
     }
 
     @Override
+    @Transactional
     public void getGamesFromTransactionToLibrary(UserInfo user, Transaction transaction) {
         Set<TransactionGames> transactionGamesList = transaction.getTransactionGames();
         Set<UserGames> userGames = new LinkedHashSet<>();

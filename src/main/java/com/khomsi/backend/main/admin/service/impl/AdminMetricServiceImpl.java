@@ -32,7 +32,10 @@ public class AdminMetricServiceImpl implements AdminMetricService {
     public Map<String, Long> getTotalUsersOnWebsite() {
         return Map.of("totalUsers", userInfoRepository.count());
     }
-
+    @Override
+    public Map<String, Long> getTotalUsersWithGamesOnWebsite() {
+        return Map.of("totalUsersWithGames", userInfoRepository.countUsersWithAtLeastOneGame());
+    }
     @Override
     public Map<String, BigDecimal> getTotalRevenueByGameId(Long gameId) {
         return Map.of("sumTotalRevenue", transactionGamesRepository.sumTotalRevenueByGameId(gameId));

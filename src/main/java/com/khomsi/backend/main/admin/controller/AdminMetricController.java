@@ -44,7 +44,13 @@ public class AdminMetricController {
     public Map<String, Long> showUsersQtyOnWebsite() {
         return adminMetricService.getTotalUsersOnWebsite();
     }
-
+    @GetMapping("/total/users/games")
+    @Operation(security = {@SecurityRequirement(name = BEARER_KEY_SECURITY_SCHEME)},
+            summary = "Total qty of users with games on Website")
+    @ResponseStatus(HttpStatus.OK)
+    public Map<String, Long> showUsersWithGamesOnWebsite() {
+        return adminMetricService.getTotalUsersWithGamesOnWebsite();
+    }
     @GetMapping("/total/amount/{game-id}")
     @Operation(security = {@SecurityRequirement(name = BEARER_KEY_SECURITY_SCHEME)}, summary = "Total amount of game purchase")
     @ResponseStatus(HttpStatus.OK)

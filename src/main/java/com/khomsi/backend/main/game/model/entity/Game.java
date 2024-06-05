@@ -47,7 +47,7 @@ public class Game {
     @Lob
     @Column(name = "description")
     private String description;
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     @Column(name = "release_date")
     private LocalDate releaseDate;
     @NotNull
