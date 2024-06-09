@@ -41,7 +41,7 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: http://auth.grid.domain-for-tests.com:8084/realms/GRID
+          issuer-uri: https://auth.grid.domain-for-tests.com/realms/GRID
   jpa:
     generate-ddl: 'false'
     database-platform: org.hibernate.dialect.MySQLDialect

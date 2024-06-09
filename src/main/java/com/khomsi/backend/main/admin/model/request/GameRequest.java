@@ -18,7 +18,7 @@ public record GameRequest(
         @NotNull
         String title,
         String description,
-        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
         LocalDate releaseDate,
         String systemRequirements,
         @NotNull

@@ -41,7 +41,7 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: http://auth.grid.domain-for-tests.com:8084/realms/GRID
+          issuer-uri: https://auth.grid.domain-for-tests.com/realms/GRID
   datasource:
     username: ${DB_USERNAME}
     url: ${DB_URL}
