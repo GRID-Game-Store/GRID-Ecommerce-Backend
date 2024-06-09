@@ -41,7 +41,7 @@ jobs:
       - run: ls ; mvn clean package
       - name: Rename the artifact
         run: ls; cp target/grid-0.0.1-SNAPSHOT.jar grid-0.0.1-SNAPSHOT.jar
-      - run: sudo nohup java -jar grid-0.0.1-SNAPSHOT.jar --spring.profiles.active=docker 
+      - run: sudo nohup java -jar -Dspring.profiles.active=docker grid-0.0.1-SNAPSHOT.jar 
 
 
                   
