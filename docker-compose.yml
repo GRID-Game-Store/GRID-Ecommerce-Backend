@@ -21,23 +21,23 @@ services:
       - src/main/resources/db/db.env
     networks:
       - grid-network
-  grid:
-    image: backend
-    container_name: grid-backend
-    build:
-      dockerfile: Dockerfile
-    ports:
-      - "8082:8082"
-    depends_on:
-      - mysql
+#  grid:
+#    image: backend
+#    container_name: grid-backend
+#    build:
+#      dockerfile: Dockerfile
+#    ports:
+#      - "8082:8082"
+#   depends_on:
+#     - mysql
 #      - keycloak
-    env_file:
-      - src/main/resources/db/db.env
-      - src/main/resources/keys.env
-    volumes:
-      - ./target:/app/target
-    networks:
-      - grid-network
+#   env_file:
+#      - src/main/resources/db/db.env
+#     - src/main/resources/keys.env
+#    volumes:
+#     - ./target:/app/target
+#    networks:
+#     - grid-network
 #  keycloak:
 #    container_name: keycloak
 #    image: quay.io/keycloak/keycloak:23.0.4
