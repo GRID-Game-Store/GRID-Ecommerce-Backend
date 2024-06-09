@@ -38,7 +38,9 @@ jobs:
         continue-on-error: true
         run: sudo pkill -f 'java -jar' 
       - run: ls ; mvn clean package
-      - run: ls 
+      - name: Rename the artifact
+        run: ls; cp target/grid-0.0.1-SNAPSHOT.jar grid-0.0.1-SNAPSHOT.jar
+      - run: ls
 
 
                   
