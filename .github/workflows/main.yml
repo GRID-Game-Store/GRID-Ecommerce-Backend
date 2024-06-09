@@ -34,5 +34,11 @@ jobs:
       - name: Set auto start
         continue-on-error: true
         run: docker update --restart unless-stopped $(docker ps -q)
+      - name: Kill java process 
+        continue-on-error: true
+        run: sudo pkill -f 'java -jar' 
+      - run: ls ; mvn clean package
+      - run: ls 
+
 
                   
