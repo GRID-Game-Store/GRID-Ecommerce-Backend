@@ -37,6 +37,7 @@ jobs:
       - name: Kill java process 
         continue-on-error: true
         run: sudo pkill -f 'java -jar' 
+      - run: export SPRING_PROFILES_ACTIVE=docker
       - run: ls ; mvn clean package
       - name: Rename the artifact
         run: ls; cp target/grid-0.0.1-SNAPSHOT.jar grid-0.0.1-SNAPSHOT.jar
