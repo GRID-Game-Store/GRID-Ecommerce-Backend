@@ -22,7 +22,7 @@ client_id = login-app
 ###
 # group: Auth
 # @name Get access token remote
-POST http://auth.grid.domain-for-tests.com:8084/realms/GRID/protocol/openid-connect/token?
+POST https://auth.grid.domain-for-tests.com/realms/GRID/protocol/openid-connect/token?
     username=admin&
     password=admin&
     grant_type=password&
