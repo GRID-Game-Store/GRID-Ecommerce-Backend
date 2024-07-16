@@ -54,100 +54,59 @@ It is recommended to start Keycloak before the backend to ensure that the authen
 
 [Link to documentation](https://github.com/GRID-Game-Store/documentation/tree/main/backend)
 
-# Game Controller
+## API Documentation
 
-**CRUD operations for Game entities.**
+The API documentation is available via Swagger UI. After starting the application, you can access it at:
+```http://localhost:8084/swagger```
+This interface provides a comprehensive list of all available endpoints and allows you to test them directly from your browser.
 
-This controller provides endpoints for performing CRUD operations on Game entities. It supports operations such as retrieving all games, filtering by genre, special offers, popularity, random games, and searching by title.
+## GRID Demo Video
 
-## Endpoints
+Check out our demo video showcasing the main features of the GRID project:
 
-### Get all games
+### Main Page
 
-- **Endpoint:** `/api/v1/games`
-- **Method:** `GET`
-- **Summary:** Get all games with optional pagination, sorting, and title filtering.
-- **Parameters:**
-  - `page` (optional, default: 0): Page number for pagination.
-  - `size` (optional, default: 5, min: 1, max: Integer.MAX_VALUE): Number of items per page.
-  - `title` (optional): Filter games by title.
-  - `sort` (optional, default: "id,desc"): Sorting criteria.
+https://github.com/user-attachments/assets/540fdc0d-b89e-4ab5-b09a-98554d3e0f59
 
-### Get games by genre
+### AI Chat Consultant
 
-- **Endpoint:** `/api/v1/games/genre`
-- **Method:** `GET`
-- **Summary:** Get games filtered by genre.
-- **Parameters:**
-  - `genre` (required): Genre to filter by.
-  - `qty` (optional, default: 5, min: 1, max: Integer.MAX_VALUE): Number of games to retrieve.
+https://github.com/user-attachments/assets/48e87a2d-fe04-44a7-b9c8-6060a6840901
 
-### Get games by special offer
+### Authentication, Authorization 
 
-- **Endpoint:** `/api/v1/games/offers`
-- **Method:** `GET`
-- **Summary:** Get games with special offers.
-- **Parameters:**
-  - `query` (required): Special offer query.
-  - `qty` (optional, default: 5, min: 1, max: Integer.MAX_VALUE): Number of games to retrieve.
+https://github.com/user-attachments/assets/759e81ef-abc9-462f-bc86-2146ac7ed2e6
 
-### Get most popular games
+### Payment Abilities
 
-- **Endpoint:** `/api/v1/games/popular`
-- **Method:** `GET`
-- **Summary:** Get the most popular games.
-- **Parameters:**
-  - `qty` (optional, default: 5, min: 1, max: Integer.MAX_VALUE): Number of games to retrieve.
+https://github.com/user-attachments/assets/8648e341-3ea2-4f1c-968f-13e65f6395f2
 
-### Get n-number of random games
 
-- **Endpoint:** `/api/v1/games/random`
-- **Method:** `GET`
-- **Summary:** Get a specified number of random games.
-- **Parameters:**
-  - `qty` (optional, default: 20, min: 1, max: Integer.MAX_VALUE): Number of games to retrieve.
+The demo includes:
+- Overview of the main page
+- AI-powered chat consultant using Vertext Gemini
+- Registration and authorization process with Keycloak
+- Payment integration with Stripe and PayPal
+- Admin panel walkthrough
 
-### Get game by title
+## Features
 
-- **Endpoint:** `/api/v1/games/search`
-- **Method:** `GET`
-- **Summary:** Search for games by title symbol by symbol.
-- **Parameters:**
-  - `title` (required): Title to search for.
-  - `qty` (optional, default: 20, min: 1, max: Integer.MAX_VALUE): Number of games to retrieve.
+- **AI Chat Consultant**: Powered by Vertext Gemini, providing intelligent customer support.
+- **Secure Authentication**: Implemented using Keycloak for robust user management.
+- **Multiple Payment Options**: Integrated with Stripe and PayPal for flexible payment processing.
+- **Admin Panel**: Comprehensive admin interface for easy management of the platform with a help of Astro.js and Spring Boot
 
-### Get game by id
+## Built With
 
-- **Endpoint:** `/api/v1/games/{game-id}`
-- **Method:** `GET`
-- **Summary:** Get a specific game by its ID.
-- **Parameters:**
-  - `game-id` (required, min: 1, max: Long.MAX_VALUE): ID of the game to retrieve.
-
-# Genre Controller
-
-**CRUD operations for Genre entities.**
-
-This controller provides an endpoint for retrieving all available genres.
-
-## Endpoints
-
-### Get all genres
-
-- **Endpoint:** `/api/v1/genres`
-- **Method:** `GET`
-- **Summary:** Get all available genres.
-
----
-
-*Note: Make sure to replace placeholder names like `{game-id}` with actual values when making requests to the API.*
-
-### Built With:
-
-* Maven - Build tool
-* Spring Boot - Web framework
-* JUnit - Testing framework
+* [Maven](https://maven.apache.org/) - Dependency Management
+* [Spring Boot](https://spring.io/projects/spring-boot) - Server Framework
+* [JUnit](https://junit.org/junit5/) - Testing Framework
+* [Keycloak](https://www.keycloak.org/) - Identity and Access Management
+* [Swagger](https://swagger.io/) - API Documentation
+* [Docker](https://www.docker.com/) - Containerization Platform
 
 ## Authors:
 
 * [SEM24](https://github.com/SEM24)
+
+[Link to backend documentation](https://github.com/GRID-Game-Store/documentation/tree/main/backend)
+
